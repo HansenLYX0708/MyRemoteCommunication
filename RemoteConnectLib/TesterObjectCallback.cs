@@ -27,18 +27,7 @@ namespace Hitachi.Tester.Client
         }
         #endregion Constructors
 
-        #region Properties
-
-        #endregion Properties
-
-        #region Methods
-
-        #endregion Methods
-
-
-
         #region ITesterObjectCallback Members
-
         /// <summary>
         /// Calls the callback decision func in RemoteConnectLib.
         /// RemoteConnectLib splits out the events from TesterObject and sends them to the correct
@@ -47,9 +36,8 @@ namespace Hitachi.Tester.Client
         /// <param name="e"></param>
         public void BladeEventCallback(BladeEventArgs e)
         {
-            // remoteConnectLib.BladeEvent.InternalBladeCallback(this, e);
+            _RemoteConnectLib.BladeEvent.InternalBladeCallback(this, e);
         }
-
         #endregion
     }
 }

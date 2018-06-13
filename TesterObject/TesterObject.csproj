@@ -48,6 +48,7 @@
     <Compile Include="BladeEventStruct.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProxyListClass.cs" />
+    <Compile Include="TesterObject.BladeInfo.cs" />
     <Compile Include="TesterObject.cs" />
     <Compile Include="TesterObject.SendEvent.cs" />
   </ItemGroup>

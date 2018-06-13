@@ -26,16 +26,42 @@ namespace Hitachi.Tester.Module
         #endregion Properties
 
         #region Methods
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SendBunnyEvent(object sender, StatusEventArgs e)
-        { }
+        {
+            object[] objArray = { sender, (object)e };
+            Thread BunnyEventThread = new Thread(new ParameterizedThreadStart(SendBunnyEventThreadFunc));
+            BunnyEventThread.IsBackground = true;
+            BunnyEventThread.Start((object)objArray);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="passingObject"></param>
+        private void SendBunnyEventThreadFunc(object passingObject)
+        {
+            object[] objArray = (object[])passingObject;
+            object sender = objArray[0];
+            StatusEventArgs e = (StatusEventArgs)objArray[1];
+
+
+
+
+        }
 
         private void SendStatusEvent(object sender, StatusEventArgs e)
-        { }
+        { 
+
+        }
 
 
 
-        
-        // TODO : 
+
+        // TODO : The event of sequence. 
         //private void SendSequenceStartedEvent(object sender, StartedEventArgs e)
         //{ }
 
@@ -59,7 +85,7 @@ namespace Hitachi.Tester.Module
 
 
         /// <summary>
-        /// Puts items in the queue
+        /// Puts items in the queue.
         /// It called by all send event.
         /// </summary>
         /// <param name="sender"></param>

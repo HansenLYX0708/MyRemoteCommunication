@@ -25,7 +25,7 @@ namespace Hitachi.Tester.Client
         private bool _BusyConnecting;
 
         public TesterObjectCallback _BladeEventCallbackClass = null;
-        public BladeEventClass BladeEvent;
+        private BladeEventClass _BladeEvent;
         #endregion Fields
 
         #region Constructors
@@ -42,6 +42,7 @@ namespace Hitachi.Tester.Client
 
             _BladeEventCallbackClass = new TesterObjectCallback(this);
 
+            _BladeEvent = new BladeEventClass(this);
         }
 
         /// <summary>
@@ -54,7 +55,10 @@ namespace Hitachi.Tester.Client
         #endregion Constructors
 
         #region Properties
-
+        public BladeEventClass BladeEvent
+        {
+            get { return _BladeEvent; }
+        }
         #endregion Properties
 
         #region Methods
