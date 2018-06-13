@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Defines", "Defines\Defines.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteConnectLib", "RemoteConnectLib\RemoteConnectLib.csproj", "{9DABA7AD-B599-4EB5-8538-7087ECB5A4FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClient", "TestClient\TestClient.csproj", "{8A1724CA-1567-4A01-8FC3-75EAB974A5BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{9DABA7AD-B599-4EB5-8538-7087ECB5A4FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DABA7AD-B599-4EB5-8538-7087ECB5A4FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DABA7AD-B599-4EB5-8538-7087ECB5A4FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A1724CA-1567-4A01-8FC3-75EAB974A5BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A1724CA-1567-4A01-8FC3-75EAB974A5BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A1724CA-1567-4A01-8FC3-75EAB974A5BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A1724CA-1567-4A01-8FC3-75EAB974A5BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

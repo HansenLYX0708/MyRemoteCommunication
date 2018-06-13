@@ -1,4 +1,12 @@
-﻿using System;
+﻿// ==========================================================================================
+// Copyright ©                                                       
+//                                                                                          
+// Classification           :                  
+// Date                     :                                               
+// Author                   : Hansen Liu                                             
+// Purpose                  : 
+// ==========================================================================================
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

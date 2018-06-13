@@ -26,8 +26,41 @@ namespace Hitachi.Tester.Module
         #endregion Properties
 
         #region Methods
+        private void SendBunnyEvent(object sender, StatusEventArgs e)
+        { }
+
+        private void SendStatusEvent(object sender, StatusEventArgs e)
+        { }
+
+
+
+        
+        // TODO : 
+        //private void SendSequenceStartedEvent(object sender, StartedEventArgs e)
+        //{ }
+
+        //private void SendSequenceAbortingEvent(object sender, StatusEventArgs e)
+        //{ }
+
+        //private void SendSequenceCompletedEvent(object sender, StatusEventArgs e)
+        //{ }
+
+        //private void SendSequenceUpdateEvent(object sender, StatusEventArgs e)
+        //{ }
+
+        //private void SendTestStartedEvent(object sender, StatusEventArgs e)
+        //{ }
+
+        //private void SendTestCompletedEvent(object sender, CompletedEventArgs e)
+        //{ }
+
+        //private void SendProgramClosingEvent(object sender, StatusEventArgs e)
+        //{ }
+
+
         /// <summary>
         /// Puts items in the queue
+        /// It called by all send event.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

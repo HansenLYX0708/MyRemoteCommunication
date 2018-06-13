@@ -6,9 +6,6 @@ using System.Threading.Tasks;
 
 namespace Hitachi.Tester.Module
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class ProxyListClass
     {
         #region Fields

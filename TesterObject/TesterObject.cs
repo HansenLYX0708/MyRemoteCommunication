@@ -38,14 +38,12 @@ namespace Hitachi.Tester.Module
             _Disposed = false;
             _Exit = false;
             _Escape = false;
-
             try
             {
                 _CallbackProxyList = new ProxyListClass();
             }
             catch
             { }
-
             // TODO : 构造函数里面不应该存在如下的复杂过程，应考虑移出去
             _BladeEventsThread = new Thread(doBladeEvents);
             _BladeEventsThread.IsBackground = true;

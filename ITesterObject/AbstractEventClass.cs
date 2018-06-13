@@ -1,5 +1,12 @@
+// ==========================================================================================
+// Copyright ©                                                       
+//                                                                                          
+// Classification           :                  
+// Date                     :                                               
+// Author                   : Hansen Liu                                             
+// Purpose                  : 
+// ==========================================================================================
 using System;
-using System.Runtime.Remoting.Messaging;
 
 namespace Hitachi.Tester.Module
 {
@@ -8,20 +15,6 @@ namespace Hitachi.Tester.Module
     /// </summary>
     public abstract class AbstractEventClass : MarshalByRefObject
     {
-        #region Fields
-
-        #endregion Fields
-
-        #region Constructors
-        public AbstractEventClass()
-        {
-        }
-        #endregion Constructors
-
-        #region Properties
-
-        #endregion Properties
-
         #region Methods
         //[OneWay]
         public void StatusCallback(object sender, StatusEventArgs e)

@@ -1,4 +1,12 @@
-﻿using System;
+﻿// ==========================================================================================
+// Copyright ©                                                       
+//                                                                                          
+// Classification           :                  
+// Date                     :                                               
+// Author                   : Hansen Liu                                             
+// Purpose                  : 
+// ==========================================================================================
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -86,13 +94,9 @@ namespace Hitachi.Tester.Module
             }
         }
         #endregion Properties
-
-        #region Methods
-
-        #endregion Methods
     }
 
-    public class CompletedEventBladeArgs : BladeEventArgs
+    public class CompletedBladeEventArgs : BladeEventArgs
     {
 
     }
@@ -102,7 +106,7 @@ namespace Hitachi.Tester.Module
 
     }
 
-    public class StatusEventBladeArgs : BladeEventArgs
+    public class StatusBladeEventArgs : BladeEventArgs
     {
 
     }
@@ -129,16 +133,17 @@ namespace Hitachi.Tester.Module
         /// <returns></returns>
         static public bool TryParse(int value, out string name)
         {
+            bool retVal = false;
             try
             {
                 name = Parse(value);
-                return true;
+                retVal = true;
             }
             catch
             {
                 name = string.Empty;
             }
-            return false;
+            return retVal;
         }
 
         /// <summary>
@@ -183,7 +188,6 @@ namespace Hitachi.Tester.Module
                     break;
                 default:
                     throw new ArgumentException("Cannot parse input to BladeEventType.");
-                    //break;
             } // end switch
 
             return name;
