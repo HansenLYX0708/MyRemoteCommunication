@@ -13,17 +13,20 @@ namespace Hitachi.Tester.Module
     {
         #region Fields
         private Queue<BladeEventStruct> _BladeEventQueue = new Queue<BladeEventStruct>();
+        /// <summary>
+        /// Lock the queue of blade event
+        /// </summary>
         private ReaderWriterLock _BladeEventQueueLock = new ReaderWriterLock();
         private Thread _BladeEventsThread;
         private object _BladeEventLockObj = new object();
 
         private delegate void AsyncSendGenericEventDelegate(object sender, StatusEventArgs e, ref StatusEventHandler handler, Queue<BladeEventArgs> queue, string eventName);
         private MemsStateValues _LastBunnyStatusSent = MemsStateValues.Unknown;
+
+        private object _SendStatusEventLockObject = new object();
+
+        private int _ConsecutiveCount = 0;
         #endregion Fields
-
-        #region Properties
-
-        #endregion Properties
 
         #region Methods
         /// <summary>
@@ -48,14 +51,36 @@ namespace Hitachi.Tester.Module
             object sender = objArray[0];
             StatusEventArgs e = (StatusEventArgs)objArray[1];
 
+            BunnyEvents bEvent = (BunnyEvents)e.EventType;
+            // Add log information.voltageCheckBlade Aux I/O is too talkative.
+            // TODO : Write line content
+            
+            //  
+            if (bEvent == BunnyEvents.Broke)
+            {
 
+            }
+            else if (bEvent == BunnyEvents.BunnyFixed)
+            {
 
+            }
+            else if (bEvent == BunnyEvents.MemsOpenClose)
+            {
 
+            }
+
+            // Single channel remoting
+            SendBladeEventCallback(sender, new StatusBladeEventArgs(BladeEventType.Bunny, e).ToBladeEventArgs());
         }
 
         private void SendStatusEvent(object sender, StatusEventArgs e)
         { 
+            lock (_SendStatusEventLockObject)
+            {
 
+            }
+            // Single channel remoting
+            SendBladeEventCallback(sender, new StatusBladeEventArgs(BladeEventType.Bunny, e).ToBladeEventArgs());
         }
 
 
@@ -92,7 +117,77 @@ namespace Hitachi.Tester.Module
         /// <param name="e"></param>
         private void SendBladeEventCallback(object sender, BladeEventArgs e)
         {
+            lock (_BladeEventLockObj)
+            {
+                e.Consecutive = _ConsecutiveCount++;
+                if (_ConsecutiveCount < 0) _ConsecutiveCount = 0;
+            }
 
+            if ( e.Text.ToLower().IndexOf("Event::varToEvent".ToLower()) == 0)
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::PowerEvent::PCBPower1".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::PowerEvent::PCBPower0".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::MEMSOpenEvent::MEMSOpen".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::MEMSCloseEvent::MEMSClose".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::GetBladeValue::MEMSState".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::LoadActuator::".ToLower()))
+            {
+
+            }
+            if (_BladeEventQueue != null && _BladeEventQueueLock != null)
+            {
+                try
+                {
+                    try
+                    {
+                        _BladeEventQueueLock.AcquireWriterLock(TimeSpan.FromMilliseconds((2000)));
+                    }
+                    catch (System.Exception ex)
+                    {
+                    	// TODO : Do it anyway?
+                    }
+                    _BladeEventQueue.Enqueue(new BladeEventStruct( sender, e ));
+                    // Send to host (BladeRunner)
+                    try
+                    {
+                        StaticServerTalker.BladeEvent(new object[] { sender, e });
+                    }
+                    catch (System.Exception ex)
+                    {
+                        // TODO : Do nothing?
+                    }
+
+
+                }
+                catch (System.Exception ex)
+                {
+                	// TODO : do nothing?
+                }
+                finally
+                {
+                    if (_BladeEventQueueLock.IsWriterLockHeld)
+                    {
+                        _BladeEventQueueLock.ReleaseWriterLock();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -101,14 +196,14 @@ namespace Hitachi.Tester.Module
         /// </summary>
         private void doBladeEvents()
         {
-            // TODO : 处理SendBladeEventCallback传来的事件
+            // TODO : Deal the event send from SendBladeEventCallback
             while (!_Exit)
             {
                 //doBladeEventsGoing = true;
                 List<BladeEventStruct> bladeEventArgList = new List<BladeEventStruct>();
                 try
                 {
-                    // 2010/08/24 Akishi Murata: Use ReaderWriterLock instead of lock statement
+                    // Use ReaderWriterLock
                     while (!_Exit)
                     {
                         try
@@ -125,9 +220,7 @@ namespace Hitachi.Tester.Module
                     }
 
                     if (_Exit) continue;
-                    // TODO : 下面的测试状态
-                    if (_BladeEventQueue.Count == 0 /*||
-                        testerState.bPauseEvents*/)
+                    if (_BladeEventQueue.Count == 0 || _TesterState.PauseEvents)
                     {
                         // Do not send event
                         Thread.Sleep(5);

@@ -108,7 +108,14 @@ namespace Hitachi.Tester.Module
 
     public class StatusBladeEventArgs : BladeEventArgs
     {
+        public StatusBladeEventArgs (int eventType, StatusEventArgs e) : base (eventType, e.EventType, e.ConsecutiveCount, 0, e.Text, "", false) 
+        {
+        }
 
+        public BladeEventArgs ToBladeEventArgs()
+        {
+            return new BladeEventArgs(this.EventType, this._Type, this._ConsecutiveCount, this._Int3, this._Str1, this._Str2, this._Bool1);
+        }
     }
 
     public class BladeEventType

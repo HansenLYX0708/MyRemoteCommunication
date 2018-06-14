@@ -30,6 +30,12 @@ namespace Hitachi.Tester.Module
 
         private volatile bool _Exit;
         private volatile bool _Escape;
+
+        /// <summary>
+        /// Use for monitor all status
+        /// </summary>
+        internal volatile TesterState _TesterState;
+
         #endregion Fields
 
         #region Constructors
@@ -38,13 +44,16 @@ namespace Hitachi.Tester.Module
             _Disposed = false;
             _Exit = false;
             _Escape = false;
+
+            _TesterState = new TesterState();
+
             try
             {
                 _CallbackProxyList = new ProxyListClass();
             }
             catch
             { }
-            // TODO : 构造函数里面不应该存在如下的复杂过程，应考虑移出去
+            // TODO : The following complex processes should not exist in the constructor and should be considered for removal
             _BladeEventsThread = new Thread(doBladeEvents);
             _BladeEventsThread.IsBackground = true;
             _BladeEventsThread.Start();
@@ -68,7 +77,6 @@ namespace Hitachi.Tester.Module
             {
                 ITesterObjectCallback proxy = OperationContext.Current.GetCallbackChannel<ITesterObjectCallback>();
                 ProxyStruct aProxyStruct = new ProxyStruct(computerName, userID, proxy);
-                // TODO : 这里或许可以将这个list去掉，需要验证
                 _CallbackProxyList.Add(aProxyStruct);
             }
             catch( Exception e )
@@ -109,17 +117,17 @@ namespace Hitachi.Tester.Module
         public int PingInt()
         {
             // send StatusEvent
-            //StatusEventArgs args = new StatusEventArgs();
-            //args.Text = Constants.KeepAliveString;
-            //args.EventType = (int)eventInts.KeepAliveEvent;
-            //SendStatusEvent(this, args);
+            StatusEventArgs args = new StatusEventArgs();
+            args.Text = Constants.KeepAliveString;
+            args.EventType = (int)eventInts.KeepAliveEvent;
+            SendStatusEvent(this, args);
             return Constants.KeepAliveTimeout;  // Just some known number.
         }
 
         public bool AbortSequence(string reason, bool force)
         {
             bool retVal = false;
-            // TODO : 终止测试序列，重启TCL
+            // TODO : Stop queue of test, restart TCL.
             return retVal;
         }
 
@@ -152,7 +160,7 @@ namespace Hitachi.Tester.Module
         private void ping(string name)
         {
             // send StatusEvent
-            // TODO : 测试所有的事件
+            // TODO : Test all event type
         }
 
         private void pingCallback(IAsyncResult ar)
@@ -168,7 +176,7 @@ namespace Hitachi.Tester.Module
 
         private void StartTestSequence(string ParseString, string TestName, string GradeName, int StartingTest, bool BreakOnError, string tableStr)
         {
-            // TODO : 如果当前正在执行测试序列，处理参考之前?
+            // TODO : If doing test queue now, refer to the old code?
         }
         #endregion internal Methods
 
