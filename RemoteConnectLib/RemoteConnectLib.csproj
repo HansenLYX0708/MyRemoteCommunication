@@ -59,9 +59,12 @@
       <Project>{38347658-8b5a-4216-9dae-60a57b11be9a}</Project>
       <Name>ITesterObject</Name>
     </ProjectReference>
-  </ItemGroup> 
+  </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
