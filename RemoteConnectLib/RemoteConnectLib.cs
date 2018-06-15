@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.ServiceModel;
 
+using Hitachi.Tester;
 using Hitachi.Tester.Enums;
 using Hitachi.Tester.Module;
 
@@ -16,6 +17,7 @@ namespace Hitachi.Tester.Client
         #region Fields
         private readonly NLog.Logger nlogger = NLog.LogManager.GetLogger("RemoteConnectLibLog");
 
+        private string _OurName;
         private bool _Disposed;
 
         private DuplexChannelFactory<ITesterObject> _Factory;
@@ -40,11 +42,18 @@ namespace Hitachi.Tester.Client
         private BladeEventClass _BladeEvent;
 
         private bool _Connected = false; // Flag to see if we have ever connected.
+
+        // Justin
+        static private Dictionary<string, RemoteConnectLib> _Connections;
+        
         #endregion Fields
 
         #region Constructors
         public RemoteConnectLib()
         {
+            Microsoft.VisualBasic.Devices.Computer computer = new Microsoft.VisualBasic.Devices.Computer();
+            _OurName = computer.Name;
+
             _Disposed = false;
 
             _Factory = null;
@@ -61,6 +70,7 @@ namespace Hitachi.Tester.Client
             // After connected, timer pings host every now and then to keep the channel awake.
             _KeepAliveTimer = new System.Threading.Timer(keepAliveTimer_Tick, null, Timeout.Infinite, Timeout.Infinite);
             _KeepAliveArrived = true;
+
         }
 
         /// <summary>
@@ -77,6 +87,18 @@ namespace Hitachi.Tester.Client
         {
             get { return _BladeEvent; }
         }
+
+        public Dictionary<string, RemoteConnectLib> Connections
+        {
+            get
+            {
+                if (_Connections == null)
+                {
+                    _Connections = new Dictionary<string, RemoteConnectLib>();
+                }
+                return _Connections;
+            }
+        }
         #endregion Properties
 
         #region Methods
@@ -90,12 +112,12 @@ namespace Hitachi.Tester.Client
 
         private UInt32 Connect(string urlAddress, string userID, string password, bool netTcp, bool tobj, bool tobjStr)
         {
+            nlogger.Info("RemoteConnectLib::Connect start [url:{0}] [userID:{1}] [password:[2]][netTcp:{3}][tobj:{4}][tobjStr:{5}]", urlAddress, userID, password, netTcp, tobj, tobjStr);
             UInt32 retVal = (UInt32)ReturnValues.connectionBad;
-
+            nlogger.Info("RemoteConnectLib::Connect [ConnectBusy:{0}]", _BusyConnecting);
             if (!_BusyConnecting)
             {
                 _BusyConnecting = true;
-
                 // The reconnect uses these.
                 _CurrentUrlAddress = urlAddress;
                 _CurrentUserID = userID;
@@ -105,12 +127,13 @@ namespace Hitachi.Tester.Client
                 // Build the complete path
                 string strUrl = MakeupCompleteUrl(urlAddress, netTcp);
                 string strStreamUrl = MakeupCompleteStreamingUrl(strUrl, netTcp);
-
+                nlogger.Info("RemoteConnectLib::Connect [strUrl:{0}] [strStreamUrl:{0}]", strUrl, strStreamUrl);
                 // Add connect function
                 try
                 {
                     // Init channel factory
                     InitChannelFactory(strUrl, strStreamUrl, netTcp, tobj, tobjStr);
+                    nlogger.Info("RemoteConnectLib::Connect [Factory:{0}]", _Factory.ToString());
 
                     // Create channel and open service.
                     if (tobj)
@@ -131,10 +154,7 @@ namespace Hitachi.Tester.Client
                 catch (System.Exception ex)
                 {
                     // TODO : Add log information.
-                    //nlogger.ErrorException("RemoteConnectLib.Connect/attach connection event handler", e);
-                    //sendTextPromptEvent(this, string.Format(
-                    //    "RemoteConnectLib.Connect failed to attach event to remote server.  URL={0}",
-                    //    strUrl), Color.Red);
+                    nlogger.Error("RemoteConnectLib::Connect Create Channel fail [Exception :{0}]", ex.ToString());
                     return (UInt32)ReturnValues.connectionBad;
                 }
 
@@ -144,10 +164,36 @@ namespace Hitachi.Tester.Client
                     nlogger.Error("RemoteConnectLib::Connect failed to attach event to remote server [URL:{0}]", strUrl);
                     return (UInt32)ReturnValues.connectionBad;
                 }
-                
             }
             return retVal;
         }
+
+        //public void Disconnect()
+        //{
+        //    nlogger.Info("RemoteConnectLib::Disconnect start");
+        //    _Connected = false;
+
+        //    try
+        //    {
+        //        Delegates.Action<string, string> disconnectDelegate = new Delegates.Action<string, string>(obj.Disconnect);
+
+        //        IAsyncResult ar = disconnectDelegate.BeginInvoke(_CurrentUserID, _OurName, null, disconnectDelegate);
+        //        ar.AsyncWaitHandle.WaitOne(3000, false);
+        //        if (ar.IsCompleted)
+        //        {
+        //            try { disconnectDelegate.EndInvoke(ar); }
+        //            catch { }
+        //        }
+        //        ((ICommunicationObject)_TesterObject).Close();
+        //        // ((ICommunicationObject)m_testerObjectStreaming).Close();
+        //    }
+        //    catch (System.Exception ex)
+        //    {
+            	
+        //    }
+
+        //    nlogger.Info("RemoteConnectLib::Disconnect end");
+        //}
 
         // TODO : Think about put MakeupCompleteUrl and MakeupCompleteUrl2 together.
         private string MakeupCompleteUrl( string urlAddress, bool netTcp )
@@ -242,10 +288,10 @@ namespace Hitachi.Tester.Client
                     binding.MaxReceivedMessageSize = 524288;
                     binding.MaxBufferSize = 524288;
                     binding.MaxBufferPoolSize = 524288;
-                    //binding.ReaderQuotas.MaxArrayLength = 524288;
-                    //binding.ReaderQuotas.MaxBytesPerRead = 524288;
-                    //binding.ReaderQuotas.MaxNameTableCharCount = 524288;
-                    //binding.ReaderQuotas.MaxStringContentLength = 524288;
+                    binding.ReaderQuotas.MaxArrayLength = 524288;
+                    binding.ReaderQuotas.MaxBytesPerRead = 524288;
+                    binding.ReaderQuotas.MaxNameTableCharCount = 524288;
+                    binding.ReaderQuotas.MaxStringContentLength = 524288;
                     _Factory = new DuplexChannelFactory<ITesterObject>(context, binding, endpoint);
                 }
                 if (tobjStr)
@@ -255,7 +301,7 @@ namespace Hitachi.Tester.Client
             }
             else
             {
-                // Pipe model
+                // Pipe model, may be no use
                 if (tobj)
                 {
                     //NetNamedPipeBinding binding = new NetNamedPipeBinding();
@@ -279,6 +325,7 @@ namespace Hitachi.Tester.Client
         private void keepAliveTimer_Tick(object state)
         {
             nlogger.Info("RemoteConnectLib::KeepAliveTimer_Tick start");
+            uint ret = 999;
             try
             {
                 // Turn off the timer until we finish (we do not know how long this will take).
@@ -293,7 +340,7 @@ namespace Hitachi.Tester.Client
                 {
                     // Keep alive callback failed, so reconnect.
                     CleanObject();
-                    Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, true, true);
+                    ret = Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, true, true);
                 }
 
                 _KeepAliveArrived = false;  // Set to false.
@@ -310,7 +357,8 @@ namespace Hitachi.Tester.Client
                     // Return value was not correct so reconnect.
                     // Clean up the TCP link.
                     CleanObject();
-                    Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, true, true);
+                    ret = Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, true, true);
+                    nlogger.Info("RemoteConnectLib::KeepAliveTimer_Tick [value:{0}] [currentUrlAddress.Length:{1}] [currentUserID.Length:{2}]", value, _CurrentUrlAddress.Length, _CurrentUserID.Length);
                 }
             }
             catch
@@ -323,7 +371,7 @@ namespace Hitachi.Tester.Client
                     if (!_Connected) return;
                     // something broke, so reconnect.
                     CleanObject();
-                    Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, true, true);
+                    ret = Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, true, true);
                 }
             }
             finally
@@ -343,6 +391,7 @@ namespace Hitachi.Tester.Client
             if (_BusyConnecting) return;
 
             // TODO : Disconnect first.
+
             // Close TesterObject service.
             if (_TesterObject != null && ((ICommunicationObject)_TesterObject).State == CommunicationState.Opened)
             {

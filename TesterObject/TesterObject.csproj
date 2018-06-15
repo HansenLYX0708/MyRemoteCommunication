@@ -149,7 +149,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BladeEventStruct.cs" />
     <Compile Include="ProxyListClass.cs" />
     <Compile Include="TesterObject.BladeInfo.cs" />
