@@ -9,7 +9,7 @@ using Hitachi.Tester.Enums;
 
 namespace Hitachi.Tester.Module
 {
-    public partial class TesterObject
+    public partial class TesterObject : ITesterObject
     {
         #region Fields
         private Queue<BladeEventStruct> _BladeEventQueue = new Queue<BladeEventStruct>();

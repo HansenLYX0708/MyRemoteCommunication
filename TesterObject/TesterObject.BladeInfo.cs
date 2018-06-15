@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Hitachi.Tester.Module
 {
-    public partial class TesterObject : Hitachi.Tester.Module.ITesterObject
+    public partial class TesterObject : ITesterObject
     {
         #region Fields
         private string _MyLocation = string.Empty;

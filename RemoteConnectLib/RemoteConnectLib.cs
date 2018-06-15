@@ -242,10 +242,10 @@ namespace Hitachi.Tester.Client
                     binding.MaxReceivedMessageSize = 524288;
                     binding.MaxBufferSize = 524288;
                     binding.MaxBufferPoolSize = 524288;
-                    binding.ReaderQuotas.MaxArrayLength = 524288;
-                    binding.ReaderQuotas.MaxBytesPerRead = 524288;
-                    binding.ReaderQuotas.MaxNameTableCharCount = 524288;
-                    binding.ReaderQuotas.MaxStringContentLength = 524288;
+                    //binding.ReaderQuotas.MaxArrayLength = 524288;
+                    //binding.ReaderQuotas.MaxBytesPerRead = 524288;
+                    //binding.ReaderQuotas.MaxNameTableCharCount = 524288;
+                    //binding.ReaderQuotas.MaxStringContentLength = 524288;
                     _Factory = new DuplexChannelFactory<ITesterObject>(context, binding, endpoint);
                 }
                 if (tobjStr)

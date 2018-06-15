@@ -56,7 +56,7 @@
       <Name>Defines</Name>
     </ProjectReference>
     <ProjectReference Include="..\ITesterObject\ITesterObject.csproj">
-      <Project>{38347658-8b5a-4216-9dae-60a57b11be9a}</Project>
+      <Project>{4e46627f-92ef-47e2-812f-3fc50951f144}</Project>
       <Name>ITesterObject</Name>
     </ProjectReference>
   </ItemGroup>

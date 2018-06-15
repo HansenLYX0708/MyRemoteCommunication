@@ -7,7 +7,6 @@ using System.Threading;
 using System.ServiceModel;
 
 using Hitachi.Tester;
-using Hitachi.Tester.Module;
 using Hitachi.Tester.Enums;
 
 namespace Hitachi.Tester.Module
