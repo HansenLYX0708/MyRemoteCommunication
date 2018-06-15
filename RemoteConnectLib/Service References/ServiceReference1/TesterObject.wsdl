@@ -1,0 +1,1883 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:i0="Hitachi.Tester.Module" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:tns="http://tempuri.org/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" name="TesterObject" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:Policy wsu:Id="basicNetTcp_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1" />
+        <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:Basic256 />
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict />
+              </wsp:Policy>
+            </sp:Layout>
+          </wsp:Policy>
+        </sp:TransportBinding>
+        <wsaw:UsingAddressing />
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsp:Policy wsu:Id="basicNetPipe_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1" />
+        <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:Basic256 />
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict />
+              </wsp:Policy>
+            </sp:Layout>
+          </wsp:Policy>
+        </sp:TransportBinding>
+        <wsaw:UsingAddressing />
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsdl:import namespace="Hitachi.Tester.Module" location="http://localhost:8000/?wsdl=wsdl0" />
+  <wsdl:types />
+  <wsdl:binding name="basicNetTcp" type="i0:TesterObjectContract">
+    <wsp:PolicyReference URI="#basicNetTcp_policy" />
+    <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="BladeDelFile">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BladeDelFile" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BunnyReInit">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BunnyReInit" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetMemsType">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetMemsType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetMemsOpenSensorType">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetMemsOpenSensorType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetMemsCloseSensorType">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetMemsCloseSensorType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="PinMotionToggle">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetRampValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetRampValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_set_save_servo">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_get_neutral">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutral" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_set_neutral">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutral" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_get_servo">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_move_servo">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_usb_reset">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_reset" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetStrings">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetStrings" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetStrings">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetStrings" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetDataViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetIntegers">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetIntegers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetIntegers">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetIntegers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetTclStart">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetTclStart" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetTclStart">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetTclStart" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="PauseEvents">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/PauseEvents" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="PauseTests">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/PauseTests" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BladeFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BladeFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FactFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/FactFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GradeFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GradeFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FirmwareFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/FirmwareFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="CountsFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/CountsFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="LogInValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/LogInValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Connect">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Connect" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Initialize">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Initialize" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Ping">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Ping" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Disconnect">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Disconnect" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="AcknowledgeAnEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/AcknowledgeAnEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Abort">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Abort" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="StartTest">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/StartTest" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetConfig">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetConfig" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetConfig">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetConfig" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="DelConfig">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/DelConfig" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="DirConfig">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/DirConfig" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetConfigCRC">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetConfigCRC" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetGradeCRCs">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetGradeCRCs" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetFileCRC">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetFileCRC" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="TclInput">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/TclInput" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="TclCommand">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/TclCommand" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetModuleState">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetModuleState" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetModuleState">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetModuleState" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetBunnyStatus">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatus" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMemsState">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetMemsState" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetCounts">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetCounts" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetCountValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetCountValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetCountValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetCountValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="IncCountValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/IncCountValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SaveCounts">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SaveCounts" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ZeroCounts">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/ZeroCounts" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ClearStats">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/ClearStats" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateStatValuesViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/UpdateStatValuesViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetFirstLastIndexViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetFirstLastIndexViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetFromToViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetFromToViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateDgrValuesViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/UpdateDgrValuesViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BladeFileDir">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BladeFileDir" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BladeEventCallback">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BladeEventCallback" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="basicNetPipe" type="i0:TesterObjectContract">
+    <wsp:PolicyReference URI="#basicNetPipe_policy" />
+    <soap12:binding transport="http://schemas.microsoft.com/soap/named-pipe" />
+    <wsdl:operation name="BladeDelFile">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BladeDelFile" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BunnyReInit">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BunnyReInit" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetMemsType">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetMemsType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetMemsOpenSensorType">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetMemsOpenSensorType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetMemsCloseSensorType">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetMemsCloseSensorType" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="PinMotionToggle">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggle" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetRampValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetRampValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_set_save_servo">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_get_neutral">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutral" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_set_neutral">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutral" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_get_servo">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_move_servo">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="hgst_usb_reset">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_reset" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetStrings">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetStrings" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetStrings">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetStrings" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetDataViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetIntegers">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetIntegers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetIntegers">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetIntegers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetTclStart">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetTclStart" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetTclStart">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetTclStart" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="PauseEvents">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/PauseEvents" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="PauseTests">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/PauseTests" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BladeFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BladeFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FactFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/FactFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GradeFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GradeFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="FirmwareFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/FirmwareFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="CountsFilePath">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/CountsFilePath" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="LogInValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/LogInValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Connect">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Connect" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Initialize">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Initialize" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Ping">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Ping" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Disconnect">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Disconnect" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="AcknowledgeAnEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/AcknowledgeAnEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Abort">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/Abort" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="StartTest">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/StartTest" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetConfig">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetConfig" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetConfig">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetConfig" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="DelConfig">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/DelConfig" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="DirConfig">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/DirConfig" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetConfigCRC">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetConfigCRC" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetGradeCRCs">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetGradeCRCs" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetFileCRC">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetFileCRC" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="TclInput">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/TclInput" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="TclCommand">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/TclCommand" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetModuleState">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetModuleState" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetModuleState">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetModuleState" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetBunnyStatus">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatus" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMemsState">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetMemsState" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetCounts">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetCounts" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetCountValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetCountValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetCountValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SetCountValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="IncCountValue">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/IncCountValue" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SaveCounts">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/SaveCounts" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ZeroCounts">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/ZeroCounts" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ClearStats">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/ClearStats" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateStatValuesViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/UpdateStatValuesViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetFirstLastIndexViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetFirstLastIndexViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetFromToViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/GetFromToViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateDgrValuesViaEvent">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/UpdateDgrValuesViaEvent" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BladeFileDir">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BladeFileDir" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="SenderFaultDetailFault">
+        <soap12:fault use="literal" name="SenderFaultDetailFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ReceiverFaultDetailFault">
+        <soap12:fault use="literal" name="ReceiverFaultDetailFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="BladeEventCallback">
+      <soap12:operation soapAction="Hitachi.Tester.Module/TesterObjectContract/BladeEventCallback" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="TesterObject">
+    <wsdl:port name="basicNetTcp" binding="tns:basicNetTcp">
+      <soap12:address location="net.tcp://localhost:9000/TesterObject" />
+      <wsa10:EndpointReference>
+        <wsa10:Address>net.tcp://localhost:9000/TesterObject</wsa10:Address>
+      </wsa10:EndpointReference>
+    </wsdl:port>
+    <wsdl:port name="basicNetPipe" binding="tns:basicNetPipe">
+      <soap12:address location="net.pipe://localhost/TesterObject" />
+      <wsa10:EndpointReference>
+        <wsa10:Address>net.pipe://localhost/TesterObject</wsa10:Address>
+      </wsa10:EndpointReference>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="578a1cf7-c41c-4719-99c4-60b829e67c93" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:8001/" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="Hitachi.Tester.Module1.wsdl" MetadataType="Wsdl" ID="84adbeb5-a712-4c80-9327-0050dd759e50" SourceId="1" SourceUrl="http://localhost:8001/" />
+    <MetadataFile FileName="service1.wsdl" MetadataType="Wsdl" ID="206665b4-0499-42d9-bebf-76255d66e0a7" SourceId="1" SourceUrl="http://localhost:8001/" />
+    <MetadataFile FileName="Hitachi.Tester.Module1.xsd" MetadataType="Schema" ID="b2ef1d90-cff8-42fc-b8d4-efa66de959d2" SourceId="1" SourceUrl="http://localhost:8001/" />
+    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="e7cba0e4-2349-4c1c-824b-a9b8c88de8d0" SourceId="1" SourceUrl="http://localhost:8001/" />
+    <MetadataFile FileName="Message1.xsd" MetadataType="Schema" ID="84ef0dda-b0a0-486f-96e7-ecda8e7735dd" SourceId="1" SourceUrl="http://localhost:8001/" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

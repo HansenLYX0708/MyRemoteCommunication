@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using System.ServiceModel;
+using Hitachi.Tester.Module;
 
 namespace TestHost
 {
@@ -25,17 +25,18 @@ namespace TestHost
         public MainWindow()
         {
             InitializeComponent();
-            OnStart();
+
+            TestStart();
+
         }
 
-        ServiceHost serviceHost = null;
-        protected void OnStart()
+        ServiceHost serHost = null;
+        public void TestStart()
         {
-            serviceHost = new System.ServiceModel.ServiceHost(typeof(Hitachi.Tester.Module.TesterObject));
-            if (serviceHost.State != System.ServiceModel.CommunicationState.Opened)
-            {
-                serviceHost.Open();
-            }
+            ITesterObject iTestObject = new TesterObject();
+            serHost = new ServiceHost(iTestObject);
+            serHost.Open();
+
         }
 
     }

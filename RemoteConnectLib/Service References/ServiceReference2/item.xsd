@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="Hitachi.Tester.Module" elementFormDefault="qualified" targetNamespace="Hitachi.Tester.Module" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:8001/?xsd=xsd2" namespace="http://schemas.microsoft.com/Message" />
+  <xs:element name="BladeFileRead">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="fileRequest" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BladeFileReadResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.microsoft.com/Message" name="BladeFileReadResult" type="q1:StreamBody" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BladeFileWrite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="fileRequest" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BladeFileWriteResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.microsoft.com/Message" name="BladeFileWriteResult" type="q2:StreamBody" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
