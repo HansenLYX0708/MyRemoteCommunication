@@ -46,7 +46,9 @@ namespace Hitachi.Tester.Client
 
         // Justin
         static private Dictionary<string, RemoteConnectLib> _Connections;
-        
+
+        // Event hander
+        public event StatusEventHandler _ComStatusEvent;
         #endregion Fields
 
         #region Constructors
@@ -222,9 +224,20 @@ namespace Hitachi.Tester.Client
                         nlogger.Error("RemoteConnectLib::Connect Create Channel exception [Exception :{0}]", ex.Message);
                         retVal = (UInt32)ReturnValues.connectionBad;
                     }
-                    if ((retVal & (int)ReturnValues.bladeAccessBit) == 0)
+
+                    if ((retVal & (int)ReturnValues.bladeAccessBit) != 0)
                     {
+                        string cached = urlAddress.Replace(":" + Constants.WcfBladePort.ToString() + "/TesterObject", "");
+                        if (!Connections.ContainsKey(cached))
+                        {
+                            Connections.Add(cached, this);
+                        }
+                        else
+                        {
+                            Connections[cached] = this;
+                        }
                         _Connected = true;
+                        _KeepAliveArrived = true;
                     }
                 }
             }
@@ -493,6 +506,32 @@ namespace Hitachi.Tester.Client
 
             // TODO :Close TesterObjectStreaming service.
 
+        }
+
+        internal virtual void OnStatusEvent(object sender, StatusEventArgs e)
+        {
+            nlogger.Info("RemoteConnectLib::OnStatusEvent start[EventType:{0}] [Text:{1}]", e.EventType, e.Text);
+            // If keep alive event then set KeepAliveArrived
+            if ((Enums.eventInts)e.EventType == eventInts.KeepAliveEvent)
+            {
+                // Mask bug in BladeRunner 1.5++ for SCS 1.0
+                if (e.Text == "StatusEvent " + Constants.CommTestString)
+                {
+                    e.EventType = (int)eventInts.PingStatusEvent;
+                }
+                else
+                {
+                    _KeepAliveArrived = true;
+                    return;
+                }
+            }
+
+            StatusEventHandler handler = _ComStatusEvent;
+            if (handler != null)
+            {
+                // Invokes the delegates. 
+                handler(this, e);
+            }
         }
         #endregion Methods
 

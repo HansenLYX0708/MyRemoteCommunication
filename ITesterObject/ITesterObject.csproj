@@ -122,10 +122,12 @@
     <Compile Include="AbstractEventClass.cs" />
     <Compile Include="BladeEventArgs.cs" />
     <Compile Include="BladeEventWithTime.cs" />
+    <Compile Include="CompletedEventArgs.cs" />
     <Compile Include="Faults.cs" />
     <Compile Include="ITesterObject.cs" />
     <Compile Include="ITesterObjectCallback.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StartedEventArgs.cs" />
     <Compile Include="StatusEventArgs.cs" />
     <Compile Include="StopGoPauseState.cs" />
     <Compile Include="TesterState.cs" />

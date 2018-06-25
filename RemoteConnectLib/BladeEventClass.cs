@@ -104,7 +104,7 @@ namespace Hitachi.Tester.Client
                     break;
 
                 case BladeEventType.Status:
-                    //remoteConnectLib.OnStatusEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
+                    remoteConnectLib.OnStatusEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
             }
         }

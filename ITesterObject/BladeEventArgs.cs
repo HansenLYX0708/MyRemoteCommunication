@@ -94,22 +94,137 @@ namespace Hitachi.Tester.Module
             }
         }
         #endregion Properties
+
+        #region Methods
+        public CompletedBladeEventArgs ToCompletedEventBladeArgs()
+        {
+            return new CompletedBladeEventArgs(EventType, _Type, _ConsecutiveCount, _Int3, _Str1, _Str2, _Bool1);
+        }
+
+        public StatusBladeEventArgs ToStatusEventBladeArgs()
+        {
+            return new StatusBladeEventArgs(EventType, _Type, _ConsecutiveCount, _Int3, _Str1, _Str2, _Bool1);
+        }
+
+        public SequenceStartedBladeEventArgs ToSequenceStartedBladeEventArgs()
+        {
+            return new SequenceStartedBladeEventArgs(EventType, _Type, _ConsecutiveCount, _Int3, _Str1, _Str2, _Bool1);
+        }
+
+        #endregion Methods
+
     }
 
     public class CompletedBladeEventArgs : BladeEventArgs
     {
+        /// <summary>
+        /// Constructor with BladeEventArgs parameters.
+        /// </summary>
+        /// <param name="strText"></param>
+        /// <param name="iTestNum"></param>
+        /// <param name="iTestCount"></param>
+        public CompletedBladeEventArgs(int _EventType, int _Int1, int _Int2, int _Int3, string _Str1, string _Str2, bool _Bool1) :
+            base(_EventType, _Int1, _Int2, _Int3, _Str1, _Str2, _Bool1)
+        {
+        }
 
+        /// <summary>
+        /// Constructor with StatusEventArgs
+        /// </summary>
+        /// <param name="_EventType"></param>
+        /// <param name="e"></param>
+        public CompletedBladeEventArgs(int _EventType, CompletedEventArgs e) :
+            base(_EventType, e.testNum, e.ConsecutiveCount, e.testCount, e.Text, "", e.fail)
+        {
+        }
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public CompletedBladeEventArgs(int _EventType) : base()
+        {
+            EventType = _EventType;
+        }
+
+        private CompletedBladeEventArgs() { }
+
+        public CompletedEventArgs ToCompletedEventArgs()
+        {
+            return new CompletedEventArgs(_Str1, _Type, _Int3, _ConsecutiveCount, _Bool1);
+        }
+
+        public BladeEventArgs ToBladeEventArgs()
+        {
+            return new BladeEventArgs(this.EventType, this._Type, this._ConsecutiveCount, this._Int3, this._Str1, this._Str2, this._Bool1);
+        }
     }
 
     public class SequenceStartedBladeEventArgs : BladeEventArgs
     {
+        /// <summary>
+        /// Constructor with parameters.
+        /// </summary>
+        /// <param name="strText"></param>
+        /// <param name="iTestNum"></param>
+        /// <param name="iTestCount"></param>
+        public SequenceStartedBladeEventArgs(int _EventType, int _Int1, int _Int2, int _Int3, string _Str1, string _Str2, bool _Bool1) :
+            base(_EventType, _Int1, _Int2, _Int3, _Str1, _Str2, _Bool1)
+        {
+        }
 
+
+        public SequenceStartedBladeEventArgs(int _EventType, StartedEventArgs e) :
+            base(_EventType, e.iStartTest, e.iConsecutive, 0, e.seqName, e.gradeName, false)
+        {
+        }
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public SequenceStartedBladeEventArgs(int _EventType)
+            : base()
+        {
+            EventType = _EventType;
+        }
+
+        private SequenceStartedBladeEventArgs() { }
+
+        public StartedEventArgs ToStartedEventArgs()
+        {
+            return new StartedEventArgs(_Str1, _Str2, _Type, _ConsecutiveCount);
+        }
+
+        public BladeEventArgs ToBladeEventArgs()
+        {
+            return new BladeEventArgs(this.EventType, this._Type, this._ConsecutiveCount, this._Int3, this._Str1, this._Str2, this._Bool1);
+        }
     }
 
     public class StatusBladeEventArgs : BladeEventArgs
     {
+        public StatusBladeEventArgs(int _EventType, int _Int1, int _Int2, int _Int3, string _Str1, string _Str2, bool _Bool1) :
+            base(_EventType, _Int1, _Int2, _Int3, _Str1, _Str2, _Bool1)
+        {
+        }
+
         public StatusBladeEventArgs (int eventType, StatusEventArgs e) : base (eventType, e.EventType, e.ConsecutiveCount, 0, e.Text, "", false) 
         {
+        }
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public StatusBladeEventArgs(int _EventType)
+            : base()
+        {
+            EventType = _EventType;
+        }
+
+        private StatusBladeEventArgs() { }
+
+        public StatusEventArgs ToStatusEventArgs()
+        {
+            return new StatusEventArgs(_Str1, _Type, _ConsecutiveCount);  // Text, EventType, Consecutive
         }
 
         public BladeEventArgs ToBladeEventArgs()
