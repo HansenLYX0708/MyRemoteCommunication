@@ -25,9 +25,7 @@ namespace TestHost
         public MainWindow()
         {
             InitializeComponent();
-
             TestStart();
-
         }
 
         ServiceHost serHost = null;
@@ -36,8 +34,6 @@ namespace TestHost
             ITesterObject iTestObject = new TesterObject();
             serHost = new ServiceHost(iTestObject);
             serHost.Open();
-
         }
-
     }
 }

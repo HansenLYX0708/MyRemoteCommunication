@@ -24,14 +24,16 @@ namespace TestClient
         public MainWindow()
         {
             InitializeComponent();
+
+            remoteConnectLib = new RemoteConnectLib();
+
         }
 
         RemoteConnectLib remoteConnectLib = null;
 
         private void Btn_Connect_Click(object sender, RoutedEventArgs e)
         {
-            remoteConnectLib = new RemoteConnectLib();
-            remoteConnectLib.Connect("10.10.10.10", string.Empty, string.Empty);
+            remoteConnectLib.Connect("10.113.201.113", string.Empty, string.Empty);
         }
     }
 }

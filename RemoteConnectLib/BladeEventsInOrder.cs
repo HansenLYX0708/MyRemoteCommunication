@@ -41,7 +41,6 @@ namespace Hitachi.Tester.Client
 
 
         #region Methods
-
         /// <summary>
         /// Callback for timer event.
         /// Flushes queue of sequential entries.
@@ -118,7 +117,6 @@ namespace Hitachi.Tester.Client
                 // restart timer
                 _OutputTimer.Start();
             }
-        
         }
 
         /// <summary>
