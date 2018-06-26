@@ -80,7 +80,7 @@ namespace Hitachi.Tester.Module
 
             }
             // Single channel remoting
-            SendBladeEventCallback(sender, new StatusBladeEventArgs(BladeEventType.Bunny, e).ToBladeEventArgs());
+            SendBladeEventCallback(sender, new StatusBladeEventArgs(BladeEventType.Status, e).ToBladeEventArgs());
         }
 
 

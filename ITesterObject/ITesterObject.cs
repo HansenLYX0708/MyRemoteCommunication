@@ -21,6 +21,7 @@ namespace Hitachi.Tester.Module
         CallbackContract = typeof(ITesterObjectCallback))]
     public interface ITesterObject
     {
+        #region part one
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
@@ -34,8 +35,10 @@ namespace Hitachi.Tester.Module
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
-        void Initialize(string key);
+        int PingInt();
+        #endregion part one
 
+        #region part two
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
@@ -44,17 +47,9 @@ namespace Hitachi.Tester.Module
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
-        int PingInt();
+        void SetConfig(string NewConfig);
+        #endregion part two
 
-        [OperationContract]
-        [FaultContract(typeof(ReceiverFaultDetail))]
-        [FaultContract(typeof(SenderFaultDetail))]
-        bool AbortSequence(string reason, bool force);
-
-        [OperationContract]
-        [FaultContract(typeof(ReceiverFaultDetail))]
-        [FaultContract(typeof(SenderFaultDetail))]
-        void StartTest(string parseString, string testName, string gradeName, string tableStr);
     } // end interface
 
     // These event handlers are used inside of Jade and BladeRunner.
