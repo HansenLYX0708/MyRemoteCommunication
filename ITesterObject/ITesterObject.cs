@@ -36,6 +36,22 @@ namespace Hitachi.Tester.Module
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
         int PingInt();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        bool CopyFileOnBlade(string fromFile, string toFile);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void SetStrings(string key, string[] names, string[] strings);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        string[] GetStrings(string key, string[] names);
+
         #endregion part one
 
         #region part two
@@ -48,6 +64,7 @@ namespace Hitachi.Tester.Module
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
         void SetConfig(string NewConfig);
+
         #endregion part two
 
     } // end interface

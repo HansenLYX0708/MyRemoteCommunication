@@ -83,30 +83,27 @@ namespace Hitachi.Tester.Module
             SendBladeEventCallback(sender, new StatusBladeEventArgs(BladeEventType.Status, e).ToBladeEventArgs());
         }
 
-
-
-
         // TODO : The event of sequence. 
-        //private void SendSequenceStartedEvent(object sender, StartedEventArgs e)
-        //{ }
+        private void SendSequenceStartedEvent(object sender, StartedEventArgs e)
+        { }
 
-        //private void SendSequenceAbortingEvent(object sender, StatusEventArgs e)
-        //{ }
+        private void SendSequenceAbortingEvent(object sender, StatusEventArgs e)
+        { }
 
-        //private void SendSequenceCompletedEvent(object sender, StatusEventArgs e)
-        //{ }
+        private void SendSequenceCompletedEvent(object sender, StatusEventArgs e)
+        { }
 
-        //private void SendSequenceUpdateEvent(object sender, StatusEventArgs e)
-        //{ }
+        private void SendSequenceUpdateEvent(object sender, StatusEventArgs e)
+        { }
 
-        //private void SendTestStartedEvent(object sender, StatusEventArgs e)
-        //{ }
+        private void SendTestStartedEvent(object sender, StatusEventArgs e)
+        { }
 
-        //private void SendTestCompletedEvent(object sender, CompletedEventArgs e)
-        //{ }
+        private void SendTestCompletedEvent(object sender, CompletedEventArgs e)
+        { }
 
-        //private void SendProgramClosingEvent(object sender, StatusEventArgs e)
-        //{ }
+        private void SendProgramClosingEvent(object sender, StatusEventArgs e)
+        { }
 
 
         /// <summary>
@@ -194,7 +191,7 @@ namespace Hitachi.Tester.Module
         /// This function pulls items out and sends to remote clients.
         /// Actually it calls the callback function in each client via proxy.
         /// </summary>
-        private void doBladeEvents()
+        private void DoBladeEvents()
         {
             // TODO : Deal the event send from SendBladeEventCallback
             while (!_Exit)
@@ -264,7 +261,7 @@ namespace Hitachi.Tester.Module
                                 try
                                 {
                                     StaticServerTalker.MessageString = "Client callback proxy failed. ";
-                                    StaticServerTalker.MessageStringContent = "Client callback proxy failed. " + Environment.NewLine + makeUpExceptionString(e).ToString();
+                                    StaticServerTalker.MessageStringContent = "Client callback proxy failed. " + Environment.NewLine + MakeUpExceptionString(e).ToString();
                                 }
                                 catch { }
                                 _CallbackProxyList.Remove(i);

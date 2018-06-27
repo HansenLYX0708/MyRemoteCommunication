@@ -95,6 +95,9 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HGST.USB">
+      <HintPath>..\CommonLib\HGST.USB\HGST.USB.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -156,6 +159,10 @@
     <Compile Include="TesterObject.SendEvent.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BunnyAccess\BunnyAccess.csproj">
+      <Project>{3c657cb2-6d19-421d-8a60-dc12bd0bc4c2}</Project>
+      <Name>BunnyAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Defines\Defines.csproj">
       <Project>{1158CE60-E954-4FC2-9442-1BF5AC00431B}</Project>
       <Name>Defines</Name>

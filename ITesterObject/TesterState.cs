@@ -136,13 +136,11 @@ namespace Hitachi.Tester.Module
             get { return _SequenceName; }
             set { _SequenceName = value; }
         }
-
         public bool B12VDC
         {
             get { return _12VDC; }
             set { _12VDC = value; }
         }
-
         public bool B5VDC
         {
             get { return _5VDC; }
@@ -153,7 +151,6 @@ namespace Hitachi.Tester.Module
             get { return _AuxOut0; }
             set { _AuxOut0 = value; }
         }
-
         public bool AuxOut1
         {
             get { return _AuxOut1; }
