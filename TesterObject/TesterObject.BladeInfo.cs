@@ -28,7 +28,6 @@ namespace Hitachi.Tester.Module
 
         private int _OpenDelay;
         private int _CloseDelay;
-
         private string _MemsOpenDelay;
         private string _MemsCloseDelay;
 
@@ -765,15 +764,17 @@ namespace Hitachi.Tester.Module
         public void SetStrings(string key, string[] names, string[] strings)
         {
             object[] passingObjAray = new object[] { key, names, strings };
-            Thread setStringsThread = new Thread(new ParameterizedThreadStart(SetStringsThreadFunc));
-            setStringsThread.IsBackground = true;
+            Thread setStringsThread = new Thread(new ParameterizedThreadStart(SetStringsThreadFunc))
+            {
+                IsBackground = true
+            };
             setStringsThread.Start(passingObjAray);
         }
         #endregion ITesterObject Methods
 
         private void SimpleBladeInfoInit()
         {
-            _NeedToReLoadAllValues = false;
+            _NeedToReLoadAllValues = true;
             _ConstructorFinished = false;
             _ResetGoing = false;
             _UsbResetLockObject = new object();
@@ -898,7 +899,7 @@ namespace Hitachi.Tester.Module
 
         private void SetStringsThreadFunc(object obj)
         {
-            // TODO : throw new NotImplementedException();
+            // TODO : SetStringsThreadFunc     throw new NotImplementedException();
         }
 
         /// <summary>
@@ -910,9 +911,11 @@ namespace Hitachi.Tester.Module
 
             if (_VoltageCheckBlade && !_VoltageCheckThreadGoing)
             {
-                Thread voltageThread = new Thread(VoltageCheckThreadFunction);
-                voltageThread.IsBackground = true;
-                voltageThread.Name = "voltageThread";
+                Thread voltageThread = new Thread(VoltageCheckThreadFunction)
+                {
+                    IsBackground = true,
+                    Name = "voltageThread"
+                };
                 _VoltageCheckThreadGoing = true;
                 voltageThread.Start();
 
@@ -1133,8 +1136,7 @@ namespace Hitachi.Tester.Module
 
         private int ParseMemsDelay(ref string delayStr)
         {
-            int intValue;
-            if (!int.TryParse(delayStr, out intValue))
+            if (!int.TryParse(delayStr, out int intValue))
             {
                 intValue = 1500;
                 delayStr = "1500";
@@ -1314,7 +1316,7 @@ namespace Hitachi.Tester.Module
                         _TesterState.BunnyGood = false;
 
                         SendBunnyEvent(this, new StatusEventArgs(Constants.OffLine, (int)BunnyEvents.UsbReset));
-                        checkIfBunnyNowIsOK(_ResetStatus, "USB reset fail");
+                        NotifyWorldBunnyStatus(_ResetStatus, "USB reset fail");
                     }
 
                     if (_BunnyCard != null || !_ResetStatus)
@@ -1363,7 +1365,7 @@ namespace Hitachi.Tester.Module
         /// If status not 0 then tells the world that bunny is now sick.
         /// </summary>
         /// <param name="status"></param>
-        private void checkIfBunnyNowIsOK(bool status, string whatOperation)
+        private void NotifyWorldBunnyStatus(bool status, string whatOperation)
         {
             if (status && !_TesterState.BunnyGood) // function is called before bBunnyGood flag is set.
             {

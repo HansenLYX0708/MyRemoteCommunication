@@ -154,6 +154,7 @@
   <ItemGroup>
     <Compile Include="BladeEventStruct.cs" />
     <Compile Include="ProxyListClass.cs" />
+    <Compile Include="SequenceExecutionObject.cs" />
     <Compile Include="TesterObject.BladeInfo.cs" />
     <Compile Include="TesterObject.cs" />
     <Compile Include="TesterObject.SendEvent.cs" />

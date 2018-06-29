@@ -27,18 +27,19 @@ namespace Hitachi.Tester.Module
         private ProxyListClass _CallbackProxyList;
         private delegate void PingDelegate(string name);
         private delegate void StartTestSequenceDelegate(string ParseString, string TestName, string GradeName, int StartingTest, bool BreakOnError, string tableStr);
+
         /// <summary>
         /// Use for monitor all status
         /// </summary>
         internal volatile TesterState _TesterState;
-
+        private Thread _BladeEventsThread;
         private BunnyBoard _BunnyCard;
         private List<BunnyBoard> _Boards;
 
-        private volatile bool _Exit = false;
-        private volatile bool _Escape = false;
-        private volatile bool _SavingSettings = false;
-        private volatile bool _SetConfigGoing = false;
+        private volatile bool _Exit;
+        private volatile bool _Escape;
+        private volatile bool _SavingSettings;
+        private volatile bool _SetConfigGoing;
 
         private string _FactPath;
         private string _GradePath;
@@ -48,7 +49,6 @@ namespace Hitachi.Tester.Module
         private string _DebugPath;
         private string _CountsPath;
         private string _BladePath;
-        
         #endregion Fields
 
         #region Constructors
@@ -63,7 +63,6 @@ namespace Hitachi.Tester.Module
             _InLoad5vMax = GetLimitFromAppConfig("Vcc5LoadMax", 5.75);
             _Sw5vMin = GetLimitFromAppConfig("Vcc5SwitchMin", 4.25);
             _Sw5vMax = GetLimitFromAppConfig("Vcc5SwitchMax", 5.75);
-
             _In12vMin = GetLimitFromAppConfig("Vcc12NoLoadMin", 11.0);
             _In12vMax = GetLimitFromAppConfig("Vcc12NoLoadMax", 13.0);
             _InLoad12vMin = GetLimitFromAppConfig("Vcc12LoadMin", 11.0);
@@ -74,24 +73,12 @@ namespace Hitachi.Tester.Module
             _RequestedLockObj = new object();
             // Read only fields end
 
-
             Init();
-
-            _TesterState = new TesterState();
-            try
-            {
-                _CallbackProxyList = new ProxyListClass();
-            }
-            catch
-            { }
-            // TODO : The following complex processes should not exist in the constructor and should be considered for removal
-            _BladeEventsThread = new Thread(DoBladeEvents);
-            _BladeEventsThread.IsBackground = true;
-            _BladeEventsThread.Start();
         }
 
         private void Init()
         {
+            _CurrentSequenceList = new List<TestSequence>();  // holds all of our defined sequences
             _Disposed = false;
             _BladePath = "";
             _FactPath = "";
@@ -101,7 +88,27 @@ namespace Hitachi.Tester.Module
             _LogPath = "";
             _DebugPath = "";
             _CountsPath = "";
+
+            _Exit = false;
+            _Escape = false;
+            _SavingSettings = false;
+            _SetConfigGoing = false;
+
             SimpleBladeInfoInit();
+
+            _TesterState = new TesterState();
+            try
+            {
+                _CallbackProxyList = new ProxyListClass();
+            }
+            catch
+            { }
+            // TODO : The following complex processes should not exist in the constructor and should be considered for removal
+            _BladeEventsThread = new Thread(DoBladeEvents)
+            {
+                IsBackground = true
+            };
+            _BladeEventsThread.Start();
         }
 
         ~TesterObject()
@@ -254,7 +261,7 @@ namespace Hitachi.Tester.Module
             }
         }
 
-        
+
         #endregion Properties
 
         #region ITesterObject Methods
@@ -296,9 +303,11 @@ namespace Hitachi.Tester.Module
         public int PingInt()
         {
             // send StatusEvent
-            StatusEventArgs args = new StatusEventArgs();
-            args.Text = Constants.KeepAliveString;
-            args.EventType = (int)eventInts.KeepAliveEvent;
+            StatusEventArgs args = new StatusEventArgs
+            {
+                Text = Constants.KeepAliveString,
+                EventType = (int)eventInts.KeepAliveEvent
+            };
             SendStatusEvent(this, args);
             return Constants.KeepAliveTimeout;  // Just some known number.
         }
@@ -331,7 +340,7 @@ namespace Hitachi.Tester.Module
                 TxFile(fs1, fs2);
                 retVal = true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 WriteLineContent("TesterObject::CopyFileOnBlade exception");
                 throw new Exception("CopyFileOnBlade " + fromWholePath + " " + toWholePath + " ", e);
@@ -458,6 +467,23 @@ namespace Hitachi.Tester.Module
                 }
             }
         }
+
+        /// <summary>
+        /// Starts and runs the requested sequence given in TestName.
+        ///  Should be called StartSequence.
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="TestName"></param>
+        /// <returns></returns>
+        public void StartTest(string ParseString, string TestName, string GradeName, string tableStr)
+        {
+            //testerState.gradeName = GradeName;
+            // tell TCL to start testing
+            //return StartTestSequence(ParseString, TestName, GradeName, 0, false, tableStr);
+            StartTestSequenceDelegate startTestDelegate = new StartTestSequenceDelegate(StartTestSequence);
+            startTestDelegate.BeginInvoke(ParseString, TestName, GradeName, 0, false, tableStr, new AsyncCallback(delegate (IAsyncResult ar) { startTestDelegate.EndInvoke(ar); }), startTestDelegate);
+        }
+
         #endregion part two
         #endregion ITesterObject Methods
 
@@ -754,7 +780,7 @@ namespace Hitachi.Tester.Module
                     MethodInvoker del = delegate
                     {
                         WriteOutCountsData();
-                        // TODO : countStateFromDisk.writeOutData(System.IO.Path.Combine(BladePath, Constants.TesterCountsTXT));
+                        _CountStateFromDisk.writeOutData(System.IO.Path.Combine(BladePath, Constants.TesterCountsTXT));
                     };
                     del.BeginInvoke(new AsyncCallback(delegate (IAsyncResult ar) { try { del.EndInvoke(ar); } catch { } }), del);
                 }
@@ -790,14 +816,156 @@ namespace Hitachi.Tester.Module
                 toFile.Write(byteArray, 0, howMany);
             }
         }
+
+        /// <summary>
+        /// Starts and runs the requested sequence given in TestName.
+        /// BreakOnError flag is no longer used for anything.
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="TestName"></param>
+        /// <returns></returns>
+        private void StartTestSequence(string ParseString, string TestName, string GradeName, int StartingTest, bool BreakOnError, string tableStr)
+        {
+            if ((_TesterState.SeqGoing) || (_TesterState.PleaseStop))
+            {
+                WriteLine("TesterObject::StartTestSequence -- tester busy.");
+                WriteLineContent("TesterObject::StartTestSequence busy, test name:" + TestName);
+                StatusEventArgs args = new StatusEventArgs("SequenceAbortingEvent -- tester busy ", 1);
+                SendSequenceAbortingEvent(this, args);
+                Application.DoEvents();
+                Thread.Sleep(1000);
+                StatusEventArgs finishedWithThis = new StatusEventArgs("Aborted");
+                SendSequenceCompletedEvent(this, finishedWithThis);
+                return;
+            }
+
+            // TODO :  TCL need remove  waitForEveryTclThingNotBusy();
+            if (_Escape) return;
+
+            _TesterState.SeqGoing = true;
+            _TesterState.CmdBusy = true;
+
+            string testName = TestName.Replace("{", "").Replace("}", "");
+            WriteLine("StartTest " + testName);
+            WriteLineContent(" " + testName);
+            string[] bladeTypeArray = BladeType.Trim().Split(new char[] { ' ' }, StringSplitOptions.None);
+            bool arrayOk = bladeTypeArray.Length > 1;
+
+            // Append blade info to the parse string.
+            StringBuilder parseStringBuilder = new StringBuilder();
+            parseStringBuilder.Append(ParseString + ";");
+            if (MyLocation.Length > 5)
+            {
+                parseStringBuilder.Append("set FACTTest(bladeSlot) {" + MyLocation.Substring(5) + "}; ");
+            }
+            else
+            {
+                parseStringBuilder.Append("set FACTTest(bladeSlot) { 1 }; ");
+            }
+            parseStringBuilder.Append("set FACTDrive(bladeSerialNumber) {" + BladeSN + "}; ");
+            parseStringBuilder.Append("set FACTDrive(jadeSerialNumber) {" + JadeSN + "}; ");
+            parseStringBuilder.Append("set FACTDrive(bladeType) {" + (arrayOk ? bladeTypeArray[0] : BladeType) + "}; ");
+            parseStringBuilder.Append("set FACTDrive(MEMSSerialNumber) {" + MemsSn + "}; ");
+            parseStringBuilder.Append("set FACTDrive(diskSerialNumber) {" + DiskSn + "}; ");
+            parseStringBuilder.Append("set FACTDrive(PCBASerialNumber) {" + PcbaSn + "}; ");
+            parseStringBuilder.Append("set FACTDrive(motorBaseplateSerialNumber) {" + MotorBaseSn + "}; ");
+            parseStringBuilder.Append("set FACTDrive(actuatorSerialNumber) {" + ActuatorSN + "}; ");
+            parseStringBuilder.Append("set FACTDrive(flexSerialNumber) {" + FlexSN + "}; ");
+
+            SequenceExecutionObject runThis = new SequenceExecutionObject();
+
+            // find requested sequence in our list of sequences
+            for (int i = 0; i < _CurrentSequenceList.Count; i++)
+            {
+                try
+                {
+                    // Is this the one we are looking for?
+                    if (testName.Trim().ToLower() == _CurrentSequenceList[i].dictionaryHeader["Name"].Trim().ToLower())
+                    {
+                        // we found it
+                        runThis.TheSequence = _CurrentSequenceList[i];
+                        runThis.GradeName = GradeName.Replace("{", "").Replace("}", "");
+                        runThis.StartingTest = StartingTest;
+                        runThis.BreakOnError = BreakOnError;
+                        //runThis.ParseString = parseStringBuilder.ToString().Replace("{", "").Replace("}", "");
+                        runThis.TableString = tableStr.Replace("{", "").Replace("}", "");
+                        _TesterState.SequenceName = runThis.TheSequence.dictionaryHeader["Name"];
+                        break;
+                    }
+                }
+                catch
+                {
+                    StatusEventArgs args = new StatusEventArgs("SequenceAbortingEvent -- Sequence defective or not found. ", 1);
+                    SendSequenceAbortingEvent(this, args);
+                    Application.DoEvents();
+                    Thread.Sleep(1000);
+                    StatusEventArgs finishedWithThis = new StatusEventArgs("Aborted");
+                    SendSequenceCompletedEvent(this, finishedWithThis);
+                    _TesterState.SeqGoing = false;
+                    _TesterState.CmdBusy = false;
+                    return;
+                }
+            }
+            //if requested test sequence not found or missing something then return
+            if (runThis.TheSequence == null || _TesterState.SequenceName.Length == 0 || runThis.TheSequence.ArrayListTests.Count == 0)
+            {
+                WriteLine("StartTest exited  Either Sequence Not Found or defective.");
+                StatusEventArgs args = new StatusEventArgs("SequenceAbortingEvent -- Sequence Not Found. " + TestName, 1);
+                SendSequenceAbortingEvent(this, args);
+                Application.DoEvents();
+                Thread.Sleep(1000);
+                WriteLine("Calling sequence complete.");
+                StatusEventArgs finishedWithThis = new StatusEventArgs("Aborted");
+                SendSequenceCompletedEvent(this, finishedWithThis);
+                _TesterState.SeqGoing = false;
+                _TesterState.CmdBusy = false;
+                return;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            if (runThis.GradeName.Length > 0)
+            {
+                _TesterState.GradeName = runThis.GradeName;
+                sb.Append(Constants.SetupGradeFile + " " + System.IO.Path.Combine(GradePath, Path.GetFileName(_TesterState.GradeName)).Replace("\\", "/") + "; ");
+            }
+            else
+            {
+                _TesterState.GradeName = "";
+            }
+
+            if (runThis.TableString.Length > 0)
+            {
+                sb.Append(Constants.SetupGradeTable + " " + runThis.TableString + "; ");
+            }
+            else
+            {
+                // nothing
+            }
+
+            // set current values for grade and seq files.
+            _TesterState.GradeName = GradeName;
+            _TesterState.SequenceName = TestName;
+
+            // Add the above to parsestring 
+            //runThis.ParseString = sb.ToString() + parseStringBuilder.ToString().Replace("{", "").Replace("}", "");
+            runThis.ParseString = sb.ToString() + parseStringBuilder.ToString();
+
+            //Go
+            // TODO : RunTheSequence(runThis);
+            return;
+        }
+
         #endregion internal sup Methods
 
         #region Log System
         internal void WriteLine(string Text)
         {
             if (Text == null) return;
-            Thread WriteLineThread = new Thread(new ParameterizedThreadStart(WriteLineThreadFunc));
-            WriteLineThread.IsBackground = true;
+            Thread WriteLineThread = new Thread(new ParameterizedThreadStart(WriteLineThreadFunc))
+            {
+                IsBackground = true
+            };
             WriteLineThread.Start((object)Text);
         }
 
@@ -809,8 +977,10 @@ namespace Hitachi.Tester.Module
         internal void WriteLineContent(string Text)
         {
             if (Text == null) return;
-            Thread WriteLineContentThread = new Thread(new ParameterizedThreadStart(WriteLineContentThreadFunc));
-            WriteLineContentThread.IsBackground = true;
+            Thread WriteLineContentThread = new Thread(new ParameterizedThreadStart(WriteLineContentThreadFunc))
+            {
+                IsBackground = true
+            };
             WriteLineContentThread.Start((object)Text);
         }
 

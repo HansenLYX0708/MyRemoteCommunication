@@ -35,7 +35,7 @@ namespace Hitachi.Tester.Client
         // private WCF stuff
         private ITesterObject _TesterObject;  // proxy for non-stream functions.
         // TODO : private ITesterObjectStreaming m_testerObjectStreaming; // proxy for stream funcitons.
-        private object ITesterObjectLock = new object();
+        private object ITesterObjectLock;
         // TODO : private object ITesterObjectStreamLock = new object();
         private System.Threading.Timer _KeepAliveTimer;
         public bool _KeepAliveArrived;
@@ -45,6 +45,7 @@ namespace Hitachi.Tester.Client
         private bool _Connected = false; // Flag to see if we have ever connected.
 
         // Justin
+        // TODO : Should add remove function.
         static private Dictionary<string, RemoteConnectLib> _Connections;
 
         // Event hander
@@ -54,9 +55,13 @@ namespace Hitachi.Tester.Client
         #region Constructors
         public RemoteConnectLib()
         {
+            Init();
+        }
+
+        private void Init()
+        {
             Microsoft.VisualBasic.Devices.Computer computer = new Microsoft.VisualBasic.Devices.Computer();
             _OurName = computer.Name;
-
             _Disposed = false;
 
             _Factory = null;
@@ -67,13 +72,14 @@ namespace Hitachi.Tester.Client
             _ConnectLockObject = new object();
             _BusyConnecting = false;
 
+            ITesterObjectLock = new object();
+
             _BladeEventCallbackClass = new TesterObjectCallback(this);
             _BladeEvent = new BladeEventClass(this);
 
             // After connected, timer pings host every now and then to keep the channel awake.
-            _KeepAliveTimer = new System.Threading.Timer(keepAliveTimer_Tick, null, Timeout.Infinite, Timeout.Infinite);
+            _KeepAliveTimer = new System.Threading.Timer(KeepAliveTimer_Tick, null, Timeout.Infinite, Timeout.Infinite);
             _KeepAliveArrived = true;
-
         }
 
         /// <summary>
@@ -110,11 +116,11 @@ namespace Hitachi.Tester.Client
         {
             get
             {
-                if (_TesterObject == null || ((System.ServiceModel.ICommunicationObject)_TesterObject).State != CommunicationState.Opened)
+                if (_TesterObject == null || ((ICommunicationObject)_TesterObject).State != CommunicationState.Opened)
                 {
                     if (_TesterObject != null)
                     {
-                        ((System.ServiceModel.ICommunicationObject)_TesterObject).Abort();
+                        ((ICommunicationObject)_TesterObject).Abort();
                     }
                     Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, true, false);
                 }
@@ -148,70 +154,45 @@ namespace Hitachi.Tester.Client
             UInt32 retVal = 0;
             nlogger.Info("RemoteConnectLib::Connect [ConnectBusy:{0}]", _BusyConnecting);
 
-            // TODO:Determine whether the connection has been made, or reconnect put to keep alive function.
+            // TODO : Determine whether the connection has been made, or reconnect put to keep alive function.
 
             // _BusyConnecting keep only one connect operation in one class.
             if (!_BusyConnecting)
             {
-                _BusyConnecting = true;
-                // The reconnect uses these.
-                _CurrentUrlAddress = urlAddress;
-                _CurrentUserID = userID;
-                _CurrentPassword = password;
-                _CurrentNetTcpConnectFlag = netTcp;
+                lock (_ConnectLockObject)
+                {
+                    _BusyConnecting = true;
+                    // The reconnect uses these.
+                    _CurrentUrlAddress = urlAddress;
+                    _CurrentUserID = userID;
+                    _CurrentPassword = password;
+                    _CurrentNetTcpConnectFlag = netTcp;
 
-                // Build the complete path
-                string strUrl = MakeupCompleteUrl(urlAddress, netTcp);
-                string strStreamUrl = MakeupCompleteStreamingUrl(strUrl, netTcp);
-                nlogger.Info("RemoteConnectLib::Connect [strUrl:{0}] [strStreamUrl:{0}]", strUrl, strStreamUrl);
-                // Add connect function
-                try
-                {
-                    // Init channel factory
-                    InitChannelFactory(strUrl, strStreamUrl, netTcp, tobj, tobjStr);
-                    nlogger.Info("RemoteConnectLib::Connect [Factory:{0}]", _Factory.ToString());
-
-                    // Create channel and open service.
-                    if (tobj)
-                    {
-                        _TesterObject = _Factory.CreateChannel();
-                        CommunicationState chanState = ((System.ServiceModel.ICommunicationObject)_TesterObject).State;
-                        if (chanState != CommunicationState.Opened)
-                        {
-                            ((System.ServiceModel.ICommunicationObject)_TesterObject).Open();
-                        }
-                    }
-                    if (tobjStr)
-                    {
-                        // TODO : testObjectStreaming
-                    }
-                }
-                catch (WebException ex)
-                {
-                    nlogger.Error("RemoteConnectLib::Connect Create Channel WebException [Exception :{0}]", ex.Message);
-                    retVal = (UInt32)ReturnValues.connectionBad;
-                }
-                catch (Exception ex)
-                {
-                    // TODO : Add log information.
-                    nlogger.Error("RemoteConnectLib::Connect Create Channel exception [Exception :{0}]", ex.Message);
-                    retVal = (UInt32)ReturnValues.connectionBad;
-                }
-
-                // TODO : Add tester object streaming
-                if (_Factory == null || _TesterObject == null)
-                {
-                    nlogger.Error("RemoteConnectLib::Connect failed to attach event to remote server [URL:{0}]", strUrl);
-                    retVal = (UInt32)ReturnValues.connectionBad;
-                }
-
-                if (retVal != (UInt32)ReturnValues.connectionBad)
-                {
+                    // Build the complete path
+                    string strUrl = MakeupCompleteUrl(urlAddress, netTcp);
+                    string strStreamUrl = MakeupCompleteStreamingUrl(strUrl, netTcp);
+                    nlogger.Info("RemoteConnectLib::Connect [strUrl:{0}] [strStreamUrl:{0}]", strUrl, strStreamUrl);
+                    // Add connect function
                     try
                     {
-                        // This will add our proxy to testerObject's callback list.
-                        retVal = _TesterObject.Connect(userID, "", _OurName);
-                        //string what = ((System.ServiceModel.ICommunicationObject)Obj).State.ToString();
+                        // Init channel factory
+                        InitChannelFactory(strUrl, strStreamUrl, netTcp, tobj, tobjStr);
+                        nlogger.Info("RemoteConnectLib::Connect [Factory:{0}]", _Factory.ToString());
+
+                        // Create channel and open service.
+                        if (tobj)
+                        {
+                            _TesterObject = _Factory.CreateChannel();
+                            CommunicationState chanState = ((ICommunicationObject)_TesterObject).State;
+                            if (chanState != CommunicationState.Opened)
+                            {
+                                ((ICommunicationObject)_TesterObject).Open();
+                            }
+                        }
+                        if (tobjStr)
+                        {
+                            // TODO : testObjectStreaming
+                        }
                     }
                     catch (WebException ex)
                     {
@@ -225,19 +206,48 @@ namespace Hitachi.Tester.Client
                         retVal = (UInt32)ReturnValues.connectionBad;
                     }
 
-                    if ((retVal & (int)ReturnValues.bladeAccessBit) != 0)
+                    // TODO : Add tester object streaming
+                    if (_Factory == null || _TesterObject == null)
                     {
-                        string cached = urlAddress.Replace(":" + Constants.WcfBladePort.ToString() + "/TesterObject", "");
-                        if (!Connections.ContainsKey(cached))
+                        nlogger.Error("RemoteConnectLib::Connect failed to attach event to remote server [URL:{0}]", strUrl);
+                        retVal = (UInt32)ReturnValues.connectionBad;
+                    }
+
+                    if (retVal != (UInt32)ReturnValues.connectionBad)
+                    {
+                        try
                         {
-                            Connections.Add(cached, this);
+                            // This will add our proxy to testerObject's callback list.
+                            retVal = _TesterObject.Connect(userID, "", _OurName);
+                            //string what = ((System.ServiceModel.ICommunicationObject)Obj).State.ToString();
                         }
-                        else
+                        catch (WebException ex)
                         {
-                            Connections[cached] = this;
+                            nlogger.Error("RemoteConnectLib::Connect Create Channel WebException [Exception :{0}]", ex.Message);
+                            retVal = (UInt32)ReturnValues.connectionBad;
                         }
-                        _Connected = true;
-                        _KeepAliveArrived = true;
+                        catch (Exception ex)
+                        {
+                            // TODO : Add log information.
+                            nlogger.Error("RemoteConnectLib::Connect Create Channel exception [Exception :{0}]", ex.Message);
+                            retVal = (UInt32)ReturnValues.connectionBad;
+                        }
+
+                        if ((retVal & (int)ReturnValues.bladeAccessBit) != 0)
+                        {
+                            string cached = urlAddress.Replace(":" + Constants.WcfBladePort.ToString() + "/TesterObject", "");
+                            if (!Connections.ContainsKey(cached))
+                            {
+                                Connections.Add(cached, this);
+                            }
+                            else
+                            {
+                                Connections[cached] = this;
+                            }
+                            _Connected = true;
+                            _KeepAliveArrived = true;
+                        }
+                        nlogger.Error("RemoteConnectLib::Connect  [Connections number :{0}]", Connections.Count);
                     }
                 }
             }
@@ -276,7 +286,7 @@ namespace Hitachi.Tester.Client
                 ((ICommunicationObject)_TesterObject).Close();
                 // TODO : ((ICommunicationObject)m_testerObjectStreaming).Close();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 nlogger.Info("RemoteConnectLib::Disconnect delegate error [ex.message:{0}]", ex.Message);
             }
@@ -284,7 +294,7 @@ namespace Hitachi.Tester.Client
         }
 
         // TODO : Think about put MakeupCompleteUrl and MakeupCompleteUrl2 together.
-        private string MakeupCompleteUrl( string urlAddress, bool netTcp )
+        private string MakeupCompleteUrl(string urlAddress, bool netTcp)
         {
             // make up the url from the computer name/ip passed to this func
             string retVal = string.Empty;
@@ -342,7 +352,7 @@ namespace Hitachi.Tester.Client
                     portNumber = Constants.WcfBladePort;
                 }
             }
-            
+
 
             if (netTcp)
             {
@@ -410,10 +420,11 @@ namespace Hitachi.Tester.Client
         }
 
         /// <summary>
-        /// 
+        /// Timer callback, pings host every now and then to keep channel alive (and
+        /// to verify that everything is working).
         /// </summary>
         /// <param name="state"></param>
-        private void keepAliveTimer_Tick(object state)
+        private void KeepAliveTimer_Tick(object state)
         {
             nlogger.Info("RemoteConnectLib::KeepAliveTimer_Tick start");
             uint ret = 999;
@@ -481,8 +492,8 @@ namespace Hitachi.Tester.Client
 
             if (_BusyConnecting) return;
 
-            Disconnect();
             // TODO : Disconnect first.
+            Disconnect();
 
             // Close TesterObject service.
             if (_TesterObject != null && ((ICommunicationObject)_TesterObject).State == CommunicationState.Opened)
@@ -512,7 +523,7 @@ namespace Hitachi.Tester.Client
         {
             nlogger.Info("RemoteConnectLib::OnStatusEvent start[EventType:{0}] [Text:{1}]", e.EventType, e.Text);
             // If keep alive event then set KeepAliveArrived
-            if ((Enums.eventInts)e.EventType == eventInts.KeepAliveEvent)
+            if ((eventInts)e.EventType == eventInts.KeepAliveEvent)
             {
                 // Mask bug in BladeRunner 1.5++ for SCS 1.0
                 if (e.Text == "StatusEvent " + Constants.CommTestString)
@@ -525,13 +536,7 @@ namespace Hitachi.Tester.Client
                     return;
                 }
             }
-
-            StatusEventHandler handler = _ComStatusEvent;
-            if (handler != null)
-            {
-                // Invokes the delegates. 
-                handler(this, e);
-            }
+            _ComStatusEvent?.Invoke(this, e);
         }
         #endregion Methods
 

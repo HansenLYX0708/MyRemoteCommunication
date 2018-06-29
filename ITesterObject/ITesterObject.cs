@@ -65,7 +65,20 @@ namespace Hitachi.Tester.Module
         [FaultContract(typeof(SenderFaultDetail))]
         void SetConfig(string NewConfig);
 
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void StartTest(string ParseString, string TestName, string GradeName, string tableStr);
         #endregion part two
+
+        #region part three
+        #endregion part three
+
+        #region part three
+        #endregion part three
+
+        #region part three
+        #endregion part three
 
     } // end interface
 
