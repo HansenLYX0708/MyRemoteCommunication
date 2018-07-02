@@ -171,7 +171,7 @@ namespace Hitachi.Tester.Client
                     // Build the complete path
                     string strUrl = MakeupCompleteUrl(urlAddress, netTcp);
                     string strStreamUrl = MakeupCompleteStreamingUrl(strUrl, netTcp);
-                    nlogger.Info("RemoteConnectLib::Connect [strUrl:{0}] [strStreamUrl:{0}]", strUrl, strStreamUrl);
+                    nlogger.Info("RemoteConnectLib::Connect [strUrl:{0}] [strStreamUrl:{1}]", strUrl, strStreamUrl);
                     // Add connect function
                     try
                     {

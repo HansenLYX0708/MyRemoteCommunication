@@ -11,9 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TesterObject", "TesterObjec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Defines", "Defines\Defines.csproj", "{1158CE60-E954-4FC2-9442-1BF5AC00431B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHost", "TestHost\TestHost.csproj", "{F315921A-4A1E-4B17-B43F-17F36E5EA487}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_TestHost", "TestHost\_TestHost.csproj", "{F315921A-4A1E-4B17-B43F-17F36E5EA487}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClient", "TestClient\TestClient.csproj", "{114DFB7E-A792-4303-9B26-AD4F3641B21B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_TestClient", "TestClient\_TestClient.csproj", "{114DFB7E-A792-4303-9B26-AD4F3641B21B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IJadeCommonTables", "IJadeCommonTables\IJadeCommonTables.csproj", "{3AA675A1-77D6-485B-A7C3-51A14C962BB5}"
 EndProject

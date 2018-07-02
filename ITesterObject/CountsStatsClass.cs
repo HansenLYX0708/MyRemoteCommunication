@@ -28,73 +28,65 @@ namespace Hitachi.Tester.Module
         private void TheStats_StatisticsDGREvent(object sender, StatusEventArgs e)
         {
             ObjectStatusEventArgsClass argObj = new ObjectStatusEventArgsClass(sender, e);
-            Thread eventThread = new Thread(SendStatisticsDGREvent);
-            eventThread.IsBackground = true;
+            Thread eventThread = new Thread(SendStatisticsDGREvent)
+            {
+                IsBackground = true
+            };
             eventThread.Start(argObj);
         }
 
         private void SendStatisticsDGREvent(object argObj)
         {
             ObjectStatusEventArgsClass ArgObj = (ObjectStatusEventArgsClass)argObj;
-            StatusEventHandler handler = StatisticsDGREvent;
-            if (handler != null)
-            {
-                handler(ArgObj.Sender, ArgObj.Args);
-            }
+            StatisticsDGREvent?.Invoke(ArgObj.Sender, ArgObj.Args);
         }
 
         private void TheStats_StatisticsFromToTimeEvent(object sender, StatusEventArgs e)
         {
             ObjectStatusEventArgsClass argObj = new ObjectStatusEventArgsClass(sender, e);
-            Thread eventThread = new Thread(SendStatisticsValueEvent);
-            eventThread.IsBackground = true;
+            Thread eventThread = new Thread(SendStatisticsValueEvent)
+            {
+                IsBackground = true
+            };
             eventThread.Start(argObj);
         }
 
         private void SendStatisticsFromToEvent(object argObj)
         {
             ObjectStatusEventArgsClass ArgObj = (ObjectStatusEventArgsClass)argObj;
-            StatusEventHandler handler = StatisticsFromToTimeEvent;
-            if (handler != null)
-            {
-                handler(ArgObj.Sender, ArgObj.Args);
-            }
+            StatisticsFromToTimeEvent?.Invoke(ArgObj.Sender, ArgObj.Args);
         }
 
         private void TheStats_StatisticsValueEvent(object sender, StatusEventArgs e)
         {
             ObjectStatusEventArgsClass argObj = new ObjectStatusEventArgsClass(sender, e);
-            Thread eventThread = new Thread(SendStatisticsValueEvent);
-            eventThread.IsBackground = true;
+            Thread eventThread = new Thread(SendStatisticsValueEvent)
+            {
+                IsBackground = true
+            };
             eventThread.Start(argObj);
         }
 
         private void SendStatisticsValueEvent(object argObj)
         {
             ObjectStatusEventArgsClass ArgObj = (ObjectStatusEventArgsClass)argObj;
-            StatusEventHandler handler = StatisticsValueEvent;
-            if (handler != null)
-            {
-                handler(ArgObj.Sender, ArgObj.Args);
-            }
+            StatisticsValueEvent?.Invoke(ArgObj.Sender, ArgObj.Args);
         }
 
         private void TheStats_StatisticsMinMaxEvent(object sender, StatusEventArgs e)
         {
             ObjectStatusEventArgsClass argObj = new ObjectStatusEventArgsClass(sender, e);
-            Thread eventThread = new Thread(SendStatisticsMinMaxEvent);
-            eventThread.IsBackground = true;
+            Thread eventThread = new Thread(SendStatisticsMinMaxEvent)
+            {
+                IsBackground = true
+            };
             eventThread.Start(argObj);
         }
 
         private void SendStatisticsMinMaxEvent(object argObj)
         {
             ObjectStatusEventArgsClass ArgObj = (ObjectStatusEventArgsClass)argObj;
-            StatusEventHandler handler = StatisticsMinMaxEvent;
-            if (handler != null)
-            {
-                handler(ArgObj.Sender, ArgObj.Args);
-            }
+            StatisticsMinMaxEvent?.Invoke(ArgObj.Sender, ArgObj.Args);
         }
 
         public override void SetValue(string name, int value)
@@ -134,6 +126,5 @@ namespace Hitachi.Tester.Module
             theStats.StartStopTime(from, to);
         }
         #endregion Methods
-
     } // end class
 } // end namespace

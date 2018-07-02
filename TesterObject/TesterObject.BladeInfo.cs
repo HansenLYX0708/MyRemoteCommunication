@@ -24,6 +24,8 @@ namespace Hitachi.Tester.Module
         private string _FlexSn;
         private string _MotorSn;
 
+        private HGST.Blades.MemsStateValues _MemsStatus;
+        private readonly object _MemsStatusLockObj;
         private string _BladeType;
 
         private int _OpenDelay;
@@ -321,6 +323,27 @@ namespace Hitachi.Tester.Module
             {
                 WriteDataFiles(Constants.JadeSNTXT, value.Trim());
                 _JadeSn = value.Trim();
+            }
+        }
+
+        /// <summary>
+        /// Get Set current MEMS state with lock for thread problems.
+        /// </summary>
+        private HGST.Blades.MemsStateValues MemsStatus
+        {
+            get
+            {
+                lock (_MemsStatusLockObj)
+                {
+                    return _MemsStatus;
+                }
+            }
+            set
+            {
+                lock (_MemsStatusLockObj)
+                {
+                    _MemsStatus = value;
+                }
             }
         }
 
@@ -770,8 +793,119 @@ namespace Hitachi.Tester.Module
             };
             setStringsThread.Start(passingObjAray);
         }
+
+        public int[] GetIntegers(string key, string[] names)
+        {
+            List<int> retList = new List<int>();
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (string aName in names)
+            {
+                sb.Append(string.Format("GetIntegers called for {0}", aName));
+
+                int tmpStatus = 0;
+                switch (aName)
+                {
+                    case BladeDataName.MemsCount:
+                    case BladeDataName.PatrolCount:
+                    case BladeDataName.ScanCount:
+                    case BladeDataName.TestCount:
+                    case BladeDataName.DiskLoadCount:
+                        retList.Add(_CountStateFromDisk.GetValue(aName));
+                        continue;
+
+                    case BladeDataName.Ramp:
+                        // TODO : retList.Add(ReadRampValue());
+                        continue;
+
+                    case BladeDataName.BunnyStatus:
+                        retList.Add(ReadBunnyStatusAndUpdateFlags());
+                        continue;
+                    case BladeDataName.Solenoid:
+                        tmpStatus = ReadBunnyStatusAndUpdateFlags();
+                        retList.Add((tmpStatus & (int)HGST.Blades.EnumBunnyStatusBits.SOLENOID) > 0 ? 1 : 0);
+                        break;
+                    case BladeDataName.Aux12VDC:
+                        tmpStatus = ReadBunnyStatusAndUpdateFlags();
+                        retList.Add((tmpStatus & (int)HGST.Blades.EnumBunnyStatusBits.AUX_12VDC) > 0 ? 1 : 0);
+                        break;
+                    case BladeDataName.Aux5VDC:
+                        tmpStatus = ReadBunnyStatusAndUpdateFlags();
+                        retList.Add((tmpStatus & (int)HGST.Blades.EnumBunnyStatusBits.AUX_5VDC) > 0 ? 1 : 0);
+                        break;
+                    case BladeDataName.AuxIn0:
+                        tmpStatus = ReadBunnyStatusAndUpdateFlags();
+                        retList.Add((tmpStatus & (int)HGST.Blades.EnumBunnyStatusBits.AUX_IN0) > 0 ? 1 : 0);
+                        break;
+                    case BladeDataName.AuxIn1:
+                        tmpStatus = ReadBunnyStatusAndUpdateFlags();
+                        retList.Add((tmpStatus & (int)HGST.Blades.EnumBunnyStatusBits.AUX_IN1) > 0 ? 1 : 0);
+                        break;
+                    case BladeDataName.AuxOut0:
+                        tmpStatus = ReadBunnyStatusAndUpdateFlags();
+                        retList.Add((tmpStatus & (int)HGST.Blades.EnumBunnyStatusBits.AUX_OUT0) > 0 ? 1 : 0);
+                        break;
+                    case BladeDataName.AuxOut1:
+                        tmpStatus = ReadBunnyStatusAndUpdateFlags();
+                        retList.Add((tmpStatus & (int)HGST.Blades.EnumBunnyStatusBits.AUX_OUT1) > 0 ? 1 : 0);
+                        break;
+                    case BladeDataName.BackLight:
+                        tmpStatus = ReadBunnyStatusAndUpdateFlags();
+                        retList.Add((tmpStatus & (int)HGST.Blades.EnumBunnyStatusBits.BACKLIGHT) > 0 ? 1 : 0);
+                        break;
+                    case BladeDataName.MemsState:
+                        // TODO : retList.Add((int)GetMemsState());
+                        break;
+                    case BladeDataName.CardPower:
+                        tmpStatus = ReadBunnyStatusAndUpdateFlags();
+                        bool pwrOn = (tmpStatus & ((int)HGST.Blades.EnumBunnyStatusBits.AUX_12VDC | (int)HGST.Blades.EnumBunnyStatusBits.AUX_5VDC)) == ((int)HGST.Blades.EnumBunnyStatusBits.AUX_12VDC | (int)HGST.Blades.EnumBunnyStatusBits.AUX_5VDC);
+                        retList.Add(pwrOn ? 1 : 0);
+                        break;
+                    default:
+                        retList.Add(-1);
+                        continue;
+                } // end switch
+
+                if (retList.Count > 0) sb.Append(retList[retList.Count - 1].ToString());
+
+            } // end for
+
+            WriteLineContent(sb.ToString());
+
+            return retList.ToArray();
+        }
+
+        public void SetIntegers(string key, string[] names, int[] numbers)
+        {
+            object[] passingObjAray = new object[] { (object)key, (object)names, (object)numbers };
+            Thread setIntsThread = new Thread(new ParameterizedThreadStart(SetIntegersThreadFunc))
+            {
+                IsBackground = true
+            };
+            setIntsThread.Start((object)passingObjAray);
+        }
+
+        /// <summary>
+        /// Set Mems to opposite state.
+        /// </summary>
+        public void PinMotionToggle()
+        {
+            // TODO :
+            //if (MemsState == HGST.Blades.MemsStateValues.Opened || MemsState == HGST.Blades.MemsStateValues.Unknown)
+            //{
+            //    OpenCloseMems(0); // close it
+            //}
+            //else if (MemsState == HGST.Blades.MemsStateValues.Closed)
+            //{
+            //    OpenCloseMems(1); // open it
+            //}
+            // else if memsState == MemsStateValues.Changing, we do nothing.
+        }
+
         #endregion ITesterObject Methods
 
+        #region Support Methods
         private void SimpleBladeInfoInit()
         {
             _NeedToReLoadAllValues = true;
@@ -816,7 +950,6 @@ namespace Hitachi.Tester.Module
                 }
                 catch { }
             }
-
             _MyLocation = "";
             _JadeSn = "";
             _MemsSn = "";
@@ -831,6 +964,9 @@ namespace Hitachi.Tester.Module
             _CloseDelay = 0;
             _MemsOpenDelay = "";
             _MemsCloseDelay = "";
+
+            _MemsStatus = HGST.Blades.MemsStateValues.Unknown;
+            
             _BladeType = "";
             _VoltageCheckBlade = false;
             _VoltageCheckThreadGoing = false;
@@ -1447,5 +1583,124 @@ namespace Hitachi.Tester.Module
                 }
             } // end lock
         }
+
+        private void SetIntegersThreadFunc(object passingObj)
+        {
+            try
+            {
+                object[] passingObjAray = (object[])passingObj;
+                //string key = (string)passingObjAray[0];
+                string[] names = (string[])passingObjAray[1];
+                int[] numbers = (int[])passingObjAray[2];
+
+                bool counterStateUpdated = true;
+
+                for (int i = 0; i < names.Length && i < numbers.Length; i++)
+                {
+                    WriteLineContent(string.Format("SetIntegers called {0} {1}", names[i], numbers[i]));
+                    switch (names[i])
+                    {
+                        case BladeDataName.MemsCount:
+                        case BladeDataName.PatrolCount:
+                        case BladeDataName.ScanCount:
+                        case BladeDataName.TestCount:
+                        case BladeDataName.DiskLoadCount:
+                            counterStateUpdated = false;
+                            _CountStateFromDisk.SetValue(names[i], numbers[i]);
+                            //TODO : SendBunnyCountEvents(names[i]);
+                            continue;
+
+                        case BladeDataName.AuxOut0:
+                            if (_BunnyCard != null)
+                            {
+                                SendBunnyEvent(this, new StatusEventArgs(numbers[i].ToString(), (int)BunnyEvents.Aux0Out));
+                                if (_BunnyCard != null) _BunnyCard.SetAuxOut0(numbers[i] > 0);
+                            }
+                            continue;
+
+                        case BladeDataName.AuxOut1:
+                            if (_BunnyCard != null)
+                            {
+                                SendBunnyEvent(this, new StatusEventArgs(numbers[i].ToString(), (int)BunnyEvents.Aux1Out));
+                                if (_BunnyCard != null) _BunnyCard.SetAuxOut1(numbers[i] > 0);
+                            }
+                            continue;
+
+                        case BladeDataName.Aux5VDC:
+                            if (_BunnyCard != null)
+                            {
+                                SendBunnyEvent(this, new StatusEventArgs(numbers[i].ToString(), (int)BunnyEvents.Pwr5V));
+                                if (_BunnyCard != null) _BunnyCard.Set5vdc(numbers[i] > 0);
+                            }
+                            continue;
+
+                        case BladeDataName.Aux12VDC:
+                            if (_BunnyCard != null)
+                            {
+                                SendBunnyEvent(this, new StatusEventArgs(numbers[i].ToString(), (int)BunnyEvents.Pwr12V));
+                                if (_BunnyCard != null) _BunnyCard.Set12vdc(numbers[i] > 0);
+                            }
+                            continue;
+
+                        case BladeDataName.BackLight:
+                            if (_BunnyCard != null)
+                            {
+                                SendBunnyEvent(this, new StatusEventArgs(numbers[i].ToString(), (int)BunnyEvents.BackLight));
+                                if (_BunnyCard != null) _BunnyCard.SetBackLight(numbers[i] > 0);
+                            }
+                            continue;
+
+                        case BladeDataName.PinMotion:
+                            if (_BunnyCard != null)
+                            {
+                                WriteLine("PinMotion " + ((numbers[i] != 0) ? "true" : "false"));
+                                WriteLineContent(numbers[i].ToString());
+                                // TODO : OpenCloseMems(numbers[i] > 0 ? 1 : 0);
+                            }
+                            continue;
+
+                        case BladeDataName.CardPower:
+                            if (_BunnyCard != null)
+                            {
+                                SendBunnyEvent(this, new StatusEventArgs(numbers[i].ToString(), (int)BunnyEvents.Pwr12V));
+                                SendBunnyEvent(this, new StatusEventArgs(numbers[i].ToString(), (int)BunnyEvents.Pwr5V));
+                                if (_BunnyCard != null) _BunnyCard.Set12vdc(numbers[i] > 0);
+                                if (_BunnyCard != null) _BunnyCard.Set5vdc(numbers[i] > 0);
+                            }
+                            continue;
+
+                        case BladeDataName.Solenoid:
+                            if (_BunnyCard != null)
+                            {
+                                SendBunnyEvent(this, new StatusEventArgs(numbers[i].ToString(), (int)BunnyEvents.Solenoid));
+                                if (_BunnyCard != null) _BunnyCard.SetSolenoid((int)HGST.Blades.EnumSolenoidServoAddr.SOLENOID, numbers[i] > 0);
+                            }
+                            continue;
+
+                        case BladeDataName.Ramp:
+                            if (_BunnyCard != null)
+                            {
+                                WriteLine("Set RampRate called ");
+                                WriteLineContent(numbers[i].ToString());
+                                // TODO : SetRampValue(numbers[i]);
+                            }
+                            continue;
+                    } // end switch
+                } // end for
+
+                if (!counterStateUpdated)
+                {
+                    WriteOutCountsData();
+                    //counterStateUpdated = true;
+                }
+            }
+            catch
+            {
+                // TODO : CheckIfBunnyNowIsOK(false, "set integers bunny off ");
+            }
+        }
+
+        #endregion Support Methods
+
     }// end class
 }

@@ -29,7 +29,7 @@ namespace Hitachi.Tester.Module
         private int _ConsecutiveCount = 0;
         #endregion Fields
 
-        #region Methods
+        #region Event Methods
         private void SendBunnyEvent(object sender, StatusEventArgs e)
         {
             object[] objArray = { sender, (object)e };
@@ -340,91 +340,6 @@ namespace Hitachi.Tester.Module
             del.BeginInvoke(new AsyncCallback(delegate (IAsyncResult ar) { del.EndInvoke(ar); }), del);
         }
 
-        /// <summary>
-        /// Puts items in the queue.
-        /// It called by all send event.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SendBladeEventCallback(object sender, BladeEventArgs e)
-        {
-            lock (_BladeEventLockObj)
-            {
-                e.Consecutive = _ConsecutiveCount++;
-                if (_ConsecutiveCount < 0) _ConsecutiveCount = 0;
-            }
-
-            if ( e.Text.ToLower().IndexOf("Event::varToEvent".ToLower()) == 0)
-            {
-
-            }
-            else if (e.Text.ToLower().Contains("Event::PowerEvent::PCBPower1".ToLower()))
-            {
-
-            }
-            else if (e.Text.ToLower().Contains("Event::PowerEvent::PCBPower0".ToLower()))
-            {
-
-            }
-            else if (e.Text.ToLower().Contains("Event::MEMSOpenEvent::MEMSOpen".ToLower()))
-            {
-
-            }
-            else if (e.Text.ToLower().Contains("Event::MEMSCloseEvent::MEMSClose".ToLower()))
-            {
-
-            }
-            else if (e.Text.ToLower().Contains("Event::GetBladeValue::MEMSState".ToLower()))
-            {
-
-            }
-            else if (e.Text.ToLower().Contains("Event::LoadActuator::".ToLower()))
-            {
-
-            }
-            if (_BladeEventQueue != null && _BladeEventQueueLock != null)
-            {
-                try
-                {
-                    try
-                    {
-                        _BladeEventQueueLock.AcquireWriterLock(TimeSpan.FromMilliseconds((2000)));
-                    }
-                    catch 
-                    {
-                    	// TODO : Do it anyway?
-                    }
-                    _BladeEventQueue.Enqueue(new BladeEventStruct( sender, e ));
-                    // Send to host (BladeRunner)
-                    try
-                    {
-                        StaticServerTalker.BladeEvent(new object[] { sender, e });
-                    }
-                    catch 
-                    {
-                        // TODO : Do nothing?
-                    }
-
-
-                }
-                catch 
-                {
-                	// TODO : do nothing?
-                }
-                finally
-                {
-                    if (_BladeEventQueueLock.IsWriterLockHeld)
-                    {
-                        _BladeEventQueueLock.ReleaseWriterLock();
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="passingObject"></param>
         private void SendBunnyEventThreadFunc(object passingObject)
         {
             object[] objArray = (object[])passingObject;
@@ -471,6 +386,89 @@ namespace Hitachi.Tester.Module
             }
             // Single channel remoting
             SendBladeEventCallback(sender, new StatusBladeEventArgs(BladeEventType.Bunny, e).ToBladeEventArgs());
+        }
+        #endregion Event Methods
+
+        #region Event process Methods
+        /// <summary>
+        /// Puts items in the queue.
+        /// It called by all send event.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SendBladeEventCallback(object sender, BladeEventArgs e)
+        {
+            lock (_BladeEventLockObj)
+            {
+                e.Consecutive = _ConsecutiveCount++;
+                if (_ConsecutiveCount < 0) _ConsecutiveCount = 0;
+            }
+
+            if (e.Text.ToLower().IndexOf("Event::varToEvent".ToLower()) == 0)
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::PowerEvent::PCBPower1".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::PowerEvent::PCBPower0".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::MEMSOpenEvent::MEMSOpen".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::MEMSCloseEvent::MEMSClose".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::GetBladeValue::MEMSState".ToLower()))
+            {
+
+            }
+            else if (e.Text.ToLower().Contains("Event::LoadActuator::".ToLower()))
+            {
+
+            }
+            if (_BladeEventQueue != null && _BladeEventQueueLock != null)
+            {
+                try
+                {
+                    try
+                    {
+                        _BladeEventQueueLock.AcquireWriterLock(TimeSpan.FromMilliseconds((2000)));
+                    }
+                    catch
+                    {
+                        // TODO : Do it anyway?
+                    }
+                    _BladeEventQueue.Enqueue(new BladeEventStruct(sender, e));
+                    // Send to host (BladeRunner)
+                    try
+                    {
+                        StaticServerTalker.BladeEvent(new object[] { sender, e });
+                    }
+                    catch
+                    {
+                        // TODO : Do nothing?
+                    }
+
+
+                }
+                catch
+                {
+                    // TODO : do nothing?
+                }
+                finally
+                {
+                    if (_BladeEventQueueLock.IsWriterLockHeld)
+                    {
+                        _BladeEventQueueLock.ReleaseWriterLock();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -559,6 +557,7 @@ namespace Hitachi.Tester.Module
                 }
             }
         }
-        #endregion Methods
+        #endregion Event process Methods
+
     }
 }

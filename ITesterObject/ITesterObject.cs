@@ -7,12 +7,10 @@
 // Purpose                  : 
 // ==========================================================================================
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using System.ServiceModel;
+
+using Hitachi.Tester.Enums;
 
 namespace Hitachi.Tester.Module
 {
@@ -21,7 +19,7 @@ namespace Hitachi.Tester.Module
         CallbackContract = typeof(ITesterObjectCallback))]
     public interface ITesterObject
     {
-        #region part one
+        #region base function
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
@@ -40,7 +38,52 @@ namespace Hitachi.Tester.Module
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
+        string Ping(string message);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        FileNameStruct[] BladeFileDir(string path, string Filter);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
         bool CopyFileOnBlade(string fromFile, string toFile);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        bool BladeDelFile(string Key, string FileName);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void SafeRemoveBlade();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        bool BunnyReInit();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        TesterState GetModuleState();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void SetModuleState(TesterState testerState);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void GetBunnyStatus();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        MemsStateValues GetMemsStatus();
 
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
@@ -52,14 +95,29 @@ namespace Hitachi.Tester.Module
         [FaultContract(typeof(SenderFaultDetail))]
         string[] GetStrings(string key, string[] names);
 
-        #endregion part one
-
-        #region part two
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
-        string Ping(string message);
+        void SetIntegers(string key, string[] names, int[] numbers);
 
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        int[] GetIntegers(string key, string[] names);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void PinMotionToggle();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        string Name();
+
+        #endregion base function
+
+        #region Tester function
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
@@ -68,16 +126,31 @@ namespace Hitachi.Tester.Module
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
+        void GetConfig(string TestName);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        bool DelConfig(string Key, string TestName);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
         void StartTest(string ParseString, string TestName, string GradeName, string tableStr);
-        #endregion part two
+        #endregion Tester function
 
+
+        // TODO :
         #region part three
+
         #endregion part three
 
         #region part three
+
         #endregion part three
 
         #region part three
+
         #endregion part three
 
     } // end interface
@@ -88,8 +161,8 @@ namespace Hitachi.Tester.Module
     //public delegate void CompleteEventHandler(object sender, CompletedEventArgs e);
     //public delegate void StartedEventHandler(object sender, StartedEventArgs e);
 
-    // The following event handler is used to send all events across the wire.
-    // Actually we no longer do .NET remoting events.  Instead we use a WCF callback.
+    // The following event handler is used to send all events across the wire. Actually we no longer do .NET remoting events.  Instead we use a WCF callback.
     // Blade runner wraps this in a callback.
+    // !!be used in server
     public delegate void BladeEventHandler(object sender, BladeEventArgs e);
 }

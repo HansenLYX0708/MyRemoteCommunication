@@ -327,9 +327,11 @@ namespace Hitachi.Tester.Sequence
             sc.Add(null, xsdFile);
 
             // Set the validation settings.
-            XmlReaderSettings settings = new XmlReaderSettings();
-            settings.ValidationType = ValidationType.Schema;
-            settings.Schemas = sc;
+            XmlReaderSettings settings = new XmlReaderSettings
+            {
+                ValidationType = ValidationType.Schema,
+                Schemas = sc
+            };
             settings.ValidationEventHandler += new ValidationEventHandler(ValidationEventHandler);
 
             // Create the XmlReader object.
@@ -388,13 +390,15 @@ namespace Hitachi.Tester.Sequence
                 for (int i = 1; i < xmlTestDoc.ChildNodes[1].ChildNodes.Count; i++)
                 {
                     // one test struct
-                    aTest = new ATest();
-                    // get the test name
-                    aTest.Name = xmlTestDoc.ChildNodes[1].ChildNodes[i].Attributes[0].Value;
-                    // get the test image
-                    aTest.Image = xmlTestDoc.ChildNodes[1].ChildNodes[i].Attributes[1].Value;
-                    // get the toolTip
-                    aTest.ToolTip = xmlTestDoc.ChildNodes[1].ChildNodes[i].Attributes[2].Value;
+                    aTest = new ATest
+                    {
+                        // get the test name
+                        Name = xmlTestDoc.ChildNodes[1].ChildNodes[i].Attributes[0].Value,
+                        // get the test image
+                        Image = xmlTestDoc.ChildNodes[1].ChildNodes[i].Attributes[1].Value,
+                        // get the toolTip
+                        ToolTip = xmlTestDoc.ChildNodes[1].ChildNodes[i].Attributes[2].Value
+                    };
 
                     // loop once for each subtype (testState, testFlags, ...)
                     for (int j = 0; j < xmlTestDoc.ChildNodes[1].ChildNodes[i].ChildNodes.Count; j++)

@@ -6,10 +6,13 @@ using System.ServiceModel;
 using System.IO;
 using System.Windows.Forms;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections;
+using System.Xml;
 
 using Hitachi.Tester.Enums;
 using Hitachi.Tester.Sequence;
 using HGST.Blades;
+using RemoveDriveByLetter;
 
 namespace Hitachi.Tester.Module
 {
@@ -40,6 +43,7 @@ namespace Hitachi.Tester.Module
         private volatile bool _Escape;
         private volatile bool _SavingSettings;
         private volatile bool _SetConfigGoing;
+        private volatile bool _DelConfigGoing;
 
         private string _FactPath;
         private string _GradePath;
@@ -71,6 +75,7 @@ namespace Hitachi.Tester.Module
             _Sw12vMax = GetLimitFromAppConfig("Vcc12SwitchMax", 13.0);
 
             _RequestedLockObj = new object();
+            _MemsStatusLockObj = new object();
             // Read only fields end
 
             Init();
@@ -93,6 +98,7 @@ namespace Hitachi.Tester.Module
             _Escape = false;
             _SavingSettings = false;
             _SetConfigGoing = false;
+            _DelConfigGoing = false;
 
             SimpleBladeInfoInit();
 
@@ -264,8 +270,7 @@ namespace Hitachi.Tester.Module
 
         #endregion Properties
 
-        #region ITesterObject Methods
-        #region part one
+        #region ITesterObject base function
         public UInt32 Connect(string userID, string password, string computerName)
         {
             UInt32 retVal = (UInt32)ReturnValues.bladeAccessBit;
@@ -296,6 +301,20 @@ namespace Hitachi.Tester.Module
             }
         }
 
+        public string Ping(string message)
+        {
+            string retVal = message;
+            // TODO : TesterState
+
+            WriteLine(string.Format("TesterObject::Ping"));
+            WriteLineContent("TesterObject::Ping" + message);
+
+            PingDelegate aPingDelegate = new PingDelegate(PingOperation);
+            aPingDelegate.BeginInvoke(message, PingCallback, aPingDelegate);
+            // TODO
+            return retVal;
+        }
+
         /// <summary>
         /// Service to maintain a connection
         /// </summary>
@@ -310,6 +329,111 @@ namespace Hitachi.Tester.Module
             };
             SendStatusEvent(this, args);
             return Constants.KeepAliveTimeout;  // Just some known number.
+        }
+
+        ///<summary>
+        /// Returns directory list to client.  
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="Filter"></param>
+        /// <returns></returns>
+        public FileNameStruct[] BladeFileDir(string path, string Filter)
+        {
+            WriteLine("TesterObject::BladeFileDir called ");
+            WriteLineContent("TesterObject::BladeFileDir called " + Filter);
+            ArrayList gradeList = new ArrayList();
+            try
+            {
+                // get directory from Windows.
+                string[] fileList;
+                //string[] dirList;
+                string wholePath = FixUpThePaths(path);
+
+                try
+                {
+                    fileList = Directory.GetFiles(wholePath, Filter);
+                }
+                catch (DirectoryNotFoundException e)
+                {
+                    throw new Exception("Invalid path: Check \"Path to Grade files\" in BladeRunner.", e);
+                }
+                // open each file and get internal version and date
+                for (int i = 0; i < fileList.Length; i++)
+                {
+                    FileStream fs = null;
+                    try
+                    {
+                        FileNameStruct oneFile = new FileNameStruct
+                        {
+                            FileNameStr = Path.GetFileName(fileList[i])
+                        };
+                        FileInfo fi = new FileInfo(fileList[i]);
+                        try
+                        {
+                            fs = new FileStream(fileList[i], FileMode.Open, FileAccess.Read, FileShare.Read);
+                            // we parse all of the xml stuff with this
+                            XmlDocument xmlTestDoc = new XmlDocument();
+                            // load the file
+                            xmlTestDoc.Load(fs);
+                            oneFile.VersionStr = xmlTestDoc.ChildNodes[1].Attributes[2].Value;
+                            for (int j = 0; j < xmlTestDoc.ChildNodes[1].ChildNodes.Count; j++)
+                            {
+                                switch (xmlTestDoc.ChildNodes[1].ChildNodes[j].Name)
+                                {
+                                    case "date":
+                                        oneFile.DateStr = xmlTestDoc.ChildNodes[1].ChildNodes[j].InnerText + " " + fi.LastWriteTime.ToShortTimeString();
+                                        break;
+                                    case "binSpecTable":
+                                        oneFile.BinVerStr = xmlTestDoc.ChildNodes[1].ChildNodes[j].Attributes[0].Value;
+                                        break;
+                                    case "skipSpecTable":
+                                        oneFile.SkipVerStr = xmlTestDoc.ChildNodes[1].ChildNodes[j].Attributes[0].Value;
+                                        break;
+                                    case "ocrSpecTable":
+                                        oneFile.OcrVerStr = xmlTestDoc.ChildNodes[1].ChildNodes[j].Attributes[0].Value;
+                                        break;
+                                    case "gradeSpecTable":
+                                        oneFile.GradeVerStr = xmlTestDoc.ChildNodes[1].ChildNodes[j].Attributes[0].Value;
+                                        break;
+                                    case "rankDispositionTable":
+                                        oneFile.DispVerStr = xmlTestDoc.ChildNodes[1].ChildNodes[j].Attributes[0].Value;
+                                        break;
+                                    case "RetryTable":
+                                        oneFile.RetryDispoVerStr = xmlTestDoc.ChildNodes[1].ChildNodes[j].Attributes[0].Value;
+                                        break;
+                                    case "testerLimitsTable":
+                                        oneFile.TestCountVerStr = xmlTestDoc.ChildNodes[1].ChildNodes[j].Attributes[0].Value;
+                                        break;
+                                    case "trayDispositionTable":
+                                        oneFile.TrayDispoVerStr = xmlTestDoc.ChildNodes[1].ChildNodes[j].Attributes[0].Value;
+                                        break;
+                                } // end switch
+                            } // end for
+                        }
+                        catch
+                        {
+                            oneFile.DateStr = fi.LastWriteTime.ToShortDateString() + " " + fi.LastWriteTime.ToShortTimeString();
+                        }
+                        gradeList.Add(oneFile);
+                    }
+                    catch (Exception e)
+                    {
+                        throw e;
+                    }
+                    finally
+                    {
+                        try { fs.Close(); }
+                        catch { }
+                        try { fs.Dispose(); }
+                        catch { }
+                    }
+                }
+            }
+            catch (Exception ee)
+            {
+                throw ee;
+            }
+            return (FileNameStruct[])gradeList.ToArray(typeof(FileNameStruct));
         }
 
         /// <summary>
@@ -362,23 +486,103 @@ namespace Hitachi.Tester.Module
             return retVal;
         }
 
-        #endregion part one
-
-        #region part two
-        public string Ping(string message)
+        /// <summary>
+        /// Delete file in this remote module.
+        /// Returns true if file not there after delete.
+        /// Returns false if something wrong.
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="FileName"></param>
+        /// <returns></returns>
+        public bool BladeDelFile(string Key, string FileName)
         {
-            string retVal = message;
-            // TODO : TesterState
-
-            WriteLine(string.Format("TesterObject::Ping"));
-            WriteLineContent("TesterObject::Ping" + message);
-
-            PingDelegate aPingDelegate = new PingDelegate(PingOperation);
-            aPingDelegate.BeginInvoke(message, PingCallback, aPingDelegate);
-            // TODO
-            return retVal;
+            try
+            {
+                WriteLine("TesterObject::BladeDelFile called ");
+                string wholePath = FixUpThePaths("TesterObject::BladeDelFile:" + FileName);
+                WriteLineContent(wholePath);
+                File.Delete(wholePath);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
+        /// <summary>
+        /// Officially "eject" blade flash drive.
+        /// </summary>
+        public void SafeRemoveBlade()
+        {
+            //TODO: Do not hard code F:
+            RemoveDriveTools.RemoveDrive("F:");
+        }
+
+        public bool BunnyReInit()
+        {
+            WriteLine("TesterObject::BunnyReInit called ");
+            bool bunnyOK = false;
+            try
+            {
+                bunnyOK = UsbReset(0);
+                if (!bunnyOK)
+                {
+                    throw new Exception("Blade controller Init failed.");
+                }
+
+                // if possible reload all of the stuff
+                ReadBunnyStatusAndUpdateFlags();
+            }
+            catch (Exception e)
+            {
+                WriteLineContent(MakeUpExceptionString(e).ToString());
+            }
+            return bunnyOK;
+        }
+
+        /// <summary>
+        /// Returns the current state of the remote module.  
+        /// Clients can connect at any time to this singleton module.  A new client must call 
+        /// this to see what is happening.
+        /// </summary>
+        /// <returns></returns>
+        public TesterState GetModuleState()
+        {
+            WriteLine("TesterObject::GetModuleState called ");
+            WriteLineContent("TesterObject::GetModuleState called " + _TesterState.ToString());
+            return _TesterState;
+        }
+
+        public void SetModuleState(TesterState testerState)
+        {
+            WriteLine("TesterObject::SetModuleState called ");
+            WriteLineContent("TesterObject::SetModuleState called " + _TesterState.ToString());
+            Thread setModuleThread = new Thread(new ParameterizedThreadStart(SetModuleStateThreadFunc))
+            {
+                IsBackground = true
+            };
+            setModuleThread.Start(testerState);
+        }
+
+        // TODO : no use in old code
+        public void GetBunnyStatus()
+        {
+            Thread getBunnyStatusThread = new Thread(new ThreadStart(GetBunnyStatusThreadFunc))
+            {
+                IsBackground = true
+            };
+            getBunnyStatusThread.Start();
+        }
+
+        public Enums.MemsStateValues GetMemsStatus()
+        {
+            return (Enums.MemsStateValues)MemsStatus;
+        }
+
+        #endregion ITesterObject base function
+
+        #region Tester function
         /// <summary>
         /// Reads a test Sequence file from the grade dir and writes to TesterObject.
         /// To write file from Jade, call bladeFileWrite and then this.
@@ -444,7 +648,6 @@ namespace Hitachi.Tester.Module
                         i--;
                     }
                 }
-
                 // add new one
                 _CurrentSequenceList.Add(newSequence);
                 WriteLineContent("File read from: " + fromWholePath);
@@ -469,6 +672,96 @@ namespace Hitachi.Tester.Module
         }
 
         /// <summary>
+        /// This is a remotable function (see ITesterObject)
+        /// This function reads sequence file from TesterObject and writes to the grade directory.
+        /// Call this and then call BladeFileRead to read file into Jade.
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="TestName"></param>
+        /// <returns></returns>
+        public void GetConfig(string TestName)
+        {
+            WriteLine("GetConfig called " + TestName);
+
+            string translatedPath = FixUpThePaths(TestName);
+            string justFilename = Path.GetFileNameWithoutExtension(translatedPath);
+            if (justFilename.Length >= 0)
+            {
+                try
+                {
+                    // See if the requested TestName is in the list
+                    for (int i = 0; i < _CurrentSequenceList.Count; i++)
+                    {
+                        // Is this the one?
+                        if (_CurrentSequenceList[i].dictionaryHeader["Name"].Trim().ToLower() == justFilename.Trim().ToLower())
+                        {
+                            // Write file to requested location.
+                            _CurrentSequenceList[i].WriteTests(translatedPath, false);
+                            WriteLineContent("File saved at: " + translatedPath);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception e) // for debug; can comment out.
+                {
+                    throw e;
+                }
+            }
+        }
+
+        /// <summary>
+        /// This is a remotable function (see ITesterObject)
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="TestName"></param>
+        /// <returns></returns>
+        public bool DelConfig(string Key, string TestName)
+        {
+            WriteLine("DelConfig called ");
+            WriteLineContent(TestName);
+
+            // if saving this struct then wait
+            while (_SavingSettings)
+            {
+                if (_Exit || _Escape) return true;
+                Application.DoEvents();
+                Thread.Sleep(10);
+            }
+            // if already doing then wait
+            while (_DelConfigGoing)
+            {
+                if (_Exit || _Escape)
+                {
+                    return true;
+                }
+                Application.DoEvents();
+                Thread.Sleep(10);
+            }
+            try
+            {
+                _DelConfigGoing = true;
+
+                // Loop through all existing ones and see if it is already there.
+                for (int i = 0; i < _CurrentSequenceList.Count; i++)
+                {
+                    // Is this the same one?
+                    if (_CurrentSequenceList[i].dictionaryHeader["Name"].Trim().ToLower() == TestName.Trim().ToLower())
+                    {
+                        // Remove old instance.
+                        _CurrentSequenceList.RemoveAt(i);
+                        return true;
+                    }
+                }
+                SaveSettings();
+            }
+            finally
+            {
+                _DelConfigGoing = false;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Starts and runs the requested sequence given in TestName.
         ///  Should be called StartSequence.
         /// </summary>
@@ -484,8 +777,7 @@ namespace Hitachi.Tester.Module
             startTestDelegate.BeginInvoke(ParseString, TestName, GradeName, 0, false, tableStr, new AsyncCallback(delegate (IAsyncResult ar) { startTestDelegate.EndInvoke(ar); }), startTestDelegate);
         }
 
-        #endregion part two
-        #endregion ITesterObject Methods
+        #endregion Tester function
 
         #region internal sup Methods
         private void PingOperation(string name)
@@ -954,6 +1246,24 @@ namespace Hitachi.Tester.Module
             //Go
             // TODO : RunTheSequence(runThis);
             return;
+        }
+
+        private void SetModuleStateThreadFunc(object testerStateObj)
+        {
+            _TesterState = (TesterState)testerStateObj;
+
+            _FormerStatusRead = -1;
+            ReadBunnyStatusAndUpdateFlags();
+            WriteLine("TesterObject::SetModuleStateThreadFunc called ");
+            WriteLineContent(_TesterState.ToString());
+        }
+
+        private void GetBunnyStatusThreadFunc()
+        {
+            _FormerStatusRead = -1;
+            ReadBunnyStatusAndUpdateFlags();
+            WriteLine("TesterObject::GetBunnyStatusThreadFunc called ");
+            WriteLineContent("TesterObject::GetBunnyStatusThreadFunc called " + _TesterState.ToString());
         }
 
         #endregion internal sup Methods

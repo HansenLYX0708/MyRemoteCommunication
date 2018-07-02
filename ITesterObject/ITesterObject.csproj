@@ -127,6 +127,7 @@
     <Compile Include="CountsClass.cs" />
     <Compile Include="CountsStatsClass.cs" />
     <Compile Include="Faults.cs" />
+    <Compile Include="FileNameStruct.cs" />
     <Compile Include="ITesterObject.cs" />
     <Compile Include="ITesterObjectCallback.cs" />
     <Compile Include="ObjectStatusEventArgsClass.cs" />
