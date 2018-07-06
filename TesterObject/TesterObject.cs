@@ -52,6 +52,7 @@ namespace Hitachi.Tester.Module
         private string _LogPath;
         private string _DebugPath;
         private string _CountsPath;
+        private string _TclPath;
         private string _BladePath;
         #endregion Fields
 
@@ -267,7 +268,25 @@ namespace Hitachi.Tester.Module
             }
         }
 
+        private string TclPath
+        {
+            get
+            {
+                // if not set then assign default.
+                if (string.IsNullOrEmpty(_TclPath))
+                {
+                    _TclPath = "C:\\Tcl\\bin\\tclsh85.exe";
+                }
+                return _TclPath;
+            }
 
+            set
+            {
+                _TclPath = value;
+            }
+        }
+
+        private string TclStart { get; set; }
         #endregion Properties
 
         #region ITesterObject base function

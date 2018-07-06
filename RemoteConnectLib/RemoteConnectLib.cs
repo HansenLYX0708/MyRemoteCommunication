@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.ServiceModel;
 using System.Net;
+using System.Windows.Forms;
 
 using Hitachi.Tester;
 using Hitachi.Tester.Enums;
@@ -50,6 +51,29 @@ namespace Hitachi.Tester.Client
 
         // Event hander
         public event StatusEventHandler _ComStatusEvent;
+
+
+        private static object oBladeInfoLockObject;
+
+        private delegate string EventPingDelegate(string str);
+
+        private delegate string[] GetBladeStringsDelegate(string key, string[] names);
+        private delegate void SetBladeStringsDelegate(string key, string[] names, string[] strings);
+        private delegate int[] GetBladeIntsDelegate(string key, string[] names);
+        private delegate void SetBladeIntsDelegate(string key, string[] names, int[] numbers);
+        private delegate bool DelConfigDelegate(string Key, string TestName);
+
+
+        public event StatusEventHandler comProgramClosingEvent;
+        public event StatusEventHandler comSequenceUpdateEvent;
+        public event StatusEventHandler comSequenceAbortingEvent;
+        public event StatusEventHandler comSequenceCompleteEvent;
+        public event StartedEventHandler comSequenceStartedEvent;
+        public event StatusEventHandler comStatusEvent;
+        public event StatusEventHandler comBunnyEvent;
+        public event StatusEventHandler comTestStartedEvent;
+        public event CompleteEventHandler comTestCompleteEvent;
+        public event EventHandler ConnectedToRemote;
         #endregion Fields
 
         #region Constructors
@@ -73,6 +97,8 @@ namespace Hitachi.Tester.Client
             _BusyConnecting = false;
 
             ITesterObjectLock = new object();
+
+            oBladeInfoLockObject = new object();
 
             _BladeEventCallbackClass = new TesterObjectCallback(this);
             _BladeEvent = new BladeEventClass(this);
@@ -129,13 +155,264 @@ namespace Hitachi.Tester.Client
         }
         #endregion Properties
 
-        #region Methods
+        #region Service methods
         public UInt32 Connect(string urlAddress, string userID, string password)
         {
             _KeepAliveTimer.Change(Timeout.Infinite, Timeout.Infinite);
             UInt32 value = Connect(urlAddress, userID, password, true, true, true);
             _KeepAliveTimer.Change(Constants.KeepAliveTimeout, Timeout.Infinite);
             return value;
+        }
+
+        public void Disconnect()
+        {
+            nlogger.Info("RemoteConnectLib::Disconnect start");
+            _Connected = false;
+            try
+            {
+                Delegates.Action<string, string> disconnectDelegate = new Delegates.Action<string, string>(Obj.Disconnect);
+                IAsyncResult ar = disconnectDelegate.BeginInvoke(_CurrentUserID, _OurName, null, disconnectDelegate);
+                ar.AsyncWaitHandle.WaitOne(3000, false);
+                if (ar.IsCompleted)
+                {
+                    try { disconnectDelegate.EndInvoke(ar); }
+                    catch { }
+                }
+                ((ICommunicationObject)_TesterObject).Close();
+                // TODO : ((ICommunicationObject)m_testerObjectStreaming).Close();
+            }
+            catch (Exception ex)
+            {
+                nlogger.Info("RemoteConnectLib::Disconnect delegate error [ex.message:{0}]", ex.Message);
+            }
+            nlogger.Info("RemoteConnectLib::Disconnect end");
+        }
+
+        public string Ping(string message)
+        {
+            if (Obj == null) return "";
+            EventPingDelegate pingDelegate = new EventPingDelegate(Obj.Ping);
+            IAsyncResult ar = pingDelegate.BeginInvoke(message, null, null);
+
+            //ar.AsyncWaitHandle.WaitOne(20000, false);
+            // for loop used instead of AsyncWaitHandle so that Twidler moves during the wait.
+            for (int i = 0; i < 200 && !ar.IsCompleted; i++)
+            {
+                Thread.Sleep(100);
+            }
+            return ar.IsCompleted ? pingDelegate.EndInvoke(ar) : "Fail";
+        }
+
+        public string GetBladeString(string name)
+        {
+            string strValue = (GetBladeStrings(new string[] { name }))[0];
+            return strValue;
+        }
+
+        public void SetBladeString(string name, string value)
+        {
+            SetBladeStrings(new string[] { name }, new string[] { value });
+        }
+
+        public int GetBladeInteger(string name)
+        {
+            if (Obj == null) return -1;
+            return GetBladeIntegers(new string[] { name })[0];
+        }
+
+        public void SetBladeInteger(string name, int value)
+        {
+            if (Obj == null) return;
+            SetBladeIntegers(new string[] { name }, new int[] { value });
+        }
+
+        public bool CopyFileOnBlade(string fromFile, string toFile)
+        {
+            if (Obj == null) return false;
+            return Obj.CopyFileOnBlade(fromFile, toFile);
+        }
+
+        public bool BladeDelFile(string FileName)
+        {
+            DelConfigDelegate factFileDeleteDelegate = new DelConfigDelegate(Obj.BladeDelFile);
+            IAsyncResult ar = factFileDeleteDelegate.BeginInvoke(MakeKey(), FileName, null, null);
+            ar.AsyncWaitHandle.WaitOne(30000, false);
+            if (ar.IsCompleted) return (bool)factFileDeleteDelegate.EndInvoke(ar);
+            else throw new Exception("Cannot delete file in BladeDelFile " + FileName + ".");
+        }
+
+        public void SafelyRemove()
+        {
+            Obj.SafeRemoveBlade();
+        }
+
+        public void PinMotionToggle()
+        {
+            if (Obj == null) return;
+            Obj.PinMotionToggle();
+        }
+
+        public string Name()
+        {
+            if (Obj != null) return Obj.Name();
+            else return "";
+        }
+        // TODO : Consider remove follow GradeFilePath FirmwareFilePath FactFilePath
+        public string GradeFilePath()
+        {
+            if (Obj == null) return "";
+            return Obj.GetStrings("", new string[] { BladeDataName.GradePath })[0];
+        }
+
+        public string FirmwareFilePath()
+        {
+            if (Obj == null) return "";
+            return Obj.GetStrings("", new string[] { BladeDataName.FirmwarePath })[0];
+        }
+
+        public string FactFilePath()
+        {
+            if (Obj == null) return "";
+            return Obj.GetStrings("", new string[] { BladeDataName.FactPath })[0];
+        }
+
+        // TODO :  No use in current code
+        //public void SetModuleState(TesterStateStruct testerState)
+        //{
+        //    if (obj == null) return;
+        //    obj.SetModuleState(testerState);
+        //}
+
+        public MemsStateValues GetMemsState()
+        {
+            if (Obj == null) return MemsStateValues.Unknown;
+            return Obj.GetMemsStatus();
+        }
+
+        #endregion Service methods
+
+        #region Blade string and integer methods
+        public string GetFwRev()
+        {
+            return GetBladeString(BladeDataName.FwRev);
+        }
+
+        public string GetBladeType()
+        {
+            return GetBladeString(BladeDataName.BladeType);
+        }
+
+        public string GetSerialNumber()
+        {
+            return GetBladeString(BladeDataName.BladeSN);
+        }
+
+        public string GetTclStart()
+        {
+            return GetBladeString(BladeDataName.TclStart);
+        }
+
+        public void CardPower(bool State)
+        {
+            SetBladeInteger(BladeDataName.CardPower, State ? 1 : 0);
+        }
+
+        public void SetSerialNumber(string serialNumber)
+        {
+            SetBladeString(BladeDataName.BladeSN, serialNumber);
+        }
+
+        public void SetBladeType(string bladeType)
+        {
+            SetBladeString(BladeDataName.BladeType, bladeType);
+        }
+
+        public void SetMotorBaseplateSN(string serialNumber)
+        {
+            SetBladeString(BladeDataName.MotorBaseplateSN, serialNumber);
+        }
+
+        public void SetMotorSN(string serialNumber)
+        {
+            SetBladeString(BladeDataName.MotorSN, serialNumber);
+        }
+
+        public void SetActuatorSN(string serialNumber)
+        {
+            SetBladeString(BladeDataName.ActuatorSN, serialNumber);
+        }
+
+        public void SetDiskSN(string serialNumber)
+        {
+            SetBladeString(BladeDataName.DiskSN, serialNumber);
+        }
+
+        public void SetPcbaSN(string serialNumber)
+        {
+            SetBladeString(BladeDataName.PcbaSN, serialNumber);
+        }
+
+        public void SetJadeSN(string serialNumber)
+        {
+            SetBladeString(BladeDataName.JadeSN, serialNumber);
+        }
+
+        public void SetBladeLoc(string serialNumber)
+        {
+            SetBladeString(BladeDataName.BladeLoc, serialNumber);
+        }
+
+        public void SetMemsOpenDelay(string delayMs)
+        {
+            SetBladeString(BladeDataName.MemsOpenDelay, delayMs);
+        }
+
+        public void SetMemsCloseDelay(string delayMs)
+        {
+            SetBladeString(BladeDataName.MemsCloseDelay, delayMs);
+        }
+
+        public void SetFlexSN(string serialNumber)
+        {
+            SetBladeString(BladeDataName.FlexSN, serialNumber);
+        }
+
+        public void SetMemsSN(string serialNumber)
+        {
+            SetBladeString(BladeDataName.MemsSN, serialNumber);
+        }
+
+        public void SetTclStart(string command)
+        {
+            SetBladeString(BladeDataName.TclStart, command);
+        }
+
+        public void PinMotion(bool State)
+        {
+            SetBladeInteger(BladeDataName.PinMotion, State ? 1 : 0);
+        }
+
+        public void BackLight(bool State)
+        {
+            SetBladeInteger(BladeDataName.BackLight, State ? 1 : 0);
+        }
+
+        public void AuxOut0(int output)
+        {
+            SetBladeInteger(BladeDataName.AuxOut0, output);
+        }
+
+        public void AuxOut1(int output)
+        {
+            SetBladeInteger(BladeDataName.AuxOut1, output);
+        }
+
+        #endregion Blade string and integer methods
+
+        #region internal Methods
+        private string MakeKey()
+        {
+            return _OurName;
         }
 
         /// <summary>
@@ -267,30 +544,6 @@ namespace Hitachi.Tester.Client
             _BusyConnecting = false;
 
             return retVal;
-        }
-
-        public void Disconnect()
-        {
-            nlogger.Info("RemoteConnectLib::Disconnect start");
-            _Connected = false;
-            try
-            {
-                Delegates.Action<string, string> disconnectDelegate = new Delegates.Action<string, string>(Obj.Disconnect);
-                IAsyncResult ar = disconnectDelegate.BeginInvoke(_CurrentUserID, _OurName, null, disconnectDelegate);
-                ar.AsyncWaitHandle.WaitOne(3000, false);
-                if (ar.IsCompleted)
-                {
-                    try { disconnectDelegate.EndInvoke(ar); }
-                    catch { }
-                }
-                ((ICommunicationObject)_TesterObject).Close();
-                // TODO : ((ICommunicationObject)m_testerObjectStreaming).Close();
-            }
-            catch (Exception ex)
-            {
-                nlogger.Info("RemoteConnectLib::Disconnect delegate error [ex.message:{0}]", ex.Message);
-            }
-            nlogger.Info("RemoteConnectLib::Disconnect end");
         }
 
         // TODO : Think about put MakeupCompleteUrl and MakeupCompleteUrl2 together.
@@ -538,7 +791,211 @@ namespace Hitachi.Tester.Client
             }
             _ComStatusEvent?.Invoke(this, e);
         }
-        #endregion Methods
+
+        private string[] GetBladeStrings(string[] names)
+        {
+            if (Obj == null) return new string[] { "" };
+            const int numRetry = 3;
+            // Single channel
+            for (int i = 0; i < numRetry; i++)
+            {
+                GetBladeStringsDelegate del = new GetBladeStringsDelegate(Obj.GetStrings);
+                try
+                {
+                    lock (oBladeInfoLockObject)
+                    {
+                        IAsyncResult ar = del.BeginInvoke(MakeKey(), names, null, null);
+                        ar.AsyncWaitHandle.WaitOne(10000, false);
+                        if (ar.IsCompleted) return del.EndInvoke(ar);
+                    }
+                    nlogger.Error(string.Format(
+                        "GetBladeStrings timeout key={0} retry={1}/{2}",
+                        string.Join("/", names), i, numRetry));
+                }
+                catch (WebException e)
+                {
+                    nlogger.ErrorException(
+                        string.Format("GetBladeStrings failed key={0} retry={1}/{2}",
+                       string.Join(",", names), i, numRetry),
+                        e);
+                    if (i + 1 == numRetry)
+                    {
+                        // Temporally throw exception to switch to multi channel
+                        //deadBladeDelegate(string.Format("GetBladeStrings for key={0}", string.Join(",", names)));
+                        throw;
+                    }
+                    Thread.Sleep(1000);
+                }
+            }
+            nlogger.Error(string.Format(
+                "GetBladeStrings failed names={0} retry={1} ",
+                string.Join(",", names), numRetry));
+            string[] ret = new string[names.Length];
+            for (int j = 0; j < ret.Length; j++) ret[j] = "";
+            return ret;
+        }
+
+        private void SetBladeStrings(string[] names, string[] values)
+        {
+            if (Obj == null) return;
+            const int numRetry = 3;
+
+            // Single channel
+            for (int i = 0; i < numRetry; i++)
+            {
+                SetBladeStringsDelegate del = new SetBladeStringsDelegate(Obj.SetStrings);
+                try
+                {
+                    lock (oBladeInfoLockObject)
+                    {
+                        IAsyncResult ar = del.BeginInvoke(MakeKey(), names, values, null, null);
+                        //ar.AsyncWaitHandle.WaitOne(10000, false);  // doesn't work
+                        int maxCount = 100;
+                        for (int j = 0; j < maxCount; j++)
+                        {
+                            if (ar.IsCompleted)
+                            {
+                                break;
+                            }
+                            Thread.Sleep(100);
+                            Application.DoEvents();
+                        }
+                        if (ar.IsCompleted)
+                        {
+                            del.EndInvoke(ar);
+                            return;
+                        }
+                    }
+                    nlogger.Error(string.Format(
+                        "SetBladeStrings timeout key={0} retry={1}/{2}",
+                        string.Join("/", names), i, numRetry));
+                }
+                catch (WebException e)
+                {
+                    nlogger.FatalException(string.Format(
+                        "SetBladeStrings failed key={0} retry={1}/{2}",
+                        string.Join(",", names), i, numRetry), e);
+                    if (i + 1 == numRetry)
+                    {
+                        // Temporally thorw exception to switch to multi channel
+                        //deadBladeDelegate(string.Format("SetBladeStrings for key={0}", string.Join(",", names)));
+                        throw;
+                    }
+                    Thread.Sleep(1000);
+                }
+            }
+
+            nlogger.Error(string.Format("SetBladeStrings failed key={0}", string.Join("/", names)));
+        }
+
+        private int[] GetBladeIntegers(string[] names)
+        {
+            if (Obj == null) return new int[] { -1 };
+
+            const int numRetry = 3;
+
+            // Single channel
+            for (int i = 0; i < numRetry; i++)
+            {
+                GetBladeIntsDelegate del = new GetBladeIntsDelegate(Obj.GetIntegers);
+                try
+                {
+                    lock (oBladeInfoLockObject)
+                    {
+                        IAsyncResult ar = del.BeginInvoke(MakeKey(), names, null, null);
+                        ar.AsyncWaitHandle.WaitOne(10000, false);
+                        if (ar.IsCompleted) return del.EndInvoke(ar);
+                    }
+                    nlogger.Error(string.Format(
+                        "GetBladeIntegers timeout key={0} retry={1}/{2}",
+                        string.Join(",", names), i, numRetry));
+                }
+                catch (WebException e)
+                {
+                    nlogger.ErrorException(
+                         string.Format(
+                             "GetBladeIntegers failed key={0} retry={1}/{2}",
+                             string.Join("/", names), i, numRetry),
+                        e);
+                    if (i + 1 == numRetry)
+                    {
+                        // Temporarily throw exception to switch to multi channel
+                        //deadBladeDelegate(string.Format("GetBladeIntegers for key={0}", string.Join(",", names)));
+                        throw;
+                    }
+                    Thread.Sleep(1000);
+                }
+            }
+
+            nlogger.Error(string.Format(
+                "GetBladeIntegers failed names={0} retry={1} ", string.Join(",", names), numRetry));
+            int[] ret = new int[names.Length];
+            for (int j = 0; j < ret.Length; j++) ret[j] = 0;
+            return ret;
+        }
+
+        private void SetBladeIntegers(string[] names, int[] values)
+        {
+            if (Obj == null) return;
+            const int numRetry = 1;
+
+            // Single channel
+            for (int i = 0; i < numRetry; i++)
+            {
+                SetBladeIntsDelegate del = new SetBladeIntsDelegate(Obj.SetIntegers);
+                try
+                {
+                    lock (oBladeInfoLockObject)
+                    {
+                        IAsyncResult ar = del.BeginInvoke(MakeKey(), names, values, null, null);
+                        ar.AsyncWaitHandle.WaitOne(10000, false);
+                        if (ar.IsCompleted)
+                        {
+                            try
+                            {
+                                del.EndInvoke(ar);
+                            }
+                            catch
+                            {
+                            }
+                        }
+                    }
+                    nlogger.Error(string.Format(
+                        "SetBladeIntegers passed key={0} retry={1}/{2}",
+                        string.Join("/", names), i, numRetry));
+                }
+                catch (WebException e)
+                {
+                    nlogger.FatalException(string.Format(
+                        "SetBladeIntegers failed key={0} retry={1}", string.Join("/", names), i),
+                        e);
+                    if (i + 1 == numRetry)
+                    {
+                        // Temporally throw exception to switch to multi channel
+                        //deadBladeDelegate(string.Format("SetBladeIntegers for key={0}", string.Join(",", names)));
+                        throw;
+                    }
+                    Thread.Sleep(1000);
+                }
+                catch (Exception e)
+                {
+                    nlogger.FatalException(string.Format(
+                        "SetBladeIntegers failed key={0} retry={1}", string.Join("/", names), i),
+                        e);
+                    if (i + 1 == numRetry)
+                    {
+                        // Temporally throw exception to switch to multi channel
+                        //deadBladeDelegate(string.Format("SetBladeIntegers for key={0}", string.Join(",", names)));
+                        throw;
+                    }
+                    Thread.Sleep(1000);
+                }
+            }
+
+            nlogger.Error(string.Format("SetBladeIntegers failed key={0}", string.Join("/", names)));
+        }
+
+        #endregion internal Methods
 
         #region dispose Methods
         protected virtual void Dispose(bool disposing)
@@ -560,6 +1017,45 @@ namespace Hitachi.Tester.Client
                 _KeepAliveTimer.Dispose();
                 _KeepAliveTimer = null;
             }
+
+            // Close TesterObject service.
+            if (_TesterObject != null && ((ICommunicationObject)_TesterObject).State == CommunicationState.Opened)
+            {
+                try { ((ICommunicationObject)_TesterObject).Close(); }
+                catch
+                {
+                    // ignored
+                }
+            }
+            // Close TesterObject service.
+            else if (_TesterObject != null)
+            {
+                try { ((ICommunicationObject)_TesterObject).Abort(); }
+                catch
+                {
+                    // ignored
+                }
+            }
+            _TesterObject = null;
+
+            // Close TesterObjectStreaming service.
+            //if (_TesterObjectStreaming != null && ((ICommunicationObject)m_testerObjectStreaming).State == CommunicationState.Opened)
+            //{
+            //    try { ((ICommunicationObject)m_testerObjectStreaming).Close(); }
+            //    catch
+            //    {
+            //        // ignored
+            //    }
+            //}
+            //else if (m_testerObjectStreaming != null)
+            //{
+            //    try { ((ICommunicationObject)m_testerObjectStreaming).Abort(); }
+            //    catch
+            //    {
+            //        // ignored
+            //    }
+            //}
+            //m_testerObjectStreaming = null;
 
             // Notice sys 
             _Disposed = true;

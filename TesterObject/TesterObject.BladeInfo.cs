@@ -89,9 +89,28 @@ namespace Hitachi.Tester.Module
 
         private string _FirmwareRev;
         private string _DriverRev;
-
-        private object _ReadInCountsLockObject;
         // Bunny card fields end
+        private object _ReadInCountsLockObject;
+
+        private System.Threading.Timer memsOpenWatchdogTimer;
+        private System.Threading.TimerCallback watchdogDelegate;
+        DateTime m_MemsOpenClosedStartTime;
+        private ServoPositionClass openPosition;
+        private ServoPositionClass closePosition;
+        private volatile bool bMemsThreadGoing;
+        private double verNumDriver = -1.0;
+        private double verNumFirm = -1.0;
+
+        private bool m_ServoArrived;
+        private HGST.Blades.MemsStateValues m_ServoMemsState;
+
+        private delegate bool boolFiveIntsDelegate(int value1, int value2, int value3, int value4, int value5);
+
+        private int servoMoveCloseCallbackRetries;
+        private int servoMoveOpenCallbackRetries;
+        private int hgstGetServoRetryCount;
+        private int hgstSetSaveServoRetries = 0;
+        private int hgstGetNeutralRetryCount = 0;
         #endregion Fields
 
         #region Properties
@@ -535,7 +554,6 @@ namespace Hitachi.Tester.Module
         #endregion Properties
 
         #region ITesterObject Methods
-
         /// <summary>
         /// Get one or more blade strings.
         /// Appends result for each item in names[] to returned string[].
@@ -903,6 +921,319 @@ namespace Hitachi.Tester.Module
             // else if memsState == MemsStateValues.Changing, we do nothing.
         }
 
+        /// <summary>
+        /// Calls BunnyLib hgst_get_servo and returns answer in out parameter.
+        /// Also returns answer async in Bunny event.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="dev"></param>
+        private void hgst_get_servo(int index, int dev, out int i_position)
+        {
+            i_position = -1;
+            if (!CheckIfServoIsOK(true)) return;
+            WriteLine("hgst_get_servo called ");
+            bool status = false;
+
+            if (_BunnyCard != null)
+            {
+                status = _BunnyCard.GetServoPosition(dev, ref i_position);
+            }
+            else
+            {
+                status = false;
+                i_position = -1;
+            }
+            if (_Exit) return;
+
+
+            // if recorded position not valid, then read in position (only happens first time).
+            if (openPosition.position == 0 || openPosition.velocity == 0 || openPosition.acceleration == 0)
+            {
+                ServoPositionClass currentPosition = new ServoPositionClass();
+
+                if (_BunnyCard != null) _BunnyCard.SetSaveServo((int)HGST.Blades.EnumSolenoidServoAddr.SERVO, (int)HGST.Blades.EnumServoSaveTypes.READEEPROM,
+                    ref openPosition.position, ref openPosition.velocity, ref openPosition.acceleration,
+                    ref closePosition.position, ref closePosition.velocity, ref closePosition.acceleration,
+                    ref currentPosition.position, ref currentPosition.position, ref currentPosition.position);
+            }
+
+            if (i_position == openPosition.position)
+            {
+                m_ServoMemsState = HGST.Blades.MemsStateValues.Opened;
+            }
+            else if (i_position == closePosition.position)
+            {
+                m_ServoMemsState = HGST.Blades.MemsStateValues.Closed;
+            }
+            else
+            {
+                m_ServoMemsState = HGST.Blades.MemsStateValues.Unknown;
+            }
+
+            NotifyWorldBunnyStatus(status, "hgst_get_servo");
+            WriteLineContent(index.ToString() + " " + dev.ToString() + " " + i_position.ToString());
+
+            if (status)
+            {
+                SendBunnyEvent(this, new StatusEventArgs(i_position.ToString(), (int)BunnyEvents.Position));
+            }
+        }
+
+        /// <summary>
+        /// For servo pin motion to enable, disable, open, or close.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="dev"></param>
+        /// <param name="type"></param>
+        /// <param name="end_pos"></param>
+        /// <param name="max_vel"></param>
+        /// <param name="accel"></param>
+        public void hgst_move_servo(int index, int dev, int type, int end_pos, int max_vel, int accel)
+        {
+            if (!CheckIfServoIsOK(false)) return;
+
+            WriteLine("hgst_move_servo called ");
+            WriteLineContent(index.ToString() + " " + dev.ToString() + " " + type.ToString() + " " +
+              end_pos.ToString() + " " + max_vel.ToString() + " " + accel.ToString());
+            bool status = true;
+
+            // If not moving (enable or disable).
+            if ((int)EnumServoTypeActions.CLOSE != type && (int)EnumServoTypeActions.OPEN != type)
+            {
+                if (_BunnyCard != null)
+                {
+                    // Enable or disable servo.
+                    status = _BunnyCard.MoveServo((int)HGST.Blades.EnumSolenoidServoAddr.SERVO, type, end_pos, max_vel, accel);
+                }
+                else
+                {
+                    status = false;
+                }
+                NotifyWorldBunnyStatus(status, "hgst_move_servo");
+                if (!status)
+                {
+                    return; // broke
+                }
+                if ((int)EnumServoTypeActions.SERVOON == type)
+                {
+                    SendBunnyEvent(this, new StatusEventArgs(((int)EnableDisable.Enable).ToString(), (int)BunnyEvents.ServoEnable));
+                    _TesterState.ServoEnabled = true;
+                    return;
+                }
+                if ((int)EnumServoTypeActions.SERVOOFF == type)
+                {
+                    SendBunnyEvent(this, new StatusEventArgs(((int)EnableDisable.Disable).ToString(), (int)BunnyEvents.ServoEnable));
+                    _TesterState.ServoEnabled = false;
+                    return;
+                }
+            }
+
+            if ((int)EnumServoTypeActions.CLOSE == type)
+            {
+                m_ServoArrived = false;  // not there yet.
+                boolFiveIntsDelegate servoMoveDelegate = new boolFiveIntsDelegate(_BunnyCard.MoveServo);
+                servoMoveDelegate.BeginInvoke((int)HGST.Blades.EnumSolenoidServoAddr.SERVO, type, end_pos, max_vel, accel,
+                   new AsyncCallback(ServoMoveCloseCallback), new object[] { servoMoveDelegate, index, dev, type, end_pos, max_vel, accel });
+                return;
+            }
+            if ((int)EnumServoTypeActions.OPEN == type)
+            {
+                m_ServoArrived = false;  // not there yet.
+                boolFiveIntsDelegate servoMoveDelegate = new boolFiveIntsDelegate(_BunnyCard.MoveServo);
+                servoMoveDelegate.BeginInvoke((int)EnumSolenoidServoAddr.SERVO, type, end_pos, max_vel, accel,
+                   new AsyncCallback(ServoMoveOpenCallback), new object[] { servoMoveDelegate, index, dev, type, end_pos, max_vel, accel });
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Calls BunnyLib hgst_get_servo and returns answer async in Bunny event.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="dev"></param>
+        public void hgst_get_servo(int index, int dev)
+        {
+            if (!CheckIfServoIsOK(true)) return;
+            WriteLine("hgst_get_servo called ");
+            bool status = false;
+            int i_position = 0;
+
+            while (hgstGetServoRetryCount < Constants.BunnyRetryLimit)
+            {
+
+                i_position = 0;
+                if (_BunnyCard != null)
+                {
+                    status = _BunnyCard.GetServoPosition(dev, ref i_position);
+                }
+                else
+                {
+                    status = false;
+                }
+                if (status)
+                {
+                    break;
+                }
+                else
+                {
+                    Interlocked.Increment(ref hgstGetServoRetryCount);
+                    Application.DoEvents();
+                    Thread.Sleep(500);
+                    if (_Exit) return;
+                }
+            }
+
+            // if recorded position not valid, then read in position (only happens first time).
+            if (openPosition.position == 0 || openPosition.velocity == 0 || openPosition.acceleration == 0)
+            {
+                ServoPositionClass currentPosition = new ServoPositionClass();
+
+                if (_BunnyCard != null) _BunnyCard.SetSaveServo((int)HGST.Blades.EnumSolenoidServoAddr.SERVO, (int)HGST.Blades.EnumServoSaveTypes.READEEPROM,
+                    ref openPosition.position, ref openPosition.velocity, ref openPosition.acceleration,
+                    ref closePosition.position, ref closePosition.velocity, ref closePosition.acceleration,
+                    ref currentPosition.position, ref currentPosition.position, ref currentPosition.position);
+            }
+
+            if (i_position == openPosition.position)
+            {
+                m_ServoMemsState = HGST.Blades.MemsStateValues.Opened;
+            }
+            else if (i_position == closePosition.position)
+            {
+                m_ServoMemsState = HGST.Blades.MemsStateValues.Closed;
+            }
+            else
+            {
+                m_ServoMemsState = HGST.Blades.MemsStateValues.Unknown;
+            }
+
+            hgstGetServoRetryCount = 0;
+            NotifyWorldBunnyStatus(status, "hgst_get_servo");
+            WriteLineContent("hgst_get_servo called " + index.ToString() + " " + dev.ToString() + " " + i_position.ToString());
+
+            if (status)
+            {
+                SendBunnyEvent(this, new StatusEventArgs(i_position.ToString(), (int)BunnyEvents.Position));
+            }
+        }
+
+        /// <summary>
+        /// GetDataViaEvent reads item and sends result via BunnyEvent.
+        /// </summary>
+        /// <param name="names"></param>
+        public void GetDataViaEvent(string[] names)
+        {
+            object passingObj = names;
+            Thread getDataThread = new Thread(new ParameterizedThreadStart(GetDataViaEventThreadFunc))
+            {
+                IsBackground = true
+            };
+            getDataThread.Start(passingObj);
+        }
+
+        public void hgst_set_save_servo(int index, int dev, int type,
+           int open_end_pos, int open_max_vel, int open_accel,
+           int close_end_pos, int close_max_vel, int close_accel,
+           int current_end_pos, int current_max_vel, int current_accel)
+        {
+            if (!CheckIfServoIsOK(true)) return;
+
+            WriteLine("hgst_set_save_servo called ");
+            WriteLineContent("hgst_set_save_servo called " + index.ToString() + " " + dev.ToString() + " " + type.ToString() + " " +
+              open_end_pos.ToString() + " " + open_max_vel.ToString() + " " + open_accel.ToString() + " " +
+              close_end_pos.ToString() + " " + close_max_vel.ToString() + " " + close_accel.ToString() + " " +
+              current_end_pos.ToString() + " " + current_max_vel.ToString() + " " + current_accel.ToString());
+
+            bool status = false;
+
+            while (hgstSetSaveServoRetries < Constants.BunnyRetryLimit)
+            {
+
+                if (_BunnyCard != null)
+                {
+                    status = _BunnyCard.SetSaveServo((int)HGST.Blades.EnumSolenoidServoAddr.SERVO, type,
+                       ref open_end_pos, ref open_max_vel, ref open_accel,
+                       ref close_end_pos, ref close_max_vel, ref close_accel,
+                       ref current_end_pos, ref current_max_vel, ref current_accel);
+                }
+                else
+                {
+                    status = false;
+                }
+                if (!status)
+                {
+                    Interlocked.Increment(ref hgstSetSaveServoRetries);
+                    Thread.Sleep(500);
+                    if (_Exit) return;
+
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            hgstSetSaveServoRetries = 0;
+            NotifyWorldBunnyStatus(status, "hgst_set_save_servo");
+            if (status)
+            {
+                openPosition.position = open_end_pos;
+                openPosition.velocity = open_max_vel;
+                openPosition.acceleration = open_accel;
+
+                closePosition.position = close_end_pos;
+                closePosition.velocity = close_max_vel;
+                closePosition.acceleration = close_accel;
+
+                SendBunnyEvent(this, new StatusEventArgs(
+                   open_end_pos.ToString() + ", " + open_max_vel.ToString() + ", " + open_accel.ToString() + ", " +
+                   close_end_pos.ToString() + ", " + close_max_vel.ToString() + ", " + close_accel.ToString() + ", " +
+                   current_end_pos.ToString() + ", " + current_max_vel.ToString() + ", " + current_accel.ToString(),
+                   (int)BunnyEvents.SetSaveServo));
+            }
+        }
+
+        public void hgst_get_neutral(int index, int dev)
+        {
+            if (!CheckIfServoIsOK(true)) return;
+
+            WriteLine("hgst_get_neutral called ");
+            WriteLineContent("hgst_get_neutral called " + index.ToString() + " " + dev.ToString());
+            bool status = false;
+            int i_neutral = 0;
+
+            while (hgstGetNeutralRetryCount < Constants.BunnyRetryLimit)
+            {
+                i_neutral = 0;
+                if (_BunnyCard != null)
+                {
+                    status = _BunnyCard.GetNeutral((int)HGST.Blades.EnumSolenoidServoAddr.SERVO, ref i_neutral);
+                }
+                else
+                {
+                    status = false;
+                }
+                if (!status)
+                {
+                    Interlocked.Increment(ref hgstGetNeutralRetryCount);
+                    Application.DoEvents();
+                    Thread.Sleep(500);
+                    if (_Exit) return;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            hgstGetNeutralRetryCount = 0;
+            NotifyWorldBunnyStatus(status, "hgst_get_neutral");
+
+            if (status)
+            {
+                SendBunnyEvent(this, new StatusEventArgs(i_neutral.ToString(), (int)BunnyEvents.Neutral));
+            }
+        }
+
         #endregion ITesterObject Methods
 
         #region Support Methods
@@ -1005,6 +1336,17 @@ namespace Hitachi.Tester.Module
             //_CountStateFromDisk.StatisticsValueEvent += new StatusEventHandler(countState_StatisticsValueEvent);
             //_CountStateFromDisk.StatisticsFromToTimeEvent += new StatusEventHandler(countState_StatisticsFromToTimeEvent);
             //_CountStateFromDisk.StatisticsDGREvent += new StatusEventHandler(countState_StatisticsDGREvent);
+
+            watchdogDelegate = new TimerCallback(MemsOpenWatchdogTimerCallback);
+            memsOpenWatchdogTimer = new System.Threading.Timer(watchdogDelegate, null, Timeout.Infinite, Timeout.Infinite);
+            m_MemsOpenClosedStartTime = DateTime.Now;
+
+            openPosition = new ServoPositionClass();
+            closePosition = new ServoPositionClass();
+            bMemsThreadGoing = false;
+
+            m_ServoMemsState = HGST.Blades.MemsStateValues.Unknown;
+            m_ServoArrived = false;
         }
 
         /// <summary>
@@ -1655,7 +1997,7 @@ namespace Hitachi.Tester.Module
                             {
                                 WriteLine("PinMotion " + ((numbers[i] != 0) ? "true" : "false"));
                                 WriteLineContent(numbers[i].ToString());
-                                // TODO : OpenCloseMems(numbers[i] > 0 ? 1 : 0);
+                                OpenCloseMems(numbers[i] > 0 ? 1 : 0);
                             }
                             continue;
 
@@ -1698,6 +2040,1062 @@ namespace Hitachi.Tester.Module
             {
                 // TODO : CheckIfBunnyNowIsOK(false, "set integers bunny off ");
             }
+        }
+
+        private void OpenCloseMems(int value)
+        {
+            // If close then stop timer.
+            if (value == 0)
+            {
+                MemsTimerStop();
+            }
+            else // else open then start timer.
+            {
+                MemsTimerStart();
+            }
+
+            m_MemsOpenClosedStartTime = DateTime.Now;  // MEMS state checking thread uses this for open/close delay time.
+            MemsRequestedState = (value == 0) ? HGST.Blades.MemsStateValues.Closed : HGST.Blades.MemsStateValues.Opened;
+
+            string whatType = "";
+
+            // inc counter if open requested and it is now closed
+            if (MemsRequestedState == HGST.Blades.MemsStateValues.Opened && MemsStatus == HGST.Blades.MemsStateValues.Closed)
+            {
+                _CountStateFromDisk.IncValue(BladeDataName.MemsCount);
+                string cPath = CountsPath;
+                WriteOutCountsData();
+                SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.ToString(), (int)BunnyEvents.Counts));
+                SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(BladeDataName.MemsCount).ToString(), (int)BunnyEvents.MemsCount));
+            }
+
+            // if we do not know what kind of pin motion yet then ...
+            if (_TesterState.PinMotionType == BunnyPinMotionType.NONE)
+            {
+                try
+                {
+                    // read the requested type
+                    whatType = ReadDataFiles(Constants.WhichPinMotionFileNameTXT);
+                }
+                catch (FileNotFoundException)
+                {
+                    whatType = BunnyPinMotionType.NONE.ToString();
+                }
+                // is requested type valid?
+                if (whatType.Trim() != BunnyPinMotionType.SERVO.ToString() && whatType.Trim() != BunnyPinMotionType.SOLENOID.ToString())
+                {
+                    // Not valid do nothing
+                }
+                else if (whatType.Trim() == BunnyPinMotionType.SERVO.ToString())
+                {
+                    _TesterState.PinMotionType = BunnyPinMotionType.SERVO;
+                }
+                else if (whatType.Trim() == BunnyPinMotionType.SOLENOID.ToString())
+                {
+                    _TesterState.PinMotionType = BunnyPinMotionType.SOLENOID;
+                }
+            }
+
+            // if servo make sure it is ok.
+            if (_TesterState.PinMotionType == BunnyPinMotionType.SERVO && !CheckIfServoIsOK(true))
+            {
+                // Not valid do nothing
+            }
+
+            // if servo and open
+            if (_TesterState.PinMotionType == BunnyPinMotionType.SERVO && MemsRequestedState == HGST.Blades.MemsStateValues.Opened)
+            {
+                ServoPositionClass currentPosition = new ServoPositionClass();
+                // if recorded position not valid, then read in position (only happens first time).
+                if (openPosition.position == 0 || openPosition.velocity == 0 || openPosition.acceleration == 0)
+                {
+
+                    if (_BunnyCard != null) _BunnyCard.SetSaveServo((int)HGST.Blades.EnumSolenoidServoAddr.SERVO, (int)HGST.Blades.EnumServoSaveTypes.READEEPROM,
+                        ref openPosition.position, ref openPosition.velocity, ref openPosition.acceleration,
+                        ref closePosition.position, ref closePosition.velocity, ref closePosition.acceleration,
+                        ref currentPosition.position, ref currentPosition.position, ref currentPosition.position);
+                }
+                else // Just get current position
+                {
+                    hgst_get_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO, out currentPosition.position);
+                }
+
+                // If not there then move.
+                if (currentPosition.position != openPosition.position)
+                {
+                    MemsStatus = HGST.Blades.MemsStateValues.Opening;
+                    SendBunnyEvent(this, new StatusEventArgs(MemsStatus.ToString(), (int)BunnyEvents.MemsOpenClose));
+                    // Tell servo to open.
+                    hgst_move_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO, (int)HGST.Blades.EnumServoTypeActions.OPEN, 0, 0, 0);
+                }
+            }
+
+            // if servo and close
+            else if (_TesterState.PinMotionType == BunnyPinMotionType.SERVO && MemsRequestedState == HGST.Blades.MemsStateValues.Closed)
+            {
+                ServoPositionClass currentPosition = new ServoPositionClass();
+                // if position not valid, then read in position and accel and vel
+                if (closePosition.position == 0 || closePosition.velocity == 0 || closePosition.acceleration == 0)
+                {
+                    if (_BunnyCard != null) _BunnyCard.SetSaveServo((int)HGST.Blades.EnumSolenoidServoAddr.SERVO, (int)HGST.Blades.EnumServoSaveTypes.READEEPROM,
+                       ref openPosition.position, ref openPosition.velocity, ref openPosition.acceleration,
+                       ref closePosition.position, ref closePosition.velocity, ref closePosition.acceleration,
+                       ref currentPosition.position, ref currentPosition.position, ref currentPosition.position);
+                }
+                else // Just get current pos
+                {
+                    hgst_get_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO, out currentPosition.position);
+                }
+
+                // If we are not there then move.
+                if (currentPosition.position != closePosition.position)
+                {
+                    MemsStatus = HGST.Blades.MemsStateValues.Closing;
+                    SendBunnyEvent(this, new StatusEventArgs(MemsStatus.ToString(), (int)BunnyEvents.MemsOpenClose));
+                    // Tell servo to close.
+                    hgst_move_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO, (int)HGST.Blades.EnumServoTypeActions.CLOSE, 0, 0, 0);
+                }
+            }
+            else if (_TesterState.PinMotionType == BunnyPinMotionType.SOLENOID)
+            {
+                if (_BunnyCard != null)
+                {
+                    if (MemsStatus != MemsRequestedState)
+                    {
+                        if (MemsRequestedState == HGST.Blades.MemsStateValues.Closed)
+                        {
+                            MemsStatus = HGST.Blades.MemsStateValues.Closing;
+                            SendBunnyEvent(this, new StatusEventArgs(MemsStatus.ToString(), (int)BunnyEvents.MemsOpenClose));
+                        }
+                        else if (MemsRequestedState == HGST.Blades.MemsStateValues.Opened)
+                        {
+                            MemsStatus = HGST.Blades.MemsStateValues.Opening;
+                            SendBunnyEvent(this, new StatusEventArgs(MemsStatus.ToString(), (int)BunnyEvents.MemsOpenClose));
+                        }
+                    }                // Turn solenoid on or off.
+                    _BunnyCard.SetSolenoid(0, MemsRequestedState == HGST.Blades.MemsStateValues.Opened ? true : false);
+                }
+                else
+                {
+                    // Nothing works.
+                    MemsStatus = HGST.Blades.MemsStateValues.Unknown;
+                }
+                // Set bit per request (even if we could not do it).
+                _TesterState.MemsSolenoid = value > 0;
+            }
+
+            if (!bMemsThreadGoing)
+            {
+                Thread openCloseThread = new Thread(new ThreadStart(MemsOpenCloseStateCheckThreadFunc));
+                openCloseThread.IsBackground = true;
+                openCloseThread.Name = "openCloseThread";
+                openCloseThread.Start();
+            }
+
+        }
+
+        private void MemsTimerStop()
+        {
+            memsOpenWatchdogTimer.Change(Timeout.Infinite, Timeout.Infinite);
+        }
+
+        private void MemsTimerStart()
+        {
+            // Stop timer
+            memsOpenWatchdogTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
+            // Find watchdog timeout
+            int msFactor = 60 * 1000;
+            int timeoutMs;
+            try
+            {
+                // Read from constants (or app.config file).
+                timeoutMs = Constants.MemsOpenTimeoutMins * msFactor;
+            }
+            catch
+            {
+                // If app config has strange value.
+                timeoutMs = 10 * msFactor;
+            }
+            // Restart timer.
+            memsOpenWatchdogTimer.Change(timeoutMs, Timeout.Infinite);
+        }
+
+        /// <summary>
+        /// Called if MEMS open watchdog timer times out.
+        /// </summary>
+        private void MemsOpenWatchdogTimerCallback(object state)
+        {
+            OpenCloseMems(0);
+        }
+
+        private bool CheckIfServoIsOK(bool enableIfNeeded)
+        {
+            // if versions not inited yet then read versions
+            if (verNumDriver <= 0.0 || verNumFirm <= 0.0)
+            {
+                GetDriverVer();
+                GetFwRev();
+            }
+
+            // Make sure both Bunny card and driver can accept servo.
+            if (verNumDriver < Constants.verNumDriver || verNumFirm < Constants.verNumFirm)
+            {
+                return false;
+            }
+            else // servo OK
+            {
+                // See if we need to read status.
+                if (_FormerStatusRead == -1)
+                {
+                    ReadBunnyStatusAndUpdateFlags();
+                }
+                // Is status now OK?
+                if (_FormerStatusRead == -1)
+                {
+                    // not OK.
+                    return false;
+                }
+                // Is servo not enabled?
+                if (!_TesterState.ServoEnabled && enableIfNeeded)
+                {
+                    // Not enabled so enable servo.
+                    hgst_move_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO, (int)HGST.Blades.EnumServoTypeActions.SERVOON, 0, 0, 0);
+                }
+                return true;
+            }
+        }
+
+        private void SleepUntilDelayFinished(int requestedDelay)
+        {
+            TimeSpan timeused = DateTime.Now - m_MemsOpenClosedStartTime;
+            int milliSecondsLeft = requestedDelay - (int)timeused.TotalMilliseconds;
+            if (milliSecondsLeft > 10) Thread.Sleep(milliSecondsLeft);
+        }
+        /// <summary>
+        /// This function checks that the mems has arrived and is still there at the requested location.
+        /// </summary>
+        private void MemsOpenCloseStateCheckThreadFunc()
+        {
+            bMemsThreadGoing = true;
+            // Run until we exit.
+            while (!_Exit)
+            {
+                try
+                {
+                    //Application.DoEvents();
+                    // If needed sleep until timeout expired (if already expired this returns soon).
+                    SleepUntilDelayFinished((MemsRequestedState == HGST.Blades.MemsStateValues.Opened) ? OpenDelay : CloseDelay);
+
+                    // If solenoid and open requested.
+                    if (_TesterState.PinMotionType == BunnyPinMotionType.SOLENOID &&
+                        MemsRequestedState == HGST.Blades.MemsStateValues.Opened &&
+                        _TesterState.MemsSolenoid &&
+                        MemsOpenSensorOpened() &&
+                        !MemsCloseSensorClosed())
+                    {
+                        if (MemsStatus != HGST.Blades.MemsStateValues.Opened)
+                        {
+                            MemsStatus = HGST.Blades.MemsStateValues.Opened;
+                            SendBunnyEvent(this, new StatusEventArgs(MemsStatus.ToString(), (int)BunnyEvents.MemsOpenClose));
+                        }
+                    }
+                    // if solenoid and close requested.
+                    else if (_TesterState.PinMotionType == BunnyPinMotionType.SOLENOID &&
+                             MemsRequestedState == HGST.Blades.MemsStateValues.Closed &&
+                             !_TesterState.MemsSolenoid &&
+                             !MemsOpenSensorOpened() &&
+                             MemsCloseSensorClosed())
+                    {
+                        if (MemsStatus != HGST.Blades.MemsStateValues.Closed)
+                        {
+                            MemsStatus = HGST.Blades.MemsStateValues.Closed;
+                            SendBunnyEvent(this, new StatusEventArgs(MemsStatus.ToString(), (int)BunnyEvents.MemsOpenClose));
+                        }
+                    }
+                    // If servo and open requested.
+                    else if (_TesterState.PinMotionType == BunnyPinMotionType.SERVO &&
+                             MemsRequestedState == HGST.Blades.MemsStateValues.Opened &&
+                             m_ServoMemsState == MemsRequestedState &&
+                             m_ServoArrived &&
+                             MemsOpenSensorOpened() &&
+                             !MemsCloseSensorClosed())
+                    {
+                        if (MemsStatus != HGST.Blades.MemsStateValues.Opened)
+                        {
+                            MemsStatus = HGST.Blades.MemsStateValues.Opened;
+                            SendBunnyEvent(this, new StatusEventArgs(MemsStatus.ToString(), (int)BunnyEvents.MemsOpenClose));
+                        }
+                    }
+                    // If servo and close requested.
+                    else if (_TesterState.PinMotionType == BunnyPinMotionType.SERVO &&
+                             MemsRequestedState == HGST.Blades.MemsStateValues.Closed &&
+                             m_ServoMemsState == MemsRequestedState &&
+                             m_ServoArrived &&
+                             !MemsOpenSensorOpened() &&
+                             MemsCloseSensorClosed())
+                    {
+                        if (MemsStatus != HGST.Blades.MemsStateValues.Closed)
+                        {
+                            MemsStatus = HGST.Blades.MemsStateValues.Closed;
+                            SendBunnyEvent(this, new StatusEventArgs(MemsStatus.ToString(), (int)BunnyEvents.MemsOpenClose));
+                        }
+                    }
+
+                    Thread.Sleep(25);  // Give the processor a rest.
+                    if (MemsStatus == MemsRequestedState) Thread.Sleep(75);
+                } // end inner try
+                catch { }  // We are running in a thread and cannot stop.
+            } // end while not exiting
+            bMemsThreadGoing = false;
+        }
+
+        private void GetDriverVer()
+        {
+            WriteLine("GetDriverVer called ");
+            try
+            {
+                if (_BunnyCard != null) _DriverRev = _BunnyCard.GetDriverVersion;
+                verNumDriver = GetRevNumber(_DriverRev);
+                SendBunnyEvent(this, new StatusEventArgs(_DriverRev, (int)BunnyEvents.DriverVer));
+            }
+            catch
+            {
+                _DriverRev = "OffLine";
+                verNumFirm = -1;
+                SendBunnyEvent(this, new StatusEventArgs(_DriverRev, (int)BunnyEvents.DriverVer));
+            }
+            WriteLineContent("GetDriverVer called " + _DriverRev.ToString());
+        }
+
+        /// <summary>
+        /// Reads the firmware revision from the Bunny card.
+        /// Sends the values off to the world.
+        ///  Calls UpdateAllValues if needed.
+        /// </summary>
+        private void GetFwRev()
+        {
+            try
+            {
+                string tmpFwRev = "";
+                if (_BunnyCard != null) tmpFwRev = _BunnyCard.GetFirmwareVersion;
+                FirmwareRev = tmpFwRev;
+                verNumFirm = GetRevNumber(FirmwareRev);
+                SendBunnyEvent(this, new StatusEventArgs(FirmwareRev, (int)BunnyEvents.FirmwareVer));
+
+                //if firmware rev worked then send bunny fixed event
+                if (tmpFwRev.Length > 0 && !tmpFwRev.ToLower().Contains("offline") && verNumFirm > 0.5)
+                {
+                    SendBunnyEvent(this, new StatusEventArgs("Bunny Card operational", (int)BunnyEvents.BunnyFixed));
+                }
+
+                if (_NeedToReLoadAllValues)
+                {
+                    _NeedToReLoadAllValues = false;
+                    UpdateAllValues();
+                }
+
+            }
+            catch
+            {
+                FirmwareRev = "OffLine";
+                verNumFirm = -1;
+                SendBunnyEvent(this, new StatusEventArgs(FirmwareRev, (int)BunnyEvents.FirmwareVer));
+            }
+            WriteLine("Fw " + FirmwareRev.ToString());
+        }
+
+        /// <summary>
+        /// Read various values from Blade.
+        /// </summary>
+        private void UpdateAllValues()
+        {
+            string[] allTheStuff = {BladeDataName.ActuatorSN, BladeDataName.BladeLoc, BladeDataName.BladeSN, BladeDataName.BladeType,
+                                    BladeDataName.Counts, BladeDataName.DiskSN, BladeDataName.FlexSN, BladeDataName.GradeName,
+                                    BladeDataName.JadeSN, BladeDataName.MemsCloseDelay, BladeDataName.MemsCloseSensor,
+                                    BladeDataName.MemsOpenDelay, BladeDataName.MemsOpenSensor, BladeDataName.MemsSN,
+                                    BladeDataName.MemsState, BladeDataName.MemsType, BladeDataName.MotorBaseplateSN,
+                                    BladeDataName.MotorSN, BladeDataName.PcbaSN, BladeDataName.PinMotion, BladeDataName.Position,
+                                    BladeDataName.Ramp, BladeDataName.RunningAvgSize, BladeDataName.Aux12VDC, BladeDataName.Aux5VDC,
+                                    BladeDataName.AuxIn0, BladeDataName.AuxIn1, BladeDataName.AuxOut0,
+                                    BladeDataName.AuxOut1, BladeDataName.BackLight};
+            // Reads the above set values and sends events for all to see.
+            GetDataViaEvent(allTheStuff);
+        }
+
+        /// <summary>
+        /// Parse version string for double version number.
+        /// </summary>
+        /// <param name="verString"></param>
+        /// <returns></returns>
+        private double GetRevNumber(string verString)
+        {
+            double dblVal;
+            int startSpot = 0;
+            int stopSpot = 0;
+            char[] theChars = verString.ToCharArray();
+            bool checkStart = true;
+            bool foundDot = false;
+            try
+            {
+                foreach (char aChar in theChars)
+                {
+                    stopSpot += 1;
+                    if (!char.IsDigit(aChar) && checkStart)
+                    {
+                        startSpot += 1;
+                        continue;
+                    }
+                    else if (char.IsDigit(aChar) && checkStart)
+                    {
+                        checkStart = false;
+                        continue;
+                    }
+                    else if (char.IsDigit(aChar) && !checkStart)
+                    {
+                        continue;
+                    }
+                    else if (aChar == '.' && !checkStart && !foundDot)
+                    {
+                        foundDot = true;
+                        continue;
+                    }
+                    else if (aChar == '.' && !checkStart && foundDot)
+                    {
+                        break;
+                    }
+                    else if (!char.IsDigit(aChar) && !checkStart)
+                    {
+                        break;
+                    }
+                }
+                if (stopSpot == startSpot)
+                {
+                    dblVal = 0;
+                }
+                else if (!double.TryParse(verString.Substring(startSpot, stopSpot - startSpot - 1), out dblVal))
+                {
+                    dblVal = 0;
+                }
+            }
+            catch
+            {
+                dblVal = 0;
+            }
+            return dblVal;
+        }
+
+        private void ServoMoveCloseCallback(IAsyncResult ar)
+        {
+            if (ar.AsyncState == null) return;
+
+            // hgst_move_servo(int index, int dev, int type, int end_pos, int max_vel, int accel)
+            object[] objArray = (object[])ar.AsyncState;
+            boolFiveIntsDelegate caller = (boolFiveIntsDelegate)objArray[0];
+            int index = (int)objArray[1];
+            int dev = (int)objArray[2];
+            int type = (int)objArray[3];
+            int end_pos = (int)objArray[4];
+            int max_vel = (int)objArray[5];
+            int accel = (int)objArray[6];
+            bool status = false;
+
+            // Retry loop
+            while (servoMoveCloseCallbackRetries < Constants.BunnyRetryLimit)
+            {
+                try
+                {
+                    status = caller.EndInvoke(ar);
+                }
+                catch
+                {
+                    status = false;
+                }
+                if (status)
+                {
+                    break;
+                }
+                else
+                {
+                    Interlocked.Increment(ref servoMoveCloseCallbackRetries);
+                    if (_Exit) return;
+
+                    Application.DoEvents();
+                    Thread.Sleep(500);
+                    hgst_move_servo(index, dev, type, end_pos, max_vel, accel);
+                    return;
+                }
+            }
+            servoMoveCloseCallbackRetries = 0;
+            NotifyWorldBunnyStatus(status, "hgst_move_servo close");
+
+            if (status)
+            {
+                hgst_get_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO);
+                m_ServoArrived = true;
+            }
+        }
+
+        private void ServoMoveOpenCallback(IAsyncResult ar)
+        {
+            if (ar.AsyncState == null) return;
+
+            // hgst_move_servo(int index, int dev, int type, int end_pos, int max_vel, int accel)
+            object[] objArray = (object[])ar.AsyncState;
+            boolFiveIntsDelegate caller = (boolFiveIntsDelegate)objArray[0];
+            int index = (int)objArray[1];
+            int dev = (int)objArray[2];
+            int type = (int)objArray[3];
+            int end_pos = (int)objArray[4];
+            int max_vel = (int)objArray[5];
+            int accel = (int)objArray[6];
+            bool status = false;
+
+            // Retry loop
+            while (servoMoveOpenCallbackRetries < Constants.BunnyRetryLimit)
+            {
+                try
+                {
+                    status = caller.EndInvoke(ar);
+                }
+                catch
+                {
+                    status = false;
+                }
+                if (status)
+                {
+                    break;
+                }
+                else
+                {
+                    Interlocked.Increment(ref servoMoveOpenCallbackRetries);
+                    Application.DoEvents();
+                    if (_Exit) return;
+
+                    Thread.Sleep(500);
+                    hgst_move_servo(index, dev, type, end_pos, max_vel, accel);
+                    return;
+                }
+            }
+            servoMoveOpenCallbackRetries = 0;
+            NotifyWorldBunnyStatus(status, "hgst_move_servo open ");
+
+            if (status)
+            {
+                hgst_get_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO);
+                m_ServoArrived = true;
+            }
+        }
+
+        private bool MemsOpenSensorOpened()
+        {
+            // If low active open sensor and input low.
+            if (_TesterState.PinMotionOpenSensor == BunnyPinMotionSensor.LOW &&
+               !_TesterState.AuxIn0)
+            {
+                return true;
+            }
+            // If high active open sensor and input high.
+            else if (_TesterState.PinMotionOpenSensor == BunnyPinMotionSensor.HIGH &&
+                     _TesterState.AuxIn0)
+            {
+                return true;
+            }
+            // else no open sensor 
+            else if (_TesterState.PinMotionOpenSensor == BunnyPinMotionSensor.NONE)
+            {
+                return MemsRequestedState == HGST.Blades.MemsStateValues.Opened; // return request
+            }
+            else // not open
+            {
+                return false;
+            }
+        }
+
+        private bool MemsCloseSensorClosed()
+        {
+            // If low active close sensor and input low.
+            if (_TesterState.PinMotionCloseSensor == BunnyPinMotionSensor.LOW &&
+               !_TesterState.AuxIn1)
+            {
+                return true;
+            }
+            // If high active close sensor and input high.
+            else if (_TesterState.PinMotionCloseSensor == BunnyPinMotionSensor.HIGH &&
+                     _TesterState.AuxIn1)
+            {
+                return true;
+            }
+            // else no close sensor 
+            else if (_TesterState.PinMotionCloseSensor == BunnyPinMotionSensor.NONE &&
+                     MemsRequestedState == HGST.Blades.MemsStateValues.Closed)
+            {
+                return MemsRequestedState == HGST.Blades.MemsStateValues.Closed; // return request
+            }
+            else  // not closed
+            {
+                return false;
+            }
+        }
+
+        private void GetDataViaEventThreadFunc(object passingObj)
+        {
+            string[] names = (string[])passingObj;
+
+            WriteLineContent(string.Format("GetDataViaEvent called for {0}", string.Join(",", names)));
+            ServoPositionClass currentPosition = new ServoPositionClass();
+
+            foreach (string aName in names)
+            {
+                switch (aName)
+                {
+                    case BladeDataName.ActuatorSN:
+                        if (ActuatorSN.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(ActuatorSN, (int)BunnyEvents.ActuatorSN));
+                        }
+                        continue;
+
+                    case BladeDataName.BladeType:
+                        if (BladeType.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(BladeType, (int)BunnyEvents.BladeType));
+                        }
+                        continue;
+
+                    case BladeDataName.BladeSN:
+                        if (BladeSN.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(BladeSN, (int)BunnyEvents.BladeSN));
+                        }
+                        continue;
+
+                    case BladeDataName.DiskSN:
+                        if (DiskSn.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(DiskSn, (int)BunnyEvents.DiskSN));
+                        }
+                        continue;
+
+                    case BladeDataName.FlexSN:
+                        if (FlexSN.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(FlexSN, (int)BunnyEvents.FlexSN));
+                        }
+                        continue;
+
+                    case BladeDataName.MemsSN:
+                        if (MemsSn.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(MemsSn, (int)BunnyEvents.MemsSN));
+                        }
+                        continue;
+
+                    case BladeDataName.MotorBaseplateSN:
+                        if (MotorBaseSn.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(MotorBaseSn, (int)BunnyEvents.MotorBaseSN));
+                        }
+                        continue;
+
+                    case BladeDataName.MotorSN:
+                        if (MotorSN.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(MotorSN, (int)BunnyEvents.MotorSN));
+                        }
+                        continue;
+
+                    case BladeDataName.PcbaSN:
+                        if (PcbaSn.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(PcbaSn, (int)BunnyEvents.PcbaSN));
+                        }
+                        continue;
+
+                    case BladeDataName.MemsCloseDelay:
+                        if (MemsCloseDelay.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(MemsCloseDelay, (int)BunnyEvents.MemsCloseDelay));
+                        }
+                        continue;
+
+                    case BladeDataName.MemsOpenDelay:
+                        if (MemsOpenDelay.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(MemsOpenDelay, (int)BunnyEvents.MemsOpenDelay));
+                        }
+                        continue;
+
+                    case BladeDataName.BunnyStatus:
+                        _FormerStatusRead = -1;
+                        ReadBunnyStatusAndUpdateFlags(); // function sends event
+                        continue;
+
+                    case BladeDataName.FwRev:
+                        GetFwRev();  // function sends event
+                        continue;
+
+                    case BladeDataName.DriverVer:
+                        GetDriverVer();  // function sends event
+                        continue;
+
+                    case BladeDataName.MemsType:
+                        try
+                        {
+                            GetMemsType();
+                        }
+                        catch
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(StaticServerTalker.getCurrentCultureString("FileNotFound"), (int)BunnyEvents.MemsType));
+                        }
+                        continue;
+
+                    case BladeDataName.JadeSN:
+                        if (JadeSN.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(JadeSN, (int)BunnyEvents.JadeSN));
+                        }
+                        continue;
+
+                    case BladeDataName.BladeLoc:
+                        if (MyLocation.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(MyLocation, (int)BunnyEvents.BladeLoc));
+                        }
+                        continue;
+
+                    case BladeDataName.Ramp:
+                        try
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(ReadRampValue().ToString(), (int)BunnyEvents.SolenoidRamp));
+                        }
+                        catch
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(StaticServerTalker.getCurrentCultureString("FileNotFound"), (int)BunnyEvents.SolenoidRamp));
+                        }
+                        continue;
+                    case BladeDataName.GetRomServoValues:
+                        hgst_set_save_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO, (int)HGST.Blades.EnumServoSaveTypes.READEEPROM,
+                          openPosition.position, openPosition.velocity, openPosition.acceleration,
+                          closePosition.position, closePosition.velocity, closePosition.acceleration,
+                          currentPosition.position, currentPosition.position, currentPosition.position);
+                        break;
+                    case BladeDataName.Position:
+                        hgst_get_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO);
+                        break;
+                    case BladeDataName.Counts:
+                        string ownerStr = "";
+                        try
+                        {
+                            ownerStr = ReadDataFiles(Constants.BladeSNTXT);
+                        }
+                        catch
+                        {
+                            ownerStr = "NONE";
+                            string complaint1 = StaticServerTalker.getCurrentCultureString("InvalidCountsPath");
+                            string complaint2 = StaticServerTalker.getCurrentCultureString("CountPath");
+                            string caption = StaticServerTalker.getCurrentCultureString("CheckSettings");
+
+                            WriteLineContent(string.Format("{0} {1}.{2}{3}.",
+                                complaint1, complaint2, Environment.NewLine, caption));
+                            WriteLine(complaint1);
+                        }
+
+                        if (_CountStateFromDisk.OwnerSerialNumber != ownerStr)
+                        {
+                            ReadInCountsdata();
+                            _CountStateFromDisk.OwnerSerialNumber = ownerStr;
+                        }
+                        string countStr = _CountStateFromDisk.ToString();
+                        SendBunnyEvent(this, new StatusEventArgs(countStr, (int)BunnyEvents.Counts));
+                        break;
+                    case BladeDataName.TestCount:
+                        SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(aName).ToString(), (int)BunnyEvents.TestCount));
+                        break;
+                    case BladeDataName.MemsCount:
+                        SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(aName).ToString(), (int)BunnyEvents.MemsCount));
+                        break;
+                    case BladeDataName.DiskLoadCount:
+                        SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(aName).ToString(), (int)BunnyEvents.DiskLoadCount));
+                        break;
+                    case BladeDataName.PatrolCount:
+                        SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(aName).ToString(), (int)BunnyEvents.PatrolCount));
+                        break;
+                    case BladeDataName.ScanCount:
+                        SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(aName).ToString(), (int)BunnyEvents.ScanCount));
+                        break;
+                    case BladeDataName.Neutral:
+                        hgst_get_neutral(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO);
+                        break;
+                    case BladeDataName.MemsOpenSensor:
+                        try
+                        {
+                            updateOpenSensorValue();
+                        }
+                        catch
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(StaticServerTalker.getCurrentCultureString("FileNotFound"), (int)BunnyEvents.MemsOpenSensor));
+                        }
+                        break;
+                    case BladeDataName.MemsCloseSensor:
+                        try
+                        {
+                            updateCloseSensorValue();
+                        }
+                        catch
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs(StaticServerTalker.getCurrentCultureString("FileNotFound"), (int)BunnyEvents.MemsCloseSensor));
+                        }
+                        break;
+                    case BladeDataName.PinMotion:
+                    case BladeDataName.MemsState:
+                        SendBunnyEvent(this, new StatusEventArgs(this.MemsStatus.ToString(), (int)BunnyEvents.MemsOpenClose));
+                        break;
+                    case BladeDataName.Aux12VDC:
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.B12VDC ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Pwr12V));
+                        break;
+                    case BladeDataName.Aux5VDC:
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.B5VDC ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Pwr5V));
+                        break;
+                    case BladeDataName.AuxIn0:
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.AuxIn0 ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Aux0In));
+                        break;
+                    case BladeDataName.AuxIn1:
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.AuxIn1 ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Aux1In));
+                        break;
+                    case BladeDataName.AuxOut0:
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.AuxOut0 ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Aux0Out));
+                        break;
+                    case BladeDataName.AuxOut1:
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.AuxOut1 ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Aux1Out));
+                        break;
+                    case BladeDataName.BackLight:
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.BackLight ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.BackLight));
+                        break;
+                    case BladeDataName.CardPower:
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.B12VDC ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Pwr12V));
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.B5VDC ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Pwr5V));
+                        break;
+                    case BladeDataName.Solenoid:
+                        SendBunnyEvent(this, new StatusEventArgs(_TesterState.MemsSolenoid ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Solenoid));
+                        break;
+                    case BladeDataName.VoltageCheckBlade:
+                        string valueString = MakeVoltageBladeEventString();
+                        SendBunnyEvent(this, new StatusEventArgs(valueString, (int)BunnyEvents.VoltageCheckBlade));
+                        break;
+                    case BladeDataName.TclPath:
+                        SendBunnyEvent(this, new StatusEventArgs(TclPath, (int)BunnyEvents.TclPath));
+                        break;
+                    case BladeDataName.BladePath:
+                        SendBunnyEvent(this, new StatusEventArgs(BladePath, (int)BunnyEvents.BladePath));
+                        break;
+                    case BladeDataName.FactPath:
+                        SendBunnyEvent(this, new StatusEventArgs(TclPath, (int)BunnyEvents.TclPath));
+                        break;
+                    case BladeDataName.GradePath:
+                        SendBunnyEvent(this, new StatusEventArgs(FactPath, (int)BunnyEvents.FactPath));
+                        break;
+                    case BladeDataName.FirmwarePath:
+                        SendBunnyEvent(this, new StatusEventArgs(FirmwarePath, (int)BunnyEvents.FirmwarePath));
+                        break;
+                    case BladeDataName.ResultPath:
+                        SendBunnyEvent(this, new StatusEventArgs(ResultPath, (int)BunnyEvents.ResultPath));
+                        break;
+                    case BladeDataName.LogPath:
+                        SendBunnyEvent(this, new StatusEventArgs(LogPath, (int)BunnyEvents.LogPath));
+                        break;
+                    case BladeDataName.DebugPath:
+                        SendBunnyEvent(this, new StatusEventArgs(DebugPath, (int)BunnyEvents.DebugPath));
+                        break;
+                    case BladeDataName.CountsPath:
+                        SendBunnyEvent(this, new StatusEventArgs(CountsPath, (int)BunnyEvents.CountsPath));
+                        break;
+                    case BladeDataName.TclStart:
+                        SendBunnyEvent(this, new StatusEventArgs(TclStart, (int)BunnyEvents.TclStart));
+                        break;
+                    case BladeDataName.BladeRunnerPath:
+                        SendBunnyEvent(this, new StatusEventArgs(AppDomain.CurrentDomain.BaseDirectory, (int)BunnyEvents.BladeRunnerPath));
+                        break;
+
+                    //case BladeDataName.bCmdBusy:
+                    //case BladeDataName.GradeName:
+                    //case BladeDataName.NowTestsArePaused:
+                    //case BladeDataName.PauseEvents:
+                    //case BladeDataName.PauseTests:
+                    //case BladeDataName.PleaseStop:
+                    //case BladeDataName.RunningAvgSize:
+                    //case BladeDataName.SeqGoing:
+                    //case BladeDataName.SequenceName:
+                    //case BladeDataName.TestNumber:
+                    default:
+                        continue;
+                } // end switch
+            } // end foreach
+        } // end GetStringsViaEvent
+
+        public void GetMemsType()
+        {
+            string whatType = BunnyPinMotionType.NONE.ToString();
+            try
+            {
+                whatType = ReadDataFiles(Constants.WhichPinMotionFileNameTXT);
+            }
+            catch (FileNotFoundException)
+            {
+                whatType = BunnyPinMotionType.NONE.ToString();
+            }
+
+            if (whatType == BunnyPinMotionType.SOLENOID.ToString())
+            {
+                _TesterState.PinMotionType = BunnyPinMotionType.SOLENOID;
+            }
+            else if (whatType == BunnyPinMotionType.SERVO.ToString() && CheckIfServoIsOK(true))
+            {
+                _TesterState.PinMotionType = BunnyPinMotionType.SERVO;
+            }
+            else if (whatType == BunnyPinMotionType.NONE.ToString())
+            {
+                _TesterState.PinMotionType = BunnyPinMotionType.SOLENOID;
+            }
+            else
+            {
+                //testerState.pinMotionType = BunnyPinMotionType.SOLENOID;
+                //writeDataFiles(Constants.WhichPinMotionFileNameTXT, testerState.pinMotionType.ToString());
+            }
+            SendBunnyEvent(this, new StatusEventArgs(_TesterState.PinMotionType.ToString(), (int)BunnyEvents.MemsType));
+        }
+
+        private int ReadRampValue()
+        {
+            string currentString;
+            try
+            {
+                currentString = ReadDataFiles(Constants.MemsRampTXT);
+            }
+            catch
+            {
+                currentString = "";
+            }
+            int currentValue;
+            if (!int.TryParse(currentString, out currentValue))
+            {
+                currentValue = Constants.DefaultRampValue;
+            }
+            if (currentValue < Constants.MinRampValue || currentValue > Constants.MaxRampValue)
+            {
+                if (currentValue < Constants.MinRampValue || currentValue > Constants.MaxRampValue)
+                {
+                    currentValue = Constants.DefaultRampValue;
+                }
+            }
+            if (currentString != currentValue.ToString())
+            {
+                WriteDataFiles(Constants.MemsRampTXT, currentValue.ToString());
+            }
+            SendBunnyEvent(this, new StatusEventArgs(currentValue.ToString(), (int)BunnyEvents.SolenoidRamp));
+            return currentValue;
+        }
+
+        private void updateCloseSensorValue()
+        {
+            string closeStr = "";
+            try
+            {
+                closeStr = ReadDataFiles(Constants.MemsCloseSensorTXT);
+                try
+                {
+                    BunnyPinMotionSensor tmp = (BunnyPinMotionSensor)Enum.Parse(typeof(BunnyPinMotionSensor), closeStr.ToUpper(), true);
+                }
+                catch
+                {
+                    throw new FileNotFoundException();
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                try
+                {
+                    WriteDataFiles(Constants.MemsCloseSensorTXT, BunnyPinMotionSensor.NONE.ToString());
+                    closeStr = BunnyPinMotionSensor.NONE.ToString();
+                }
+                catch
+                {
+                    throw e;
+                }
+            }
+            catch (Exception e)
+            {
+                Exception exp = e.InnerException;
+                try
+                {
+                    if (exp != null) throw exp;
+                    else throw e;
+                }
+                catch (FileNotFoundException)
+                {
+                    WriteDataFiles(Constants.MemsCloseSensorTXT, BunnyPinMotionSensor.NONE.ToString());
+                    closeStr = BunnyPinMotionSensor.NONE.ToString();
+                }
+                catch
+                {
+                    closeStr = BunnyPinMotionSensor.NONE.ToString();
+                    throw e;
+                }
+            }
+            BunnyPinMotionSensor whichCloseType = (BunnyPinMotionSensor)Enum.Parse(typeof(BunnyPinMotionSensor), closeStr.ToUpper(), true);
+            _TesterState.PinMotionCloseSensor = whichCloseType;
+            SendBunnyEvent(this, new StatusEventArgs(whichCloseType.ToString(), (int)BunnyEvents.MemsCloseSensor));
+        }
+
+        private void updateOpenSensorValue()
+        {
+            string openStr = "";
+            try
+            {
+                openStr = ReadDataFiles(Constants.MemsOpenSensorTXT);
+                try
+                {
+                    BunnyPinMotionSensor tmp = (BunnyPinMotionSensor)Enum.Parse(typeof(BunnyPinMotionSensor), openStr.ToUpper(), true);
+                }
+                catch
+                {
+                    throw new FileNotFoundException();
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                try
+                {
+                    WriteDataFiles(Constants.MemsOpenSensorTXT, BunnyPinMotionSensor.NONE.ToString());
+                    openStr = BunnyPinMotionSensor.NONE.ToString();
+                }
+                catch
+                {
+                    throw e;
+                }
+            }
+            catch (Exception e)
+            {
+                Exception exp = e.InnerException;
+                try
+                {
+                    if (exp != null) throw exp;
+                    else throw e;
+                }
+                catch (FileNotFoundException)
+                {
+                    WriteDataFiles(Constants.MemsOpenSensorTXT, BunnyPinMotionSensor.NONE.ToString());
+                    openStr = BunnyPinMotionSensor.NONE.ToString();
+                }
+                catch
+                {
+                    openStr = BunnyPinMotionSensor.NONE.ToString();
+                    throw e;
+                }
+            }
+            BunnyPinMotionSensor whichOpenType = (BunnyPinMotionSensor)Enum.Parse(typeof(BunnyPinMotionSensor), openStr.ToUpper(), true);
+            _TesterState.PinMotionOpenSensor = whichOpenType;
+            SendBunnyEvent(this, new StatusEventArgs(whichOpenType.ToString(), (int)BunnyEvents.MemsOpenSensor));
         }
 
         #endregion Support Methods

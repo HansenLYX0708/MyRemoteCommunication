@@ -70,6 +70,7 @@ namespace Hitachi.Tester.Module
         [FaultContract(typeof(SenderFaultDetail))]
         TesterState GetModuleState();
 
+        // TODO : remove 
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
@@ -114,7 +115,6 @@ namespace Hitachi.Tester.Module
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
         string Name();
-
         #endregion base function
 
         #region Tester function
@@ -141,12 +141,36 @@ namespace Hitachi.Tester.Module
 
 
         // TODO :
+        #region servo
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void hgst_get_servo(int index, int dev);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void hgst_move_servo(int index, int dev, int type, int end_pos, int max_vel, int accel);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void hgst_set_save_servo(int index, int dev, int type,
+          int open_end_pos, int open_max_vel, int open_accel,
+          int close_end_pos, int close_max_vel, int close_accel,
+          int current_end_pos, int current_max_vel, int current_accel);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void hgst_get_neutral(int index, int dev);
+        #endregion servo
+
         #region part three
-
-        #endregion part three
-
-        #region part three
-
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void GetDataViaEvent(string[] names);
         #endregion part three
 
         #region part three
@@ -158,8 +182,8 @@ namespace Hitachi.Tester.Module
     // These event handlers are used inside of Jade and BladeRunner.
     public delegate void StatusEventHandler(object sender, StatusEventArgs e);
     // TODO :
-    //public delegate void CompleteEventHandler(object sender, CompletedEventArgs e);
-    //public delegate void StartedEventHandler(object sender, StartedEventArgs e);
+    public delegate void CompleteEventHandler(object sender, CompletedEventArgs e);
+    public delegate void StartedEventHandler(object sender, StartedEventArgs e);
 
     // The following event handler is used to send all events across the wire. Actually we no longer do .NET remoting events.  Instead we use a WCF callback.
     // Blade runner wraps this in a callback.

@@ -132,6 +132,7 @@
     <Compile Include="ITesterObjectCallback.cs" />
     <Compile Include="ObjectStatusEventArgsClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServoPositionClass.cs" />
     <Compile Include="StartedEventArgs.cs" />
     <Compile Include="StatsClass.cs" />
     <Compile Include="StatsRecord.cs" />
