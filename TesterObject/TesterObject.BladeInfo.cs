@@ -92,6 +92,11 @@ namespace Hitachi.Tester.Module
         // Bunny card fields end
         private object _ReadInCountsLockObject;
 
+        private const int readStatusTime = 50; //ms
+        private System.Threading.Timer readStatusTimer;
+        private System.Threading.TimerCallback sequenceTimeoutDelegate;
+        private System.Threading.Timer sequenceTimeoutTimer;
+        private System.Threading.TimerCallback timerDelegate;
         private System.Threading.Timer memsOpenWatchdogTimer;
         private System.Threading.TimerCallback watchdogDelegate;
         DateTime m_MemsOpenClosedStartTime;
@@ -905,7 +910,7 @@ namespace Hitachi.Tester.Module
         }
 
         /// <summary>
-        /// Set Mems to opposite state.
+        /// Set Mems to opposite state.TODO : maybe no use
         /// </summary>
         public void PinMotionToggle()
         {
@@ -919,6 +924,85 @@ namespace Hitachi.Tester.Module
             //    OpenCloseMems(1); // open it
             //}
             // else if memsState == MemsStateValues.Changing, we do nothing.
+        }
+
+        /// <summary>
+        /// GetDataViaEvent reads item and sends result via BunnyEvent.
+        /// </summary>
+        /// <param name="names"></param>
+        public void GetDataViaEvent(string[] names)
+        {
+            object passingObj = names;
+            Thread getDataThread = new Thread(new ParameterizedThreadStart(GetDataViaEventThreadFunc))
+            {
+                IsBackground = true
+            };
+            getDataThread.Start(passingObj);
+        }
+
+        public void SetMemsType(BunnyPinMotionType whichKind)
+        {
+            string whatType = BunnyPinMotionType.NONE.ToString();
+            bool changed = false;
+            BunnyPinMotionType originalType = _TesterState.PinMotionType;
+
+            WriteLine("SetMemsType called ");
+            WriteLineContent(whichKind.ToString());
+
+            if (originalType != whichKind && whichKind == BunnyPinMotionType.SOLENOID)
+            {
+                whatType = BunnyPinMotionType.SOLENOID.ToString();
+                _TesterState.PinMotionType = BunnyPinMotionType.SOLENOID;
+                changed = true;
+            }
+            else if (originalType != whichKind && whichKind == BunnyPinMotionType.SERVO)
+            {
+                if (CheckIfServoIsOK(true))
+                {
+                    // Set servo
+                    whatType = BunnyPinMotionType.SERVO.ToString();
+                    _TesterState.PinMotionType = BunnyPinMotionType.SERVO;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                // save selected pin motion type
+                WriteDataFiles(Constants.WhichPinMotionFileNameTXT, whatType);
+                DecideInitialOpenCloseAspect();
+            }
+            SendBunnyEvent(this, new StatusEventArgs(_TesterState.PinMotionType.ToString(), (int)BunnyEvents.MemsType));
+        }
+
+        public void SetMemsOpenSensorType(BunnyPinMotionSensor whichKind)
+        {
+            WriteLine("SetMemsOpenSensorType called ");
+            WriteLineContent(whichKind.ToString());
+
+            if (_TesterState.PinMotionOpenSensor != whichKind)
+            {
+                string whatType = whichKind.ToString();
+                // save selected pin motion sensor type
+                WriteDataFiles(Constants.MemsOpenSensorTXT, whatType);
+                _TesterState.PinMotionOpenSensor = whichKind;
+                SendBunnyEvent(this, new StatusEventArgs(whatType, (int)BunnyEvents.MemsOpenSensor));
+            }
+        }
+
+        public void SetMemsCloseSensorType(BunnyPinMotionSensor whichKind)
+        {
+            WriteLine("SetMemsCloseSensorType called ");
+            WriteLineContent(whichKind.ToString());
+
+            if (_TesterState.PinMotionCloseSensor != whichKind)
+            {
+                string whatType = whichKind.ToString();
+                // save selected pin motion sensor type
+                WriteDataFiles(Constants.MemsCloseSensorTXT, whatType);
+                _TesterState.PinMotionCloseSensor = whichKind;
+                SendBunnyEvent(this, new StatusEventArgs(whatType, (int)BunnyEvents.MemsCloseSensor));
+            }
         }
 
         /// <summary>
@@ -1117,20 +1201,6 @@ namespace Hitachi.Tester.Module
             }
         }
 
-        /// <summary>
-        /// GetDataViaEvent reads item and sends result via BunnyEvent.
-        /// </summary>
-        /// <param name="names"></param>
-        public void GetDataViaEvent(string[] names)
-        {
-            object passingObj = names;
-            Thread getDataThread = new Thread(new ParameterizedThreadStart(GetDataViaEventThreadFunc))
-            {
-                IsBackground = true
-            };
-            getDataThread.Start(passingObj);
-        }
-
         public void hgst_set_save_servo(int index, int dev, int type,
            int open_end_pos, int open_max_vel, int open_accel,
            int close_end_pos, int close_max_vel, int close_accel,
@@ -1246,41 +1316,6 @@ namespace Hitachi.Tester.Module
             _ResetStatus = false;
             _Boards = BunnyBoard.Manager.Devices;
 
-            try
-            {
-                _BunnyCard = _Boards[0];
-                if (!_BunnyCard.Connected)
-                {
-                    _BunnyCard.Connect();
-                }
-                if (!_BunnyCard.Connected)
-                {
-                    try
-                    {
-                        StaticServerTalker.MessageString = "Cannot initialize Bunny Library in form1 constructor. " +
-                            Environment.NewLine +
-                            "Exception while reading data from Blade controller card.";
-                    }
-                    catch { }
-                }
-                else
-                {
-                    _TesterState.BunnyGood = true;
-                    BladePath = _BunnyCard.Flash;
-                }
-            }
-            catch (Exception e)
-            {
-                _TesterState.BunnyGood = false;
-                _TesterState.RampInited = false;
-                try
-                {
-                    StaticServerTalker.MessageString = "Bunny initialization failed.  " + "Exception while reading data from Blade controller card." +
-                       Environment.NewLine +
-                       "Did you install the kernel driver?  " + Environment.NewLine + MakeUpExceptionString(e).ToString();
-                }
-                catch { }
-            }
             _MyLocation = "";
             _JadeSn = "";
             _MemsSn = "";
@@ -1297,7 +1332,7 @@ namespace Hitachi.Tester.Module
             _MemsCloseDelay = "";
 
             _MemsStatus = HGST.Blades.MemsStateValues.Unknown;
-            
+
             _BladeType = "";
             _VoltageCheckBlade = false;
             _VoltageCheckThreadGoing = false;
@@ -1337,8 +1372,6 @@ namespace Hitachi.Tester.Module
             //_CountStateFromDisk.StatisticsFromToTimeEvent += new StatusEventHandler(countState_StatisticsFromToTimeEvent);
             //_CountStateFromDisk.StatisticsDGREvent += new StatusEventHandler(countState_StatisticsDGREvent);
 
-            watchdogDelegate = new TimerCallback(MemsOpenWatchdogTimerCallback);
-            memsOpenWatchdogTimer = new System.Threading.Timer(watchdogDelegate, null, Timeout.Infinite, Timeout.Infinite);
             m_MemsOpenClosedStartTime = DateTime.Now;
 
             openPosition = new ServoPositionClass();
@@ -1347,6 +1380,45 @@ namespace Hitachi.Tester.Module
 
             m_ServoMemsState = HGST.Blades.MemsStateValues.Unknown;
             m_ServoArrived = false;
+
+            if (_Boards.Count > 0)
+            {
+                try
+                {
+                    _BunnyCard = _Boards[0];
+                    if (!_BunnyCard.Connected)
+                    {
+                        _BunnyCard.Connect();
+                    }
+                    if (!_BunnyCard.Connected)
+                    {
+                        try
+                        {
+                            StaticServerTalker.MessageString = "Cannot initialize Bunny Library in form1 constructor. " +
+                                Environment.NewLine +
+                                "Exception while reading data from Blade controller card.";
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        _TesterState.BunnyGood = true;
+                        BladePath = _BunnyCard.Flash;
+                    }
+                }
+                catch (Exception e)
+                {
+                    _TesterState.BunnyGood = false;
+                    _TesterState.RampInited = false;
+                    try
+                    {
+                        StaticServerTalker.MessageString = "Bunny initialization failed.  " + "Exception while reading data from Blade controller card." +
+                           Environment.NewLine +
+                           "Did you install the kernel driver?  " + Environment.NewLine + MakeUpExceptionString(e).ToString();
+                    }
+                    catch { }
+                }
+            }
         }
 
         /// <summary>
@@ -1931,7 +2003,6 @@ namespace Hitachi.Tester.Module
             try
             {
                 object[] passingObjAray = (object[])passingObj;
-                //string key = (string)passingObjAray[0];
                 string[] names = (string[])passingObjAray[1];
                 int[] numbers = (int[])passingObjAray[2];
 
@@ -1949,7 +2020,7 @@ namespace Hitachi.Tester.Module
                         case BladeDataName.DiskLoadCount:
                             counterStateUpdated = false;
                             _CountStateFromDisk.SetValue(names[i], numbers[i]);
-                            //TODO : SendBunnyCountEvents(names[i]);
+                            SendBunnyCountEvents(names[i]);
                             continue;
 
                         case BladeDataName.AuxOut0:
@@ -2053,12 +2124,9 @@ namespace Hitachi.Tester.Module
             {
                 MemsTimerStart();
             }
-
             m_MemsOpenClosedStartTime = DateTime.Now;  // MEMS state checking thread uses this for open/close delay time.
             MemsRequestedState = (value == 0) ? HGST.Blades.MemsStateValues.Closed : HGST.Blades.MemsStateValues.Opened;
-
             string whatType = "";
-
             // inc counter if open requested and it is now closed
             if (MemsRequestedState == HGST.Blades.MemsStateValues.Opened && MemsStatus == HGST.Blades.MemsStateValues.Closed)
             {
@@ -2068,7 +2136,6 @@ namespace Hitachi.Tester.Module
                 SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.ToString(), (int)BunnyEvents.Counts));
                 SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(BladeDataName.MemsCount).ToString(), (int)BunnyEvents.MemsCount));
             }
-
             // if we do not know what kind of pin motion yet then ...
             if (_TesterState.PinMotionType == BunnyPinMotionType.NONE)
             {
@@ -2095,7 +2162,6 @@ namespace Hitachi.Tester.Module
                     _TesterState.PinMotionType = BunnyPinMotionType.SOLENOID;
                 }
             }
-
             // if servo make sure it is ok.
             if (_TesterState.PinMotionType == BunnyPinMotionType.SERVO && !CheckIfServoIsOK(true))
             {
@@ -2183,7 +2249,6 @@ namespace Hitachi.Tester.Module
                 // Set bit per request (even if we could not do it).
                 _TesterState.MemsSolenoid = value > 0;
             }
-
             if (!bMemsThreadGoing)
             {
                 Thread openCloseThread = new Thread(new ThreadStart(MemsOpenCloseStateCheckThreadFunc));
@@ -2191,7 +2256,6 @@ namespace Hitachi.Tester.Module
                 openCloseThread.Name = "openCloseThread";
                 openCloseThread.Start();
             }
-
         }
 
         private void MemsTimerStop()
@@ -3096,6 +3160,70 @@ namespace Hitachi.Tester.Module
             BunnyPinMotionSensor whichOpenType = (BunnyPinMotionSensor)Enum.Parse(typeof(BunnyPinMotionSensor), openStr.ToUpper(), true);
             _TesterState.PinMotionOpenSensor = whichOpenType;
             SendBunnyEvent(this, new StatusEventArgs(whichOpenType.ToString(), (int)BunnyEvents.MemsOpenSensor));
+        }
+
+        private void SendBunnyCountEvents(string name)
+        {
+            switch (name)
+            {
+                case BladeDataName.DiskLoadCount:
+                    SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(name).ToString(), (int)BunnyEvents.DiskLoadCount));
+                    break;
+                case BladeDataName.MemsCount:
+                    SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(name).ToString(), (int)BunnyEvents.MemsCount));
+                    break;
+                case BladeDataName.PatrolCount:
+                    SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(name).ToString(), (int)BunnyEvents.PatrolCount));
+                    break;
+                case BladeDataName.ScanCount:
+                    SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(name).ToString(), (int)BunnyEvents.ScanCount));
+                    break;
+                case BladeDataName.TestCount:
+                    SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.GetValue(name).ToString(), (int)BunnyEvents.TestCount));
+                    break;
+            }
+            SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.ToString(), (int)BunnyEvents.Counts));
+        }
+
+        /// <summary>
+        /// Called at startup and when changing MEMS type.  Determines current mems(Pin-motion position) state.
+        /// Sets status vars to match.
+        /// </summary>
+        private void DecideInitialOpenCloseAspect()
+        {
+            // In case some exception happens we display ???? position.
+            SendBunnyEvent(this, new StatusEventArgs(HGST.Blades.MemsStateValues.Unknown.ToString(), (int)BunnyEvents.MemsOpenClose));
+            string pinMotionTypeString = ReadDataFiles(Constants.WhichPinMotionFileNameTXT);
+
+            if (_FormerStatusRead < 0)
+            {
+                ReadBunnyStatusAndUpdateFlags();
+            }
+            if (pinMotionTypeString == BunnyPinMotionType.SOLENOID.ToString())
+            {
+                MemsRequestedState = _TesterState.MemsSolenoid ? HGST.Blades.MemsStateValues.Opened : HGST.Blades.MemsStateValues.Closed;
+                SendBunnyEvent(this, new StatusEventArgs(MemsRequestedState.ToString(), (int)BunnyEvents.MemsOpenClose));
+                m_ServoArrived = false;
+            }
+            else if (pinMotionTypeString == BunnyPinMotionType.SERVO.ToString())
+            {
+                // Read current position
+                hgst_get_servo(0, (int)HGST.Blades.EnumSolenoidServoAddr.SERVO);
+
+                if (m_ServoMemsState == HGST.Blades.MemsStateValues.Opened)
+                {
+                    m_ServoArrived = true;
+                    MemsRequestedState = HGST.Blades.MemsStateValues.Opened;
+                    SendBunnyEvent(this, new StatusEventArgs(MemsRequestedState.ToString(), (int)BunnyEvents.MemsOpenClose));
+                }
+                else if (m_ServoMemsState == HGST.Blades.MemsStateValues.Closed)
+                {
+                    m_ServoArrived = true;
+                    MemsRequestedState = HGST.Blades.MemsStateValues.Closed;
+                    SendBunnyEvent(this, new StatusEventArgs(MemsRequestedState.ToString(), (int)BunnyEvents.MemsOpenClose));
+                }
+            }
+            // else we do not know.
         }
 
         #endregion Support Methods

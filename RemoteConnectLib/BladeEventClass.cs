@@ -67,44 +67,46 @@ namespace Hitachi.Tester.Client
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void unshuffleEvents_OrderedBladeEvent(object sender, BladeEventArgs e)
+        private void unshuffleEvents_OrderedBladeEvent(object sender, BladeEventArgs e)
         {
             switch (e.EventType)
             {
                 case BladeEventType.Bunny:
-                    //remoteConnectLib.OnBunnyEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
+                    remoteConnectLib.OnBunnyEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
 
                 case BladeEventType.ProgramClosing:
-                    //remoteConnectLib.OnProgramClosingEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
+                    remoteConnectLib.OnProgramClosingEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
 
                 case BladeEventType.SequenceAborting:
-                    //remoteConnectLib.OnSequenceAbortingEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
+                    remoteConnectLib.OnSequenceAbortingEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
 
                 case BladeEventType.SequenceCompleted:
-                    //remoteConnectLib.OnSequenceCompleteEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
+                    remoteConnectLib.OnSequenceCompleteEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
 
                 case BladeEventType.SequenceStarted:
-                    //remoteConnectLib.OnSequenceStartedEvent(sender, e.ToSequenceStartedBladeEventArgs().ToStartedEventArgs());
+                    remoteConnectLib.OnSequenceStartedEvent(sender, e.ToSequenceStartedBladeEventArgs().ToStartedEventArgs());
                     break;
 
                 case BladeEventType.SequenceUpdate:
-                    //remoteConnectLib.OnSequenceUpdateEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
+                    remoteConnectLib.OnSequenceUpdateEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
 
                 case BladeEventType.TestCompleted:
-                    //remoteConnectLib.OnTestCompleteEvent(sender, e.ToCompletedEventBladeArgs().ToCompletedEventArgs());
+                    remoteConnectLib.OnTestCompleteEvent(sender, e.ToCompletedEventBladeArgs().ToCompletedEventArgs());
                     break;
 
                 case BladeEventType.TestStarted:
-                    //remoteConnectLib.OnTestStartedEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
+                    remoteConnectLib.OnTestStartedEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
 
                 case BladeEventType.Status:
                     remoteConnectLib.OnStatusEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
+                    break;
+                default:
                     break;
             }
         }

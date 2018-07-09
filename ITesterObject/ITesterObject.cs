@@ -33,6 +33,11 @@ namespace Hitachi.Tester.Module
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
+        void InitializeTCL(string Key);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
         int PingInt();
 
         [OperationContract]
@@ -68,6 +73,21 @@ namespace Hitachi.Tester.Module
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
+        void SetMemsType(BunnyPinMotionType whichKind);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void SetMemsOpenSensorType(BunnyPinMotionSensor whichKind);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void SetMemsCloseSensorType(BunnyPinMotionSensor whichKind);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
         TesterState GetModuleState();
 
         // TODO : remove 
@@ -76,6 +96,7 @@ namespace Hitachi.Tester.Module
         [FaultContract(typeof(SenderFaultDetail))]
         void SetModuleState(TesterState testerState);
 
+        // TODO : remove
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
@@ -106,6 +127,7 @@ namespace Hitachi.Tester.Module
         [FaultContract(typeof(SenderFaultDetail))]
         int[] GetIntegers(string key, string[] names);
 
+        // TODO : maybe no use
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
@@ -139,9 +161,8 @@ namespace Hitachi.Tester.Module
         void StartTest(string ParseString, string TestName, string GradeName, string tableStr);
         #endregion Tester function
 
-
-        // TODO :
-        #region servo
+        // TODO : 
+        #region hgst servo
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
@@ -173,8 +194,11 @@ namespace Hitachi.Tester.Module
         void GetDataViaEvent(string[] names);
         #endregion part three
 
-        #region part three
-
+        #region TCL function
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void TclCommand(string Command, bool bToTv);
         #endregion part three
 
     } // end interface

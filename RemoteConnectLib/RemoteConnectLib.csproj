@@ -87,6 +87,7 @@
     <Compile Include="BladeEventsInOrder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteConnectLib.cs" />
+    <Compile Include="ResuffleEvents.cs" />
     <Compile Include="Service References\ServiceReference1\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -103,6 +104,10 @@
     <ProjectReference Include="..\Defines\Defines.csproj">
       <Project>{1158CE60-E954-4FC2-9442-1BF5AC00431B}</Project>
       <Name>Defines</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ITesterObjectStreaming\ITesterObjectStreaming.csproj">
+      <Project>{b5a7d014-b901-4ec2-92f4-92ca6de62336}</Project>
+      <Name>ITesterObjectStreaming</Name>
     </ProjectReference>
     <ProjectReference Include="..\ITesterObject\ITesterObject.csproj">
       <Project>{9D12B6BF-9BB6-4182-9312-E3626A344064}</Project>

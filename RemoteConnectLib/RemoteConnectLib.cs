@@ -7,6 +7,7 @@ using System.Threading;
 using System.ServiceModel;
 using System.Net;
 using System.Windows.Forms;
+using System.IO;
 
 using Hitachi.Tester;
 using Hitachi.Tester.Enums;
@@ -23,7 +24,7 @@ namespace Hitachi.Tester.Client
         private bool _Disposed;
 
         private DuplexChannelFactory<ITesterObject> _Factory;
-        //private ChannelFactory<ITesterObjectStreaming> factoryStreaming = null;
+        private ChannelFactory<ITesterObjectStreaming> _FactoryStreaming;
         private string _CurrentUrlAddress;
         private string _CurrentUserID;
         private string _CurrentPassword;
@@ -35,12 +36,12 @@ namespace Hitachi.Tester.Client
 
         // private WCF stuff
         private ITesterObject _TesterObject;  // proxy for non-stream functions.
-        // TODO : private ITesterObjectStreaming m_testerObjectStreaming; // proxy for stream funcitons.
-        private object ITesterObjectLock;
+        private ITesterObjectStreaming _TesterObjectStreaming; // proxy for stream funcitons.
+        // TODO : private object ITesterObjectLock;
         // TODO : private object ITesterObjectStreamLock = new object();
         private System.Threading.Timer _KeepAliveTimer;
         public bool _KeepAliveArrived;
-
+        private ResuffleEvents processSequenceEventsInOrder;
         private BladeEventClass _BladeEvent;
 
         private bool _Connected = false; // Flag to see if we have ever connected.
@@ -55,7 +56,10 @@ namespace Hitachi.Tester.Client
 
         private static object oBladeInfoLockObject;
 
+        private delegate void TclCommandDelegate(object CommandObj);
         private delegate string EventPingDelegate(string str);
+        private delegate Stream BladeFileReadDelegate(string fileRequest);
+        private delegate FileStreamResponse BladeFileWriteDelegate(FileStreamRequest fileRequest);
 
         private delegate string[] GetBladeStringsDelegate(string key, string[] names);
         private delegate void SetBladeStringsDelegate(string key, string[] names, string[] strings);
@@ -87,8 +91,11 @@ namespace Hitachi.Tester.Client
             Microsoft.VisualBasic.Devices.Computer computer = new Microsoft.VisualBasic.Devices.Computer();
             _OurName = computer.Name;
             _Disposed = false;
-
+            _TesterObject = null;
+            _TesterObjectStreaming = null;
             _Factory = null;
+            _FactoryStreaming = null;
+
             _CurrentUrlAddress = string.Empty;
             _CurrentUserID = string.Empty;
             _CurrentPassword = string.Empty;
@@ -96,7 +103,7 @@ namespace Hitachi.Tester.Client
             _ConnectLockObject = new object();
             _BusyConnecting = false;
 
-            ITesterObjectLock = new object();
+            //ITesterObjectLock = new object();
 
             oBladeInfoLockObject = new object();
 
@@ -106,6 +113,13 @@ namespace Hitachi.Tester.Client
             // After connected, timer pings host every now and then to keep the channel awake.
             _KeepAliveTimer = new System.Threading.Timer(KeepAliveTimer_Tick, null, Timeout.Infinite, Timeout.Infinite);
             _KeepAliveArrived = true;
+
+            processSequenceEventsInOrder = new ResuffleEvents();
+            processSequenceEventsInOrder.SequenceCompletedEvent += new StatusEventHandler(SendSequenceCompleteEventToJade);
+            processSequenceEventsInOrder.SequenceStartedEvent += new StartedEventHandler(SendSequenceStartedEventToJade);
+            processSequenceEventsInOrder.TestCompletedEvent += new CompleteEventHandler(SendTestCompleteEventToJade);
+            processSequenceEventsInOrder.TestStartedEvent += new StatusEventHandler(SendTestStartedEventToJade);
+            processSequenceEventsInOrder.SequenceAbortEvent += new StatusEventHandler(SendSequenceAbortEventToJade);
         }
 
         /// <summary>
@@ -153,9 +167,53 @@ namespace Hitachi.Tester.Client
                 return _TesterObject;
             }
         }
+
+        /// <summary>
+        /// Public property to expose ITesterObjectStreaming (to us).
+        /// This is a proxy to the remote host.
+        /// This is for stream functions.
+        /// Property checks if the channel is OK (not faulted).
+        /// If channel is faulted, it re-opens the channel.
+        /// </summary>
+        private ITesterObjectStreaming ObjStreaming  // Proxy to WCF and BladeRunner for stream functions.
+        {
+            get
+            {
+                // TODO : the lock for what
+                //lock (ITesterObjectStreamLock)
+                {
+                    //CommunicationState swhat = ((System.ServiceModel.ICommunicationObject)m_testerObjectStreaming).State;
+                    // If WCF broke, then restart.
+                    if (_TesterObjectStreaming == null || ((System.ServiceModel.ICommunicationObject)_TesterObjectStreaming).State != CommunicationState.Opened)
+                    {
+                        if (_TesterObjectStreaming != null)
+                        {
+                            ((System.ServiceModel.ICommunicationObject)_TesterObjectStreaming).Abort();
+                        }
+                        Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, false, true);
+                    }
+                    return _TesterObjectStreaming;
+                }
+            }
+        }
+
+        /// <summary>
+        /// See if we are connected.
+        /// </summary>
+        public bool Connected
+        {
+            get
+            {
+                return (_TesterObject != null &&
+                    _TesterObjectStreaming != null &&
+                    ((ICommunicationObject)_TesterObject).State == CommunicationState.Opened &&
+                    ((ICommunicationObject)_TesterObjectStreaming).State == CommunicationState.Opened &&
+                    _Connected);
+            }
+        }
         #endregion Properties
 
-        #region Service methods
+        #region TesterObject Service methods
         public UInt32 Connect(string urlAddress, string userID, string password)
         {
             _KeepAliveTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -179,7 +237,7 @@ namespace Hitachi.Tester.Client
                     catch { }
                 }
                 ((ICommunicationObject)_TesterObject).Close();
-                // TODO : ((ICommunicationObject)m_testerObjectStreaming).Close();
+                ((ICommunicationObject)_TesterObjectStreaming).Close();
             }
             catch (Exception ex)
             {
@@ -276,20 +334,67 @@ namespace Hitachi.Tester.Client
             return Obj.GetStrings("", new string[] { BladeDataName.FactPath })[0];
         }
 
-        // TODO :  No use in current code
-        //public void SetModuleState(TesterStateStruct testerState)
-        //{
-        //    if (obj == null) return;
-        //    obj.SetModuleState(testerState);
-        //}
-
         public MemsStateValues GetMemsState()
         {
             if (Obj == null) return MemsStateValues.Unknown;
             return Obj.GetMemsStatus();
         }
 
-        #endregion Service methods
+        /// <summary>
+        /// Sends a command to the BladeRunner via thread pool thread.
+        /// </summary>
+        /// <param name="Command"></param>
+        public void TclCommand(string Command, bool bToTv)
+        {
+            if (Obj == null) return;
+            if (Command.Length == 0) return;
+
+            // if exit, we do NOT close remote, we close ourselves.
+            if (Command == "exit")
+            {
+                Application.Exit();
+                // if Exit returns then user pressed cancel.
+                Command = Environment.NewLine;
+            }
+
+            object[] objArray = new object[] { Command, bToTv };
+            TclCommandDelegate tclCommandDelegate = new TclCommandDelegate(ObjTclCmd);
+            // send string to remote
+            tclCommandDelegate.BeginInvoke(objArray, new AsyncCallback(delegate (IAsyncResult ar) { tclCommandDelegate.EndInvoke(ar); }), tclCommandDelegate);
+        }
+        #endregion TesterObject Service methods
+
+        #region TesterObjectStream service methods
+        public Stream BladeFileRead(string fileName)
+        {
+            BladeFileReadDelegate factFileReadingDelegate =
+                new BladeFileReadDelegate(ObjStreaming.BladeFileRead);
+            IAsyncResult ar = factFileReadingDelegate.BeginInvoke(fileName, null, factFileReadingDelegate);
+            ar.AsyncWaitHandle.WaitOne(30000, false);
+            if (ar.IsCompleted)
+            {
+                return factFileReadingDelegate.EndInvoke(ar);
+            }
+            else throw new Exception("Cannot open file in BladeFileRead " + fileName + ".");
+        }
+
+        public string BladeFileWrite(Stream readStream, string fileName)
+        {
+            FileStreamRequest fileRequest = new FileStreamRequest();
+            fileRequest.FileName = fileName;
+            fileRequest.FileByteStream = readStream;
+
+            BladeFileWriteDelegate factFileWritingDelegate = new BladeFileWriteDelegate(ObjStreaming.BladeFileWrite);
+            IAsyncResult ar = factFileWritingDelegate.BeginInvoke(fileRequest, null, factFileWritingDelegate);
+            ar.AsyncWaitHandle.WaitOne(30000, false);
+            if (ar.IsCompleted)
+            {
+                FileStreamResponse response = factFileWritingDelegate.EndInvoke(ar);
+                return response.FileName;
+            }
+            else throw new Exception("Could not write file in BladeFileWrite " + fileName + ".");
+        }
+        #endregion TesterObjectStream service methods
 
         #region Blade string and integer methods
         public string GetFwRev()
@@ -409,7 +514,7 @@ namespace Hitachi.Tester.Client
 
         #endregion Blade string and integer methods
 
-        #region internal Methods
+        #region internal support Methods
         private string MakeKey()
         {
             return _OurName;
@@ -468,7 +573,12 @@ namespace Hitachi.Tester.Client
                         }
                         if (tobjStr)
                         {
-                            // TODO : testObjectStreaming
+                            _TesterObjectStreaming = _FactoryStreaming.CreateChannel();
+                            CommunicationState chanState1 = ((System.ServiceModel.ICommunicationObject)_TesterObjectStreaming).State;
+                            if (chanState1 != CommunicationState.Opened)
+                            {
+                                ((System.ServiceModel.ICommunicationObject)_TesterObjectStreaming).Open();
+                            }
                         }
                     }
                     catch (WebException ex)
@@ -484,7 +594,7 @@ namespace Hitachi.Tester.Client
                     }
 
                     // TODO : Add tester object streaming
-                    if (_Factory == null || _TesterObject == null)
+                    if (_Factory == null || _FactoryStreaming == null || _TesterObject == null || _TesterObjectStreaming == null)
                     {
                         nlogger.Error("RemoteConnectLib::Connect failed to attach event to remote server [URL:{0}]", strUrl);
                         retVal = (UInt32)ReturnValues.connectionBad;
@@ -496,7 +606,6 @@ namespace Hitachi.Tester.Client
                         {
                             // This will add our proxy to testerObject's callback list.
                             retVal = _TesterObject.Connect(userID, "", _OurName);
-                            //string what = ((System.ServiceModel.ICommunicationObject)Obj).State.ToString();
                         }
                         catch (WebException ex)
                         {
@@ -606,7 +715,6 @@ namespace Hitachi.Tester.Client
                 }
             }
 
-
             if (netTcp)
             {
                 retVal = strUrl.Substring(0, lastColon + 1) + (portNumber + 1).ToString() + strUrl.Substring(testerObjSpot) + "Streaming";
@@ -647,7 +755,17 @@ namespace Hitachi.Tester.Client
                 }
                 if (tobjStr)
                 {
-                    // TODO : object Streaming
+                    NetTcpBinding binding2 = new NetTcpBinding();
+                    binding2.Security.Mode = SecurityMode.None;
+                    binding2.TransferMode = TransferMode.Streamed;
+                    binding2.MaxReceivedMessageSize = 524288;
+                    binding2.MaxBufferSize = 524288;
+                    binding2.MaxBufferPoolSize = 524288;
+                    binding2.ReaderQuotas.MaxArrayLength = 524288;
+                    binding2.ReaderQuotas.MaxBytesPerRead = 524288;
+                    binding2.ReaderQuotas.MaxNameTableCharCount = 524288;
+                    binding2.ReaderQuotas.MaxStringContentLength = 524288;
+                    _FactoryStreaming = new ChannelFactory<ITesterObjectStreaming>(binding2, endpoint2);
                 }
             }
             else
@@ -768,8 +886,132 @@ namespace Hitachi.Tester.Client
             }
             _TesterObject = null;
 
-            // TODO :Close TesterObjectStreaming service.
+            if (_TesterObjectStreaming != null && ((ICommunicationObject)_TesterObjectStreaming).State == CommunicationState.Opened)
+            {
+                try { ((ICommunicationObject)_TesterObjectStreaming).Close(); }
+                catch
+                {
+                    // ignored
+                }
+            }
+            else if (_TesterObjectStreaming != null)
+            {
+                try { ((ICommunicationObject)_TesterObjectStreaming).Abort(); }
+                catch
+                {
+                    // ignored
+                }
+            }
+            _TesterObjectStreaming = null;
 
+        }
+
+        internal virtual void OnBunnyEvent(object sender, StatusEventArgs e)
+        {
+            comBunnyEvent?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// When BladeRunner tells us that it is closing with this closes the window on Form1.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        internal virtual void OnProgramClosingEvent(object sender, StatusEventArgs e)
+        {
+            comProgramClosingEvent?.Invoke(this, e);
+        }
+
+        internal virtual void OnSequenceAbortingEvent(object sender, StatusEventArgs e)
+        {
+            if (e.Text.Contains("SequenceAbortingEvent " + Constants.CommTestString))
+            {
+                SendSequenceAbortEventToJade(sender, e);
+            }
+            else
+            {
+                processSequenceEventsInOrder.QueueUpSequenceAbortingEvent(sender, e);
+            }
+        }
+
+        internal virtual void OnSequenceCompleteEvent(object sender, StatusEventArgs e)
+        {
+            if (e.Text.Contains("SequenceCompleteEvent " + Constants.CommTestString))
+            {
+                SendSequenceCompleteEventToJade(sender, e);
+            }
+            else
+            {
+                processSequenceEventsInOrder.QueueUpSequenceCompletedEvent(sender, e);
+            }
+        }
+
+        internal virtual void SendSequenceCompleteEventToJade(object sender, StatusEventArgs e)
+        {
+            comSequenceCompleteEvent?.Invoke(this, e);
+        }
+
+        internal virtual void OnSequenceStartedEvent(object sender, StartedEventArgs e)
+        {
+            if (e.seqName.Contains("SequenceStartedEvent " + Constants.CommTestString))
+            {
+                SendSequenceStartedEventToJade(sender, e);
+            }
+            else
+            {
+                processSequenceEventsInOrder.QueueUpSequenceStartedEvent(sender, e);
+            }
+        }
+
+        internal virtual void SendSequenceStartedEventToJade(object sender, StartedEventArgs e)
+        {
+            comSequenceStartedEvent?.Invoke(this, e);
+        }
+
+        internal virtual void OnSequenceUpdateEvent(object sender, StatusEventArgs e)
+        {
+            comSequenceUpdateEvent?.Invoke(this, e);
+        }
+
+
+        internal virtual void SendSequenceAbortEventToJade(object sender, StatusEventArgs e)
+        {
+            comSequenceAbortingEvent?.Invoke(this, e);
+        }
+
+        internal virtual void OnTestCompleteEvent(object sender, CompletedEventArgs e)
+        {
+            if (e.Text.Contains("TestCompletedEvent " + Constants.CommTestString))
+            {
+                SendTestCompleteEventToJade(sender, e);
+            }
+            else
+            {
+                processSequenceEventsInOrder.QueueUpTestCompletedEvent(sender, e);
+            }
+        }
+
+        internal virtual void SendTestCompleteEventToJade(object sender, CompletedEventArgs e)
+        {
+            if (e.Text.Contains(Constants.SkipItSkipIt)) return;
+            comTestCompleteEvent?.Invoke(this, e);
+        }
+
+        internal virtual void OnTestStartedEvent(object sender, StatusEventArgs e)
+        {
+            if (e.Text.Contains("TestStartedEvent " + Constants.CommTestString))
+            {
+                SendTestStartedEventToJade(sender, e);
+            }
+            else
+            {
+                processSequenceEventsInOrder.QueueUpTestStartedEvent(sender, e);
+            }
+        }
+
+        internal virtual void SendTestStartedEventToJade(object sender, StatusEventArgs e)
+        {
+            if (e.Text.Contains(Constants.SkipItSkipIt)) return;
+            comTestStartedEvent?.Invoke(this, e);
         }
 
         internal virtual void OnStatusEvent(object sender, StatusEventArgs e)
@@ -995,7 +1237,22 @@ namespace Hitachi.Tester.Client
             nlogger.Error(string.Format("SetBladeIntegers failed key={0}", string.Join("/", names)));
         }
 
-        #endregion internal Methods
+        /// <summary>
+        /// Sends command to BladeRunner.
+        /// Called by TclCommand via thread pool thread.
+        /// </summary>
+        /// <param name="passingObj"></param>
+        private void ObjTclCmd(object passingObj)
+        {
+            if (Obj == null) return; // if nothing there return
+            object[] objArray = (object[])passingObj;
+            string Command = (string)objArray[0];
+            bool bToTv = (bool)objArray[1];
+            // send to BladeRunner computer
+            try { Obj.TclCommand(Command, bToTv); }
+            catch { }  // too easy to type the wrong stuff
+        }
+        #endregion internal support Methods
 
         #region dispose Methods
         protected virtual void Dispose(bool disposing)
@@ -1039,23 +1296,23 @@ namespace Hitachi.Tester.Client
             _TesterObject = null;
 
             // Close TesterObjectStreaming service.
-            //if (_TesterObjectStreaming != null && ((ICommunicationObject)m_testerObjectStreaming).State == CommunicationState.Opened)
-            //{
-            //    try { ((ICommunicationObject)m_testerObjectStreaming).Close(); }
-            //    catch
-            //    {
-            //        // ignored
-            //    }
-            //}
-            //else if (m_testerObjectStreaming != null)
-            //{
-            //    try { ((ICommunicationObject)m_testerObjectStreaming).Abort(); }
-            //    catch
-            //    {
-            //        // ignored
-            //    }
-            //}
-            //m_testerObjectStreaming = null;
+            if (_TesterObjectStreaming != null && ((ICommunicationObject)_TesterObjectStreaming).State == CommunicationState.Opened)
+            {
+                try { ((ICommunicationObject)_TesterObjectStreaming).Close(); }
+                catch
+                {
+                    // ignored
+                }
+            }
+            else if (_TesterObjectStreaming != null)
+            {
+                try { ((ICommunicationObject)_TesterObjectStreaming).Abort(); }
+                catch
+                {
+                    // ignored
+                }
+            }
+            _TesterObjectStreaming = null;
 
             // Notice sys 
             _Disposed = true;
