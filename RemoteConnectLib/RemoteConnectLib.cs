@@ -60,6 +60,7 @@ namespace Hitachi.Tester.Client
         private delegate string EventPingDelegate(string str);
         private delegate Stream BladeFileReadDelegate(string fileRequest);
         private delegate FileStreamResponse BladeFileWriteDelegate(FileStreamRequest fileRequest);
+        private delegate FileNameStruct[] FileDirDelegate(string path, string Filter);
 
         private delegate string[] GetBladeStringsDelegate(string key, string[] names);
         private delegate void SetBladeStringsDelegate(string key, string[] names, string[] strings);
@@ -246,6 +247,19 @@ namespace Hitachi.Tester.Client
             nlogger.Info("RemoteConnectLib::Disconnect end");
         }
 
+        /// <summary>
+        /// Sources FACT TCL.
+        /// </summary>
+        public void InitializeTCL()
+        {
+            if (Obj == null) return;
+            MethodInvoker del = delegate
+            {
+                Obj.InitializeTCL(MakeKey());
+            };
+            del.BeginInvoke(new AsyncCallback(delegate (IAsyncResult ar) { del.EndInvoke(ar); }), del);
+        }
+
         public string Ping(string message)
         {
             if (Obj == null) return "";
@@ -259,6 +273,16 @@ namespace Hitachi.Tester.Client
                 Thread.Sleep(100);
             }
             return ar.IsCompleted ? pingDelegate.EndInvoke(ar) : "Fail";
+        }
+
+        public FileNameStruct[] BladeFileDir(string path, string Filter)
+        {
+            if (Obj == null) throw new Exception(String.Format("Cannot read directory \"{0}\" with filter \"{1}\" in BladeFileDir", path, Filter)); ;
+            FileDirDelegate fileDirDelegate = new FileDirDelegate(Obj.BladeFileDir);
+            IAsyncResult ar = fileDirDelegate.BeginInvoke(path, Filter, null, fileDirDelegate);
+            ar.AsyncWaitHandle.WaitOne(30000, false);
+            if (ar.IsCompleted) return (FileNameStruct[])fileDirDelegate.EndInvoke(ar);
+            else throw new Exception(String.Format("Cannot read directory \"{0}\" with filter \"{1}\" in BladeFileDir", path, Filter));
         }
 
         public string GetBladeString(string name)
@@ -380,10 +404,11 @@ namespace Hitachi.Tester.Client
 
         public string BladeFileWrite(Stream readStream, string fileName)
         {
-            FileStreamRequest fileRequest = new FileStreamRequest();
-            fileRequest.FileName = fileName;
-            fileRequest.FileByteStream = readStream;
-
+            FileStreamRequest fileRequest = new FileStreamRequest
+            {
+                FileName = fileName,
+                FileByteStream = readStream
+            };
             BladeFileWriteDelegate factFileWritingDelegate = new BladeFileWriteDelegate(ObjStreaming.BladeFileWrite);
             IAsyncResult ar = factFileWritingDelegate.BeginInvoke(fileRequest, null, factFileWritingDelegate);
             ar.AsyncWaitHandle.WaitOne(30000, false);

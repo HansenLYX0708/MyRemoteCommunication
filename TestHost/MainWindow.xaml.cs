@@ -29,11 +29,17 @@ namespace TestHost
         }
 
         ServiceHost serHost = null;
+        ServiceHost streamHost = null;
+
         public void TestStart()
         {
             ITesterObject iTestObject = new TesterObject();
             serHost = new ServiceHost(iTestObject);
             serHost.Open();
+
+            ITesterObjectStreaming iTestObjectStreaming = new TesterObjectStreaming();
+            streamHost = new ServiceHost(iTestObjectStreaming);
+            streamHost.Open();
         }
     }
 }

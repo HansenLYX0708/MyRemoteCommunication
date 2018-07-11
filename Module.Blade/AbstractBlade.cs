@@ -22,10 +22,10 @@ namespace Module.Blade
         private IEnumerable<BladeCount> _Counts;
 
         // private HGST.IO.ILine<bool> _UnlockLine;
-        public event TextReceivedEventHandler TextReceived;
-        public event ResultReceivedEventHandler ResultReceived;
-        public event ParametricResultReceivedEventHandler ParametricResultReceived;
-        public event BladeEventReceivedEventHandler BladeEventReceived;
+        //public event TextReceivedEventHandler TextReceived;
+        //public event ResultReceivedEventHandler ResultReceived;
+        //public event ParametricResultReceivedEventHandler ParametricResultReceived;
+        //public event BladeEventReceivedEventHandler BladeEventReceived;
         #endregion Fields
 
         #region Properties

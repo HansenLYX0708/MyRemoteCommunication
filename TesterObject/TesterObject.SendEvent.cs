@@ -498,7 +498,6 @@ namespace Hitachi.Tester.Module
                             continue;
                         }
                     }
-
                     if (_Exit) continue;
                     if (_BladeEventQueue.Count == 0 || _TesterState.PauseEvents)
                     {

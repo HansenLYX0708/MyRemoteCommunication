@@ -29,13 +29,13 @@ namespace Module.Blade
         /// <summary>
         /// Represents the initial value of the data on the Blade.
         /// </summary>
-        private string _BladeDataInit;
+        private readonly string _BladeDataInit;
         #endregion Fields
 
         #region Constructor and destructor
         public BladeModel()
         {
-            logger.Info("Slot::BladeModel construct start");
+            logger.Info("BladeModel construct start");
             _TestingControl = false;
             _BladeDataInit = "__";
 
@@ -46,7 +46,8 @@ namespace Module.Blade
             _ActuatorSN = string.Empty;
             _PCBASN = string.Empty;
             _BladeSN = string.Empty;
-            logger.Info("Slot::BladeModel construct complete");
+            logger.Info("BladeModel construct complete");
+            Initialize();
         }
 
         ~BladeModel()
@@ -93,7 +94,7 @@ namespace Module.Blade
             get { return base.MemsControl; }
             set
             {
-                logger.Info("Slot::BladeModel MemsControl set [status:{0}]", value);
+                logger.Info("BladeModel MemsControl set [status:{0}]", value);
                 switch (value)
                 {
                     case OnOffState.On:
@@ -119,7 +120,7 @@ namespace Module.Blade
             get { return base.CardPowerControl; }
             set
             {
-                logger.Info("Slot::BladeModel CardPowerControl set [status:{0}]", value);
+                logger.Info("BladeModel CardPowerControl set [status:{0}]", value);
                 switch (value)
                 {
                     case OnOffState.On:
@@ -145,7 +146,7 @@ namespace Module.Blade
             get { return base.LCDControl; }
             set
             {
-                logger.Info("Slot::BladeModel LCDControl set [status:{0}]", value);
+                logger.Info("BladeModel LCDControl set [status:{0}]", value);
                 switch (value)
                 {
                     case OnOffState.On:
@@ -171,7 +172,7 @@ namespace Module.Blade
             get { return base.AuxOut0Control; }
             set
             {
-                logger.Info("Slot::BladeModel AuxOut0Control set [status:{0}]", value);
+                logger.Info("BladeModel AuxOut0Control set [status:{0}]", value);
                 switch (value)
                 {
                     case OnOffState.On:
@@ -224,7 +225,7 @@ namespace Module.Blade
         {
             get
             {
-                if (_BladeSN == string.Empty || _BladeSN == null)
+                if (_BladeSN == string.Empty || _BladeSN == null || _BladeSN == _BladeDataInit)
                 {
                     _BladeSN = _GetDataFromBladee("BladeSN");
                     if (_BladeSN == string.Empty)
@@ -243,7 +244,7 @@ namespace Module.Blade
         {
             get
             {
-                if (_MEMSSN == string.Empty || _MEMSSN == null)
+                if (_MEMSSN == string.Empty || _MEMSSN == null || _MEMSSN == _BladeDataInit)
                 {
                     _MEMSSN = _GetDataFromBladee("MEMSSN");
                     if (_MEMSSN == string.Empty)
@@ -262,7 +263,7 @@ namespace Module.Blade
         {
             get
             {
-                if (_DRIVESN == string.Empty || _DRIVESN == null)
+                if (_DRIVESN == string.Empty || _DRIVESN == null || _DRIVESN == _BladeDataInit)
                 {
                     _DRIVESN = _GetDataFromBladee("DiskSN");
                     if (_DRIVESN == string.Empty)
@@ -280,7 +281,7 @@ namespace Module.Blade
         {
             get
             {
-                if (_DISKSN == string.Empty || _DISKSN == null)
+                if (_DISKSN == string.Empty || _DISKSN == null || _DISKSN == _BladeDataInit)
                 {
                     _DISKSN = _GetDataFromBladee("DISKSN");
                     if (_DISKSN == string.Empty)
@@ -299,7 +300,7 @@ namespace Module.Blade
         {
             get
             {
-                if (_MBPSN == string.Empty || _MBPSN == null)
+                if (_MBPSN == string.Empty || _MBPSN == null || _MBPSN == _BladeDataInit)
                 {
                     _MBPSN = _GetDataFromBladee("MotorBasePlate");
                     if (_MBPSN == string.Empty)
@@ -318,7 +319,7 @@ namespace Module.Blade
         {
             get
             {
-                if (_ActuatorSN == string.Empty || _ActuatorSN == null)
+                if (_ActuatorSN == string.Empty || _ActuatorSN == null || _ActuatorSN == _BladeDataInit)
                 {
                     _ActuatorSN = _GetDataFromBladee("Actuator");
                     if (_ActuatorSN == string.Empty)
@@ -337,7 +338,7 @@ namespace Module.Blade
         {
             get
             {
-                if (_PCBASN == string.Empty || _PCBASN == null)
+                if (_PCBASN == string.Empty || _PCBASN == null || _PCBASN == _BladeDataInit)
                 {
                     _PCBASN = _GetDataFromBladee("PcbaSN");
                     if (_PCBASN == string.Empty)
@@ -357,11 +358,11 @@ namespace Module.Blade
         public void Initialize()
         {
             Deinitialize();
-            logger.Info("Slot::BladeModel::Initialize start.");
+            logger.Info("BladeModel::Initialize start.");
             _RemoteInstance = new RemoteConnectLib();
             if (_RemoteInstance != null)
             {
-                logger.Info("Slot::BladeModel::Initialize complete. [RemoteInstance:{0}]", _RemoteInstance.ToString());
+                logger.Info("BladeModel::Initialize complete. [RemoteInstance:{0}]", _RemoteInstance.ToString());
             }
         }
 
@@ -387,7 +388,7 @@ namespace Module.Blade
         /// <param name="Password">Same as user ID.</param>
         public override void Connect(string address, string userID, string password)
         {
-            logger.Info("Slot::BladeModel::Connect [Address:{0}] [UserID:{1}] [Password:{2}]", address, userID, password);
+            logger.Info("BladeModel::Connect [Address:{0}] [UserID:{1}] [Password:{2}]", address, userID, password);
             Disconnect();
 
             if (address != null && address != string.Empty)
@@ -410,7 +411,7 @@ namespace Module.Blade
             {
                 BladeControl = BladeState.Disconnected;
             }
-            logger.Info("Slot::BladeModel::Connect complete [Result:{0}] [BladeControl:{1}] [BladeSn:{2}]", result.ToString(), Enum.GetName(typeof(BladeState), BladeControl), _BladeSN);
+            logger.Info("BladeModel::Connect complete [Result:{0}] [BladeControl:{1}] [BladeSn:{2}]", result.ToString(), Enum.GetName(typeof(BladeState), BladeControl), _BladeSN);
         }
 
         /// <summary>
@@ -420,7 +421,7 @@ namespace Module.Blade
         {
             if (_RemoteInstance != null && _RemoteInstance.Connected)
             {
-                logger.Info("Slot::BladeModel::Disconnect [IsConnect:{0}] [Remote.Connected:{1}]", IsConnected, _RemoteInstance.Connected.ToString());
+                logger.Info("BladeModel::Disconnect [IsConnect:{0}] [Remote.Connected:{1}]", IsConnected, _RemoteInstance.Connected.ToString());
                 _RemoteInstance.Disconnect();
             }
             BladeControl = BladeState.Disconnected;
@@ -458,7 +459,7 @@ namespace Module.Blade
         /// <returns>The first row that is not empty.</returns>
         private string _GetDataFromBladee(string dataName)
         {
-            logger.Info("Slot::BladeModel::_GetDataFromBladee [data:{0}]", dataName);
+            logger.Info("BladeModel::_GetDataFromBladee [data:{0}]", dataName);
             string line = _BladeDataInit;
             try
             {
@@ -494,8 +495,8 @@ namespace Module.Blade
             {
                 Connect(IPAddress, string.Empty, string.Empty);
             }
-            // This is because takes a long time to connect we need to wait
-            Thread.Sleep(5000);
+            // TODO : This is because takes a long time to connect we need to wait
+            //Thread.Sleep(5000);
             return _RemoteInstance.BladeFileRead(fileName);
         }
 
@@ -506,10 +507,10 @@ namespace Module.Blade
         /// <param name="fileBody">Data</param>
         private void WriteFileToBlade(string filename, Stream fileBody)
         {
-            logger.Info("Slot::BladeModel::WriteFileToBlade start [filename:{0}]", filename);
+            logger.Info("BladeModel::WriteFileToBlade start [filename:{0}]", filename);
             string strRet = "";
             strRet = _RemoteInstance.BladeFileWrite(fileBody, filename);
-            logger.Info("Slot::BladeModel::WriteFileToBlade complete [strRet:{0}]", strRet);
+            logger.Info("BladeModel::WriteFileToBlade complete [strRet:{0}]", strRet);
         }
 
         /// <summary>

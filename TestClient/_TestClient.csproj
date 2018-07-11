@@ -35,7 +35,29 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\CommonLib\NLog\NLog.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -93,9 +115,17 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Defines\Defines.csproj">
+      <Project>{1158ce60-e954-4fc2-9442-1bf5ac00431b}</Project>
+      <Name>Defines</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ITesterObject\ITesterObject.csproj">
       <Project>{9D12B6BF-9BB6-4182-9312-E3626A344064}</Project>
       <Name>ITesterObject</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Module.Blade\Module.Blade.csproj">
+      <Project>{af9ea437-6482-4cf0-a614-9ab2fa4f7e09}</Project>
+      <Name>Module.Blade</Name>
     </ProjectReference>
     <ProjectReference Include="..\RemoteConnectLib\RemoteConnectLib.csproj">
       <Project>{91582196-E5B7-4841-9615-3C945E52AC42}</Project>

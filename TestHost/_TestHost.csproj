@@ -35,6 +35,24 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -95,9 +113,17 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ITesterObjectStreaming\ITesterObjectStreaming.csproj">
+      <Project>{b5a7d014-b901-4ec2-92f4-92ca6de62336}</Project>
+      <Name>ITesterObjectStreaming</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ITesterObject\ITesterObject.csproj">
       <Project>{9D12B6BF-9BB6-4182-9312-E3626A344064}</Project>
       <Name>ITesterObject</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TesterObjectStreaming\TesterObjectStreaming.csproj">
+      <Project>{8e1a98d7-005e-4225-b02a-ae2540b35772}</Project>
+      <Name>TesterObjectStreaming</Name>
     </ProjectReference>
     <ProjectReference Include="..\TesterObject\TesterObject.csproj">
       <Project>{739F9217-0D1D-485A-BDDB-9EC444B86EB5}</Project>
