@@ -31,6 +31,19 @@ namespace TestClient
             InitializeComponent();
 
             bladeModel = new BladeModel();
+
+            bladeModel.RemoteInstance.comStatusEvent += new Hitachi.Tester.Module.StatusEventHandler(TestOnStatusEvent);
+        }
+
+        private void TestOnStatusEvent(object sender, Hitachi.Tester.Module.StatusEventArgs e)
+        {
+            switch ( (Hitachi.Tester.Enums.eventInts)e.EventType )
+            {
+                case Hitachi.Tester.Enums.eventInts.Notify:
+                    break;
+                case Hitachi.Tester.Enums.eventInts.NotifyWithContent:
+                    break;
+            }
         }
 
         private void btn_Click(object sender, RoutedEventArgs e)
@@ -137,7 +150,7 @@ namespace TestClient
                 case "BladeFileWrite":
                     break;
                 case "Ping":
-                    bladeModel.RemoteInstance.Ping("Hello");
+                    bladeModel.RemoteInstance.PingAllEvent("Hello");
                     break;
                 case "InitializeTCL":
                     bladeModel.RemoteInstance.InitializeTCL();

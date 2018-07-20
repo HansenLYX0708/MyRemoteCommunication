@@ -116,6 +116,8 @@ namespace Hitachi.Tester.Module
         private int hgstGetServoRetryCount;
         private int hgstSetSaveServoRetries = 0;
         private int hgstGetNeutralRetryCount = 0;
+        private int hgstSetNeutralRetryCount = 0;
+        private int _SetStringsRetryCount = 0;
         #endregion Fields
 
         #region Properties
@@ -428,7 +430,7 @@ namespace Hitachi.Tester.Module
             }
             set
             {
-                // TODO : MemsOpenDelay = value.ToString();
+                MemsOpenDelay = value.ToString();
             }
         }
 
@@ -441,7 +443,7 @@ namespace Hitachi.Tester.Module
 
             set
             {
-                // TODO : MemsCloseDelay = value.ToString();
+                MemsCloseDelay = value.ToString();
             }
         }
 
@@ -497,7 +499,6 @@ namespace Hitachi.Tester.Module
                         catch
                         {
                             _MemsCloseDelay = "1500";
-                            // TODO : close = open?????????
                             MemsCloseDelay = _MemsOpenDelay;
                             // pops exception if file still does not work.
                             _MemsCloseDelay = ReadDataFiles(Constants.MemsCloseDelayTXT).Trim();
@@ -557,6 +558,81 @@ namespace Hitachi.Tester.Module
             }
         }
         #endregion Properties
+
+        #region countStateFromDisk function
+        public void SetCounts(string countsString)
+        {
+            WriteLine("SetCounts called ");
+            WriteLineContent(countsString);
+            _CountStateFromDisk.FromString(countsString);
+            SendBunnyEvent(this, new StatusEventArgs(_CountStateFromDisk.ToString(), (int)BunnyEvents.Counts));
+            SaveCounts();
+        }
+
+        public int GetCountValue(string name)
+        {
+            int tmpInt = _CountStateFromDisk.GetValue(name);
+            WriteLine("GetCountValue called ");
+            WriteLineContent(name + " " + tmpInt.ToString());
+            return _CountStateFromDisk.GetValue(name);
+        }
+
+        public void IncCountValue(string name)
+        {
+            WriteLine("IncCountValue called ");
+            WriteLineContent(name);
+            _CountStateFromDisk.IncValue(name);
+            SendBunnyCountEvents(name);
+        }
+
+        public void SetCountValue(string name, int value)
+        {
+            WriteLine("SetCountValue called ");
+            WriteLineContent(name + " " + value.ToString());
+            _CountStateFromDisk.SetValue(name, value);
+            SendBunnyCountEvents(name);
+        }
+        public void SaveCounts()
+        {
+            WriteLine("SaveCounts called ");
+            SaveSettings();
+        }
+
+        /// <summary>
+        /// Zero all counts.
+        /// </summary>
+        public void ZeroCounts()
+        {
+            WriteLine("ZeroCounts called ");
+            _CountStateFromDisk.ClearCounts();
+            SaveSettings();
+        }
+
+        /// <summary>
+        /// Clear statistics history.
+        /// </summary>
+        public void ClearCountsStats()
+        {
+            WriteLine("ClearStats called ");
+            _CountStateFromDisk.ClearStats();
+            SaveSettings();
+        }
+
+        public void CountsGetFirstLastIndexViaEvent()
+        {
+            _CountStateFromDisk.GetFirstLastIndexViaEvent();
+        }
+
+        public void CountsGetFromToViaEvent(Int64 from, Int64 to)
+        {
+            _CountStateFromDisk.GetFormToViaEvent(from, to);
+        }
+
+        public void CountsUpdateDgrValuesViaEvent(TimeSpan timeSpan)
+        {
+            _CountStateFromDisk.UpdateDgrValuesViaEvent(timeSpan);
+        }
+        #endregion countStateFromDisk function
 
         #region ITesterObject Methods
         /// <summary>
@@ -737,9 +813,9 @@ namespace Hitachi.Tester.Module
                         string valueString = MakeVoltageBladeEventString();
                         retList.Add(valueString);
                         break;
-                    // TODO : TCL  case BladeDataName.TclPath:
-                    //    retList.Add(TclPath);
-                    //    break;
+                    case BladeDataName.TclPath:
+                        retList.Add(TclPath);
+                        break;
                     case BladeDataName.BladePath:
                         retList.Add(BladePath);
                         break;
@@ -761,9 +837,9 @@ namespace Hitachi.Tester.Module
                     case BladeDataName.DebugPath:
                         retList.Add(DebugPath);
                         break;
-                    // TODO : TCL     case BladeDataName.TclStart:
-                    //    retList.Add(TclStart);
-                    //    break;
+                    case BladeDataName.TclStart:
+                        retList.Add(TclStart);
+                        break;
                     case BladeDataName.CountsPath:
                         retList.Add(CountsPath);
                         break;
@@ -771,6 +847,7 @@ namespace Hitachi.Tester.Module
                         retList.Add(AppDomain.CurrentDomain.BaseDirectory);
                         break;
 
+                        // TODO :
                     //case BladeDataName.FwRev:
                     //    {
                     //        BunnyCount += 1;
@@ -837,11 +914,9 @@ namespace Hitachi.Tester.Module
                     case BladeDataName.DiskLoadCount:
                         retList.Add(_CountStateFromDisk.GetValue(aName));
                         continue;
-
                     case BladeDataName.Ramp:
-                        // TODO : retList.Add(ReadRampValue());
+                        retList.Add(ReadRampValue());
                         continue;
-
                     case BladeDataName.BunnyStatus:
                         retList.Add(ReadBunnyStatusAndUpdateFlags());
                         continue;
@@ -878,7 +953,7 @@ namespace Hitachi.Tester.Module
                         retList.Add((tmpStatus & (int)HGST.Blades.EnumBunnyStatusBits.BACKLIGHT) > 0 ? 1 : 0);
                         break;
                     case BladeDataName.MemsState:
-                        // TODO : retList.Add((int)GetMemsState());
+                        retList.Add((int)GetMemsStatus());
                         break;
                     case BladeDataName.CardPower:
                         tmpStatus = ReadBunnyStatusAndUpdateFlags();
@@ -914,7 +989,7 @@ namespace Hitachi.Tester.Module
         /// </summary>
         public void PinMotionToggle()
         {
-            // TODO :
+            // TODO : consider remove
             //if (MemsState == HGST.Blades.MemsStateValues.Opened || MemsState == HGST.Blades.MemsStateValues.Unknown)
             //{
             //    OpenCloseMems(0); // close it
@@ -1011,6 +1086,10 @@ namespace Hitachi.Tester.Module
         /// </summary>
         /// <param name="index"></param>
         /// <param name="dev"></param>
+
+        #endregion ITesterObject Methods
+
+        #region
         private void hgst_get_servo(int index, int dev, out int i_position)
         {
             i_position = -1;
@@ -1304,7 +1383,55 @@ namespace Hitachi.Tester.Module
             }
         }
 
-        #endregion ITesterObject Methods
+        public void hgst_set_neutral(int index, int dev, int i_neutral)
+        {
+            if (!CheckIfServoIsOK(true)) return;
+
+            WriteLine("hgst_get_neutral called ");
+            WriteLineContent(index.ToString() + " " + dev.ToString() + " " + i_neutral.ToString());
+            bool status = false;
+
+            while (hgstSetNeutralRetryCount < Constants.BunnyRetryLimit)
+            {
+                if (_BunnyCard != null)
+                {
+                    status = _BunnyCard.GetNeutral((int)HGST.Blades.EnumSolenoidServoAddr.SERVO, ref i_neutral);
+                }
+                else
+                {
+                    status = false;
+                }
+                if (!status)
+                {
+                    hgstSetNeutralRetryCount++;
+                    Application.DoEvents();
+                    Thread.Sleep(500);
+                    if (_Exit) return;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // Sends complaint if broke.
+            hgstSetNeutralRetryCount = 0;
+            NotifyWorldBunnyStatus(status, "hgst_set_neutral");
+
+            if (status)
+            {
+                SendBunnyEvent(this, new StatusEventArgs(i_neutral.ToString(), (int)BunnyEvents.Neutral));
+            }
+        }
+
+        public void hgst_usb_reset(int index)
+        {
+            WriteLine("UsbReset called ");
+            WriteLineContent(index.ToString());
+            UsbReset(index);
+        }
+        #endregion
+
 
         #region Support Methods
         private void SimpleBladeInfoInit()
@@ -1429,8 +1556,7 @@ namespace Hitachi.Tester.Module
         private string ReadDataFiles(string fileName)
         {
             WriteLine("ReadDataFiles " + fileName);
-            // TODO : string tmpStr = _BunnyCard.ReadDataFiles(fileName);
-            string tmpStr = string.Empty;
+            string tmpStr = _BunnyCard.ReadDataFiles(fileName);
             WriteLineContent("ReadDataFiles " + fileName + Environment.NewLine + tmpStr);
             return tmpStr;
         } // end readDataFiles
@@ -1444,12 +1570,174 @@ namespace Hitachi.Tester.Module
         {
             WriteLine("WriteDataFiles " + fileName);
             WriteLineContent("WriteDataFiles " + fileName + Environment.NewLine + data);
-            // TODO : _BunnyCard.WriteDataFiles(fileName, data);
+            _BunnyCard.WriteDataFiles(fileName, data);
         }
 
-        private void SetStringsThreadFunc(object obj)
+        private void SetStringsThreadFunc(object passingObj)
         {
-            // TODO : SetStringsThreadFunc     throw new NotImplementedException();
+            object[] passingObjAray = (object[])passingObj;
+            string key = (string)passingObjAray[0];
+            string[] names = (string[])passingObjAray[1];
+            string[] strings = (string[])passingObjAray[2];
+            int brokeFlag = 0;
+            while (_SetStringsRetryCount < Constants.BunnyRetryLimit)
+            {
+                if (_BunnyCard != null && _TesterState.BunnyGood)
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    for (int i = 0; i < names.Length && i < strings.Length; i++)
+                    {
+                        int bunnyEventInt = 0;
+                        try
+                        {
+                            sb.Append(string.Format("SetStrings called for {0} {1}", names[i], strings[i]));
+
+                            switch (names[i])
+                            {
+                                case BladeDataName.ActuatorSN:
+                                    bunnyEventInt = (int)BunnyEvents.ActuatorSN;
+                                    ActuatorSN = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.BladeType:
+                                    bunnyEventInt = (int)BunnyEvents.BladeType;
+                                    BladeType = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.BladeSN:
+                                    bunnyEventInt = (int)BunnyEvents.BladeSN;
+                                    BladeSN = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.DiskSN:
+                                    bunnyEventInt = (int)BunnyEvents.DiskSN;
+                                    DiskSn = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.FlexSN:
+                                    bunnyEventInt = (int)BunnyEvents.FlexSN;
+                                    FlexSN = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.MemsSN:
+                                    bunnyEventInt = (int)BunnyEvents.MemsSN;
+                                    MemsSn = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.MotorBaseplateSN:
+                                    bunnyEventInt = (int)BunnyEvents.MotorBaseSN;
+                                    MotorBaseSn = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.MotorSN:
+                                    bunnyEventInt = (int)BunnyEvents.MotorSN;
+                                    MotorSN = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.PcbaSN:
+                                    bunnyEventInt = (int)BunnyEvents.PcbaSN;
+                                    PcbaSn = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.JadeSN:
+                                    bunnyEventInt = (int)BunnyEvents.JadeSN;
+                                    JadeSN = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.BladeLoc:
+                                    bunnyEventInt = (int)BunnyEvents.BladeLoc;
+                                    MyLocation = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.MemsCloseDelay:
+                                    bunnyEventInt = (int)BunnyEvents.MemsCloseDelay;
+                                    MemsCloseDelay = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.MemsOpenDelay:
+                                    bunnyEventInt = (int)BunnyEvents.MemsOpenDelay;
+                                    MemsOpenDelay = strings[i].Trim();
+                                    break;
+
+                                case BladeDataName.TclStart:
+                                    bunnyEventInt = (int)BunnyEvents.TclStart;
+                                    TclStart = strings[i].Trim();
+                                    break;
+                                case BladeDataName.BladePath:
+                                    bunnyEventInt = (int)BunnyEvents.BladePath;
+                                    BladePath = strings[i].Trim();
+                                    break;
+                                case BladeDataName.CountsPath:
+                                    bunnyEventInt = (int)BunnyEvents.CountsPath;
+                                    CountsPath = strings[i].Trim();
+                                    break;
+                                case BladeDataName.DebugPath:
+                                    bunnyEventInt = (int)BunnyEvents.DebugPath;
+                                    DebugPath = strings[i].Trim();
+                                    break;
+                                case BladeDataName.FactPath:
+                                    bunnyEventInt = (int)BunnyEvents.FactPath;
+                                    FactPath = strings[i].Trim();
+                                    break;
+                                case BladeDataName.FirmwarePath:
+                                    bunnyEventInt = (int)BunnyEvents.FirmwarePath;
+                                    FirmwarePath = strings[i].Trim();
+                                    break;
+                                case BladeDataName.GradePath:
+                                    bunnyEventInt = (int)BunnyEvents.GradePath;
+                                    GradePath = strings[i].Trim();
+                                    break;
+                                case BladeDataName.LogPath:
+                                    bunnyEventInt = (int)BunnyEvents.LogPath;
+                                    LogPath = strings[i].Trim();
+                                    break;
+                                case BladeDataName.ResultPath:
+                                    bunnyEventInt = (int)BunnyEvents.ResultPath;
+                                    ResultPath = strings[i].Trim();
+                                    break;
+                                case BladeDataName.TclPath:
+                                    bunnyEventInt = (int)BunnyEvents.TclPath;
+                                    TclPath = strings[i].Trim();
+                                    break;
+
+                            } // end switch
+
+                            // worked send event
+                            SendBunnyEvent(this, new StatusEventArgs(strings[i], bunnyEventInt));
+
+                        }
+                        catch
+                        {
+                            // broke send event
+                            NotifyWorldBunnyStatus(false, StaticServerTalker.getCurrentCultureString("FileNotFound") + " " + names[i]);
+                            brokeFlag = 1;
+                        }
+                        finally
+                        {
+                            _SetStringsRetryCount = Constants.BunnyRetryLimit;
+                        }
+                        // It passed.
+                        if (brokeFlag == 0)
+                        {
+                            NotifyWorldBunnyStatus(true, "set strings " + names.ToString());
+                        }
+                    } // end for
+                    WriteLineContent(sb.ToString());
+                } // end if bunny OK
+                else
+                {
+                    if (_SetStringsRetryCount >= Constants.BunnyRetryLimit)
+                    {
+                        NotifyWorldBunnyStatus(false, "SetStrings error: bunny off-line ");
+                        WriteLineContent("SetStrings error: bunny off-line ");
+                    }
+                    Interlocked.Increment(ref _SetStringsRetryCount);
+                    if (_Exit) return;
+                    Thread.Sleep(500);
+                }
+            } // end while retries
+            _SetStringsRetryCount = 0;
         }
 
         /// <summary>
@@ -2100,7 +2388,6 @@ namespace Hitachi.Tester.Module
                             continue;
                     } // end switch
                 } // end for
-
                 if (!counterStateUpdated)
                 {
                     WriteOutCountsData();
@@ -2109,7 +2396,7 @@ namespace Hitachi.Tester.Module
             }
             catch
             {
-                // TODO : CheckIfBunnyNowIsOK(false, "set integers bunny off ");
+                NotifyWorldBunnyStatus(false, "set integers bunny off ");
             }
         }
 

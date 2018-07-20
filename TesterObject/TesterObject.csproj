@@ -173,6 +173,10 @@
       <Project>{1158CE60-E954-4FC2-9442-1BF5AC00431B}</Project>
       <Name>Defines</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IJadeCommonTables\IJadeCommonTables.csproj">
+      <Project>{3aa675a1-77d6-485b-a7c3-51a14c962bb5}</Project>
+      <Name>IJadeCommonTables</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ITesterObject\ITesterObject.csproj">
       <Project>{9D12B6BF-9BB6-4182-9312-E3626A344064}</Project>
       <Name>ITesterObject</Name>

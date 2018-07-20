@@ -401,7 +401,7 @@ namespace Module.Blade
             if (_RemoteInstance.Connected)
             {
                // _RemoteInstance.comStatusEvent += new StatusEventHandler(remoteInstance_comStatusEvent);
-                string pingResult = _RemoteInstance.Ping("hello");
+                string pingResult = _RemoteInstance.PingAllEvent("hello");
                 _BladeSN = _RemoteInstance.GetSerialNumber();
                 UpdateMemsStatus();
                 BladeControl = BladeState.Idle;
@@ -495,7 +495,8 @@ namespace Module.Blade
             {
                 Connect(IPAddress, string.Empty, string.Empty);
             }
-            // TODO : This is because takes a long time to connect we need to wait
+            // TODO : (old)This is because takes a long time to connect we need to wait 
+            // TODO : but 5 seconds is too long, need verify in test
             //Thread.Sleep(5000);
             return _RemoteInstance.BladeFileRead(fileName);
         }

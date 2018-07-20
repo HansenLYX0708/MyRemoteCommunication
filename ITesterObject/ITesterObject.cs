@@ -19,7 +19,7 @@ namespace Hitachi.Tester.Module
         CallbackContract = typeof(ITesterObjectCallback))]
     public interface ITesterObject
     {
-        #region base function
+        #region Base function
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
@@ -33,17 +33,12 @@ namespace Hitachi.Tester.Module
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
-        void InitializeTCL(string Key);
+        int KeepAliveChannel();
 
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
-        int PingInt();
-
-        [OperationContract]
-        [FaultContract(typeof(ReceiverFaultDetail))]
-        [FaultContract(typeof(SenderFaultDetail))]
-        string Ping(string message);
+        string PingAllEvent(string message);
 
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
@@ -136,8 +131,13 @@ namespace Hitachi.Tester.Module
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
+        string GetFileCRC(string TestName);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
         string Name();
-        #endregion base function
+        #endregion Base function
 
         #region Tester function
         [OperationContract]
@@ -158,7 +158,17 @@ namespace Hitachi.Tester.Module
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
+        FileNameStruct[] DirConfig(string FileName);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
         void StartTest(string ParseString, string TestName, string GradeName, string tableStr);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void PauseTests(bool bwait);
         #endregion Tester function
 
         // TODO : 
@@ -185,7 +195,92 @@ namespace Hitachi.Tester.Module
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
         void hgst_get_neutral(int index, int dev);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void hgst_set_neutral(int index, int dev, int i_neutral);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void hgst_usb_reset(int index);
         #endregion servo
+
+        #region countStateFromDisk function
+        //string GetCounts(); // use GetDataViaEvent or GetStrings with BladeDataName.Counts
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void SetCounts(string countsString);  // sets all counts (please don't do this).
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        int GetCountValue(string name);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void SetCountValue(string name, int value);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void IncCountValue(string name);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void SaveCounts();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void ZeroCounts();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void ClearCountsStats();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void CountsGetFirstLastIndexViaEvent();
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void CountsGetFromToViaEvent(Int64 from, Int64 to);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void CountsUpdateDgrValuesViaEvent(TimeSpan timeSpan);
+        #endregion countStateFromDisk function
+
+        #region TCL function
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void InitializeTCL(string Key);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        bool AbortTCL(string Reason, bool Force);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void TclInput(string inputString, bool bToTv);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void TclCommand(string Command, bool bToTv);
+        #endregion TCL function
 
         #region part three
         [OperationContract]
@@ -194,23 +289,29 @@ namespace Hitachi.Tester.Module
         void GetDataViaEvent(string[] names);
         #endregion part three
 
-        #region TCL function
         [OperationContract]
         [FaultContract(typeof(ReceiverFaultDetail))]
         [FaultContract(typeof(SenderFaultDetail))]
-        void TclCommand(string Command, bool bToTv);
-        #endregion part three
+        void PauseEvents(bool bwait);
 
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void StaticTalkLogInValue(Int32 setValue);
+
+        [OperationContract]
+        [FaultContract(typeof(ReceiverFaultDetail))]
+        [FaultContract(typeof(SenderFaultDetail))]
+        void SetLcdText(string text);
     } // end interface
 
     // These event handlers are used inside of Jade and BladeRunner.
     public delegate void StatusEventHandler(object sender, StatusEventArgs e);
-    // TODO :
     public delegate void CompleteEventHandler(object sender, CompletedEventArgs e);
     public delegate void StartedEventHandler(object sender, StartedEventArgs e);
 
     // The following event handler is used to send all events across the wire. Actually we no longer do .NET remoting events.  Instead we use a WCF callback.
     // Blade runner wraps this in a callback.
-    // !!be used in server
+    // TODO : be used in server
     public delegate void BladeEventHandler(object sender, BladeEventArgs e);
 }

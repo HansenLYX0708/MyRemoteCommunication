@@ -73,7 +73,7 @@ namespace Module.Blade
         /// <summary>
         /// Gets and sets the state of lock status.
         /// </summary>
-        // TODO : If necessary         OnOffState LockControl { get; set; }
+        // TODO : If necessary OnOffState LockControl { get; set; }
 
         /// <summary>
         /// Record the amount to be recorded on the Blade.

@@ -44,12 +44,9 @@ namespace Hitachi.Tester.Module
         { 
             lock (_SendStatusEventLockObject)
             {
-                // TODO : write line
                 if (!((eventInts)e.EventType == eventInts.Notify) &&
                    !((eventInts)e.EventType == eventInts.NotifyWithContent))
                 {
-                    // Remeber the last one. TODO : no use, I remove it
-
                     _HistoryOfLastSeveralMessages.InsertMessage(e.Text);
 
                     if (_HistoryOfLastSeveralMessages.IsThisStringThereSomewhere(Constants.FACTCmdErrorString))
@@ -275,7 +272,7 @@ namespace Hitachi.Tester.Module
         }
 
         /// <summary>
-        /// TODO : only be used in ping function. no use
+        /// TODO : only be used in ping function. no use, consider remove it
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -406,31 +403,33 @@ namespace Hitachi.Tester.Module
 
             if (e.Text.ToLower().IndexOf("Event::varToEvent".ToLower()) == 0)
             {
-
+                e.Type = (int)eventInts.eventVal;
             }
             else if (e.Text.ToLower().Contains("Event::PowerEvent::PCBPower1".ToLower()))
             {
-
+                CardPower(true);
             }
             else if (e.Text.ToLower().Contains("Event::PowerEvent::PCBPower0".ToLower()))
             {
-
+                CardPower(false);
             }
             else if (e.Text.ToLower().Contains("Event::MEMSOpenEvent::MEMSOpen".ToLower()))
             {
-
+                OpenCloseMems(1);
             }
             else if (e.Text.ToLower().Contains("Event::MEMSCloseEvent::MEMSClose".ToLower()))
             {
-
+                OpenCloseMems(0);
             }
             else if (e.Text.ToLower().Contains("Event::GetBladeValue::MEMSState".ToLower()))
             {
-
+                TclInput(MemsStatus.ToString(), false);
             }
             else if (e.Text.ToLower().Contains("Event::LoadActuator::".ToLower()))
             {
-
+                _CountStateFromDisk.IncValue(BladeDataName.DiskLoadCount);
+                _CountStateFromDisk.IncValue(BladeDataName.PatrolCount);
+                _CountStateFromDisk.IncValue(BladeDataName.ScanCount);
             }
             if (_BladeEventQueue != null && _BladeEventQueueLock != null)
             {
@@ -454,8 +453,6 @@ namespace Hitachi.Tester.Module
                     {
                         // TODO : Do nothing?
                     }
-
-
                 }
                 catch
                 {
@@ -477,7 +474,6 @@ namespace Hitachi.Tester.Module
         /// </summary>
         private void DoBladeEvents()
         {
-            // TODO : Deal the event send from SendBladeEventCallback
             while (!_Exit)
             {
                 List<BladeEventStruct> bladeEventArgList = new List<BladeEventStruct>();
@@ -510,7 +506,6 @@ namespace Hitachi.Tester.Module
                     {
                         BladeEventStruct anEventStruct = _BladeEventQueue.Dequeue();
                         BladeEventArgs anEventArg = anEventStruct.EE;
-
                         bladeEventArgList.Add(anEventStruct);
                     }
                 }
@@ -557,6 +552,5 @@ namespace Hitachi.Tester.Module
             }
         }
         #endregion Event process Methods
-
     }
 }

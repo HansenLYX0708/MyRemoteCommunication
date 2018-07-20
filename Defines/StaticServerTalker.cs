@@ -124,8 +124,5 @@ namespace Hitachi.Tester.Module
                handler(0, text);
            }
        }
-
-    
-
     }
 }

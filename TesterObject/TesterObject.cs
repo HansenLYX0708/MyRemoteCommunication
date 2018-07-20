@@ -12,6 +12,7 @@ using System.Diagnostics;
 
 using Hitachi.Tester.Enums;
 using Hitachi.Tester.Sequence;
+using Hitachi.Tester.IJadeCommonTables;
 using HGST.Blades;
 using RemoveDriveByLetter;
 using NLog;
@@ -45,11 +46,14 @@ namespace Hitachi.Tester.Module
         private delegate void PingDelegate(string name);
         private delegate void StartTestSequenceDelegate(string ParseString, string TestName, string GradeName, int StartingTest, bool BreakOnError, string tableStr);
         private delegate void TclCommandDelegate(string Command, bool bToTv);
+        private delegate void CardPowerDelegate(bool State);
 
         /// <summary>
         /// Use for monitor all status
         /// </summary>
         internal volatile TesterState _TesterState;
+        private List<SequenceExecutionObject> pausedTestList;
+
         private Thread _BladeEventsThread;
         private BunnyBoard _BunnyCard;
         private List<BunnyBoard> _Boards;
@@ -73,6 +77,8 @@ namespace Hitachi.Tester.Module
         private bool tclIsNowGoing;  // set to false by constructor.
         private bool tclshGoing; // set to false in constructor.
         private int tclSleepTime;
+
+        private bool bTimeoutEnabled;
         #endregion Fields
 
         #region Constructors
@@ -99,12 +105,12 @@ namespace Hitachi.Tester.Module
 
         private void Init()
         {
+            constructorFinished = false;
+
             lastStdOut = "";
             lastLastStdOut = "";
             lastStdOut2 = "";
             lastStdErr = "";
-
-            constructorFinished = false;
 
             _CurrentSequenceList = new List<TestSequence>();  // holds all of our defined sequences
             _Disposed = false;
@@ -125,7 +131,9 @@ namespace Hitachi.Tester.Module
 
             tclIsNowGoing = false;  // Set true at start of tcl cmd; cleared by last stdout.
             tclshGoing = false;     // Set true at start of tcl cmd; cleared when we parse the result.
+            bTimeoutEnabled = false;
             tclSleepTime = 5;
+            pausedTestList = new List<SequenceExecutionObject>();
 
             SimpleBladeInfoInit();
 
@@ -159,17 +167,14 @@ namespace Hitachi.Tester.Module
             }
 
             // TODO : CallBack should be add
-            //timerDelegate = new TimerCallback(readTheStatusCallback);
-            //readStatusTimer = new System.Threading.Timer(timerDelegate, null, 5000, readStatusTime);
+            timerDelegate = new TimerCallback(readTheStatusCallback);
+            readStatusTimer = new System.Threading.Timer(timerDelegate, null, 5000, readStatusTime);
             // TODO : CallBack should be add
-            //sequenceTimeoutDelegate = new TimerCallback(sequenceTimeoutCallback);
-            //sequenceTimeoutTimer = new System.Threading.Timer(sequenceTimeoutDelegate, null, 60000, 60000);
+            sequenceTimeoutDelegate = new TimerCallback(sequenceTimeoutCallback);
+            sequenceTimeoutTimer = new System.Threading.Timer(sequenceTimeoutDelegate, null, 60000, 60000);
 
             watchdogDelegate = new TimerCallback(MemsOpenWatchdogTimerCallback);
             memsOpenWatchdogTimer = new System.Threading.Timer(watchdogDelegate, null, Timeout.Infinite, Timeout.Infinite);
-
-
-
 
             constructorFinished = true;
         }
@@ -376,25 +381,21 @@ namespace Hitachi.Tester.Module
             }
         }
 
-        public string Ping(string message)
+        public string PingAllEvent(string message)
         {
-            string retVal = message;
-            // TODO : TesterState
-
+            // TODO : // if (_TesterState.PauseEvents) PauseEvents(false);
             WriteLine(string.Format("TesterObject::Ping"));
             WriteLineContent("TesterObject::Ping" + message);
-
             PingDelegate aPingDelegate = new PingDelegate(PingOperation);
             aPingDelegate.BeginInvoke(message, PingCallback, aPingDelegate);
-            // TODO
-            return retVal;
+            return message;
         }
 
         /// <summary>
         /// Service to maintain a connection
         /// </summary>
         /// <returns>Keep Alive Timeout</returns>
-        public int PingInt()
+        public int KeepAliveChannel()
         {
             // send StatusEvent
             StatusEventArgs args = new StatusEventArgs
@@ -605,7 +606,6 @@ namespace Hitachi.Tester.Module
                 {
                     throw new Exception("Blade controller Init failed.");
                 }
-
                 // if possible reload all of the stuff
                 ReadBunnyStatusAndUpdateFlags();
             }
@@ -669,7 +669,141 @@ namespace Hitachi.Tester.Module
             SendToTclAndGetResult(TclStart, true);
         }
 
+        public string GetFileCRC(string FileName)
+        {
+            string tmpString = "0";
+            FileStream fs = null;
+            try
+            {
+                FileName = FixUpThePaths(FileName);
+                WriteLine("GetFileCRC called ");
+                WriteLineContent(FileName);
+                WaitForUsbDriveToWakeUp(FileName, 2000);
+
+                fs = new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                tmpString = WhatIsTheCRC(fs);
+                fs.Close();
+            }
+            catch
+            {
+                tmpString = "0";
+            }
+            finally
+            {
+                if (fs != null)
+                {
+                    fs.Dispose();
+                }
+            }
+            return tmpString;
+        }
+
+        /// <summary>
+        /// Public property.  Jade uses this to send LogInValue (permissions) to BladeRunner.
+        /// </summary>
+        public void StaticTalkLogInValue(Int32 value)
+        {
+            // Send to static property (goes to out server TesterModule).
+            try
+            {
+                StaticServerTalker.LogInValueProp = (ReturnValues)value;
+            }
+            catch { }
+        }
         #endregion ITesterObject base function
+
+        /// <summary>
+        /// Send text to LCD
+        /// </summary>
+        /// <param name="text"></param>
+        public void SetLcdText(string text)
+        {
+            SendLineToLCD(text);
+        }
+
+        /// <summary>
+        /// Sends Text to LCD one line at a time.
+        /// Scrolls first line to second line each call.
+        /// </summary>
+        /// <param name="Text"></param>
+        private void SendLineToLCD(string Text)
+        {
+            _BunnyCard.LcdScrollText(Text);
+        }
+
+        /// <summary>
+        /// This closes and stops everything.  Saves settings.
+        /// </summary>
+        public void OnClose()
+        {
+            // send ProgramClosingEvent - Tell Jade.exe that we are going away.
+            StatusEventArgs args = new StatusEventArgs("ProgramClosingEvent TesterModule", 0);
+            SendProgramClosingEvent(this, args);
+            WriteLine("ProgramClosingEvent - fired");
+            WriteLineContent(args.EventType + " " + args.Text);
+
+            DateTime closeTime = DateTime.Now;
+            TimeSpan maxCloseDelay = TimeSpan.FromSeconds(15.0);
+
+            //Close the Mems blocking on a thread.
+            // We join later.
+            MethodInvoker del = delegate
+            {
+                OpenCloseMems(0);
+            };
+            IAsyncResult memsIAsyncResult = del.BeginInvoke(new AsyncCallback(delegate (IAsyncResult ar) { try { del.EndInvoke(ar); } catch { } }), del);
+
+            int waitFor = 50;
+            // Wait until all events are sent
+            for (int t = 0; t < 1000; t += waitFor)
+            {
+                if (_BladeEventQueue.Count == 0) break;
+                Application.DoEvents();
+                Thread.Sleep(waitFor);
+            }
+
+            // tell TCL to go away
+            if (TclProcess != null)
+            {
+                try
+                {
+                    if (!TclProcess.HasExited)
+                    {
+                        SendToTclAndGetResult("exit", true);
+                        Thread.Sleep(500);
+                    }
+                }
+                catch { }
+                try
+                {
+                    if (!TclProcess.HasExited)
+                    {
+                        TclProcess.Kill();
+                    }
+                }
+                catch { }
+                try
+                {
+                    TclProcess.Close();
+                }
+                catch { }
+            }
+            // save current settings
+            SaveSettings();
+
+            // join mems thread
+            while (!memsIAsyncResult.IsCompleted || closeTime + maxCloseDelay > DateTime.Now)
+            {
+                Thread.Sleep(100);
+                // Is it closed yet?
+                if (GetMemsStatus() == Hitachi.Tester.Enums.MemsStateValues.Closed) break;
+                //_memsState
+            }
+
+            // tell our helper threads to go away (we do not want any more help).
+            _Exit = true;
+            _Escape = true;
+        } // end onClose
 
         #region Tester function
         /// <summary>
@@ -851,22 +985,459 @@ namespace Hitachi.Tester.Module
         }
 
         /// <summary>
+        /// Returns a directory of the sequence files in TesterObject's memory.
+        /// Returns an ArrayList of FileNameStructs.
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <returns></returns>
+        public FileNameStruct[] DirConfig(string FileName)
+        {
+            WriteLine("DirConfig called ");
+            WriteLineContent(FileName);
+            //throw new Exception("it broke");
+            ArrayList seqList = new ArrayList();
+
+            if (_CurrentSequenceList.Count == 0)
+            {
+                return (FileNameStruct[])seqList.ToArray(typeof(FileNameStruct));
+            }
+
+            for (int i = 0; i < _CurrentSequenceList.Count; i++)
+            {
+                FileNameStruct oneFile = new FileNameStruct
+                {
+                    FileNameStr = _CurrentSequenceList[i].dictionaryHeader["Name"],
+                    VersionStr = _CurrentSequenceList[i].dictionaryHeader["Version"],
+                    DateStr = _CurrentSequenceList[i].dictionaryHeader["date"]
+                };
+
+                if (FileName.Length == 0 || FileName == oneFile.FileNameStr)
+                {
+                    seqList.Add(oneFile);
+                    if (FileName.Length > 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            return (FileNameStruct[])seqList.ToArray(typeof(FileNameStruct));
+        }
+
+        /// <summary>
         /// Starts and runs the requested sequence given in TestName.
-        ///  Should be called StartSequence.
+        /// Should be called StartSequence.
         /// </summary>
         /// <param name="Key"></param>
         /// <param name="TestName"></param>
         /// <returns></returns>
         public void StartTest(string ParseString, string TestName, string GradeName, string tableStr)
         {
-            //testerState.gradeName = GradeName;
+            // TODO : StartTest
+            _TesterState.GradeName = GradeName;
             // tell TCL to start testing
-            //return StartTestSequence(ParseString, TestName, GradeName, 0, false, tableStr);
             StartTestSequenceDelegate startTestDelegate = new StartTestSequenceDelegate(StartTestSequence);
             startTestDelegate.BeginInvoke(ParseString, TestName, GradeName, 0, false, tableStr, new AsyncCallback(delegate (IAsyncResult ar) { startTestDelegate.EndInvoke(ar); }), startTestDelegate);
         }
 
+        /// <summary>
+        /// Jade exe can tell blade to pause testing.
+        /// Jade exe can tell blade to restart testing.
+        /// </summary>
+        /// <param name="bwait"></param>
+        public void PauseTests(bool bwait)
+        {
+            WriteLine("PauseTests called ");
+            WriteLineContent(bwait.ToString());
+            _TesterState.PauseTests = bwait;
+            if (bwait)
+            {
+                return;
+            }
+
+            // If no longer paused
+            // see if there are any pending tests to do.
+            while (pausedTestList.Count > 0)
+            {
+                _TesterState.NowTestsArePaused = false;
+                StartTestSequence("key",
+                   pausedTestList[0].TheSequence.FileName,
+                   pausedTestList[0].GradeName,
+                   pausedTestList[0].StartingTest,
+                   pausedTestList[0].BreakOnError,
+                   pausedTestList[0].TableString);
+                pausedTestList.RemoveAt(0);
+                Application.DoEvents();
+            }
+        } // end pauseTests
+
         #endregion Tester function
+
+        #region TCL methods
+        /// <summary>
+        /// Jade exe can tell the blade to stop sending events for a while.
+        ///   When true, Blade runner stops sending events and instead queues 
+        ///   them up.
+        ///   When false blade runner will start emptying the event queue.
+        /// </summary>
+        /// <param name="bwait"></param>
+        // 2009/8/19 Akishi Murata: This function is based on multi remoting channel, obsolate and will be modified.
+        public void PauseEvents(bool bwait)
+        {
+            WriteLine("PauseEvents called ");
+            WriteLineContent("PauseEvents called " + bwait.ToString());
+            // TODO : consider remove it
+            _TesterState.PauseEvents = bwait;
+            //if (bwait == false)
+            //{
+            //    Thread pendingEventsThread = new Thread(new ThreadStart(doPendingEvents));
+            //    pendingEventsThread.IsBackground = true;
+            //    pendingEventsThread.Start();
+            //}
+            _TesterState.PauseEvents = false; // Now does not work.
+        }
+
+        /// <summary>
+        /// Send abort to tclDosBox
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="Force"></param>
+        /// <returns></returns>
+        public bool AbortTCL(string Reason, bool Force)
+        {
+            bool bInitial = _TesterState.SeqGoing;
+
+            WriteLine("Abort called");
+            WriteLineContent(Reason + " " + Force.ToString());
+
+            // see if we are already aborting or not going
+            if ((_TesterState.PleaseStop && !Force) || (!_TesterState.SeqGoing && !Force))
+            {
+                _Escape = false;
+                // say we did it.
+                return true;
+            }
+            if (!_TesterState.PleaseStop)
+            {
+                // tell the remote(s) that this sequence is aborting
+                StatusEventArgs abortingThis = new StatusEventArgs((_TesterState.SeqGoing ? _TesterState.SequenceName : "") + "::" + Reason, Force ? 1 : 0);
+                SendSequenceAbortingEvent(this, abortingThis);
+                WriteLine("Sequence Aborting Event fired.");
+                WriteLineContent(abortingThis.Text);
+            }
+            // Stop it!
+            if (_TesterState.SeqGoing)
+            {
+                _TesterState.PleaseStop = true;  // tells the sequence to stop going.
+            }
+
+            _Escape = true;
+
+            // if force we abort immediately 
+            if (Force)
+            {
+
+                // Make sure that all timing loops exit (they check bEscape which is now true).
+                Thread.Sleep(tclSleepTime);
+                Application.DoEvents();
+                Thread.Sleep(tclSleepTime);
+                Application.DoEvents();
+                Thread.Sleep(tclSleepTime);
+                Application.DoEvents();
+
+                try { TclProcess.Kill(); }
+                catch { /* Force kill, ignore any exceptions */ }
+
+                // send message to caller
+                string AbortStr = Environment.NewLine + Environment.NewLine +
+                   " ------ " + "TclRestart" + " ------" +
+                   Environment.NewLine + Environment.NewLine;
+                StatusEventArgs args = new StatusEventArgs(AbortStr, (int)Enums.eventInts.cmdWinDone);
+
+                //WriteLine("Abort message to queue ");
+                SendStatusEvent(this, args);
+                _TesterState.CmdBusy = false;
+                _TesterState.NowTestsArePaused = false;
+                _TesterState.PauseEvents = false;
+                _TesterState.PauseTests = false;
+                _TesterState.PleaseStop = false;
+                _TesterState.SeqGoing = false;
+                _TesterState.TestNumber = 0;
+                tclIsNowGoing = false;
+                tclshGoing = false;
+                // restart tcl
+                StartTclsh();
+            }
+
+            Application.DoEvents();
+            Thread.Sleep(500);
+
+            // tell the remote that this sequence is aborted.
+            StatusEventArgs finishedWithThis = new StatusEventArgs("aborted");
+            SendSequenceCompletedEvent(this, finishedWithThis);
+            WriteLine("Sequence completed Event fired ");
+            WriteLineContent(finishedWithThis.Text);
+
+            // Wait a bit for the sequence completed to do it's thing.
+            Application.DoEvents();
+            Thread.Sleep(250);
+            // say we did it
+            _Escape = false;
+            PauseEvents(false);
+
+            // New requirement from HICAP
+            InitializeTCL("");
+
+            return true;
+        }
+
+        public void TclInput(string inputString, bool bToTv)
+        {
+            TclCommandDelegate tclInputDelegate = new TclCommandDelegate(TclInputThreadFunc);
+            // send string async
+            tclInputDelegate.BeginInvoke(inputString, bToTv, new AsyncCallback(delegate (IAsyncResult ar) { tclInputDelegate.EndInvoke(ar); }), tclInputDelegate);
+        }
+
+        /// <summary>
+        /// Public function specified in ITesterObject.
+        /// This is used by Jade to execute TCL instructions.
+        /// </summary>
+        /// <param name="Command"></param>
+        /// <param name="bToTv"></param>
+        public void TclCommand(string Command, bool bToTv)
+        {
+            TclCommandDelegate tclCommandDelegate = new TclCommandDelegate(TclCommandThreadFunc);
+            // send string async
+            tclCommandDelegate.BeginInvoke(Command, bToTv, new AsyncCallback(delegate (IAsyncResult ar) { tclCommandDelegate.EndInvoke(ar); }), tclCommandDelegate);
+        }
+
+        /// <summary>
+        /// Send string to tclsh and get return value.
+        /// </summary>
+        /// <param name="cmdStr"></param>
+        /// <returns></returns>
+        private string SendToTclAndGetResult(string cmdStr, bool bToTv)
+        {
+            try
+            {
+                // In case previous command still going, wait for it to finish.
+                WaitForCommandToFinish();
+                // If aborting 
+                if (_Escape) return "";
+
+                tclshGoing = true;
+                // Flag to tell us that tclsh is busy.
+                // This is cleared when STDOUT receives onstants.weBeDoneString.
+                tclIsNowGoing = true;
+
+                StdOutLog.Info("sendTcl start: {0} ", cmdStr);
+
+                lastStdErr = "";
+                lastStdOut = "";
+                lastLastStdOut = "";
+
+
+                // send to tcl (we get the result below).
+                SendTclCmdString(cmdStr, bToTv);
+
+                // Wait for this to return from tclsh sending function.
+                // The command is not finished until Constants.weBeDoneString
+                // Shows up in stdout handler wwhich clears tclIsNowGoing.
+                WaitForTclToFinish();
+
+                // If aborting 
+                if (_Escape) return "";
+
+                // Get the return value from TCL.
+                string retVal;
+                // Sometimes TCL gives the answer on previous stdout and
+                //   sometines on the last stdout.
+                if (lastStdOut.Trim().Length == 0)
+                {
+                    retVal = lastLastStdOut;  // Previous stdout
+                }
+                else
+                {
+                    retVal = lastStdOut;  // the last stdout
+                }
+                StdOutLog.Info("sendTcl RetVal: {0} ", retVal);
+
+                return retVal;
+            }
+            finally
+            {
+                // Now we are really done.
+                tclshGoing = false;
+            }
+        } // end sendToTclAndGetResult
+
+        /// <summary>
+        /// Wait for RunTest to finish.
+        /// This exits when tcl is finsihed and we have processed the result.
+        /// </summary>
+        private void WaitForCommandToFinish()
+        {
+            while (!_Exit && !_Escape)
+            {
+                if (!tclshGoing)
+                {
+                    break;
+                }
+                Thread.Sleep(tclSleepTime);
+                Application.DoEvents();
+            }
+        }
+
+        /// <summary>
+        /// Wait for nothing going.
+        /// </summary>
+        private void WaitForEveryTclThingNotBusy()
+        {
+            while (!_Exit && !_Escape)
+            {
+                if (!tclshGoing && !_TesterState.SeqGoing && !_TesterState.CmdBusy)
+                {
+                    break;
+                }
+                Thread.Sleep(tclSleepTime);
+                Application.DoEvents();
+            }
+        }
+
+        /// <summary>
+        /// Wait for TCL to finish.
+        /// This is just TCL.  We have not processed the TCL result yet.
+        /// </summary>
+        private void WaitForTclToFinish()
+        {
+            int count = 0;
+            while (!_Exit && !_Escape)
+            {
+                // Break when TCL instruction finishes.
+                if (!tclIsNowGoing)
+                {
+                    break;
+                }
+                // If TesterModule's constructor gets an exception, it stops TCL.
+                // This prevents a hang on this condition.
+                if (!constructorFinished)
+                {
+                    Thread.Sleep(100);
+                    if (count > 1) break;
+                }
+                Thread.Sleep(tclSleepTime);
+                Application.DoEvents();
+                count++;
+            }
+        }
+
+        /// <summary>
+        /// Sends a command string to TCL.  TCL will execute string.
+        ///   TCL returns result via stdout events.
+        ///    Actually sends:  puts "[command] Constants.weBeDoneString";
+        ///    Sends puts "Constants.weBeDoneString"  This tells Jade.Exe that it has the answer.
+        /// </summary>
+        /// <param name="Command"></param>
+        private void SendTclCmdString(string Command, bool bToTv)
+        {
+            try
+            {
+                lastStdOut2 = "";
+
+                if (TclProcess.HasExited)
+                {
+                    if (Command == "exit")
+                    {
+                        return;
+                    }
+                    StartTclsh();
+                }
+
+                //bTclError = false;   // if something goes wr_ong std err event previously set this.
+
+                if (bToTv)
+                {
+                    StatusEventArgs args = new StatusEventArgs("% " + Command, (int)Enums.eventInts.toTv);
+                    SendStatusEvent(this, args);
+                }
+
+                if (!IsCmdStringPossiblyOK(Command)) return;
+                lastLastStdOut = lastStdOut = lastStdErr = "";
+                TclStreamWriter.WriteLine("puts \"[" + Command.Trim() + "]" + Constants.weBeDoneString + "\";");
+            }
+            catch (Exception e)
+            {
+                TclStreamWriter.WriteLine("puts stderr \"" + MakeUpExceptionString(e) + Constants.weBeDoneString + "\"");
+            }
+        }
+
+        private void StartTclsh()
+        {
+            // TODO : !!!!Tcl Start
+        }
+
+        /// <summary>
+        /// Checks for "\\" at end of string and for matching TCL quotes.
+        /// If OK returns True.
+        /// If something is wrong returns false and sends error message to tcl window. 
+        /// This is in case someone types something wrong on the command line.
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        private bool IsCmdStringPossiblyOK(string cmd)
+        {
+            int singleQuote = 0;
+            int doubleQuote = 0;
+            int curlyQuote = 0;
+            char[] charArray = cmd.Trim().ToCharArray();
+            for (int i = 0; i < charArray.Length; i++)
+            {
+                char aChar = charArray[i];
+                // check the char for the various quotes
+                if (aChar == '\'') singleQuote++;
+                if (aChar == '\"') doubleQuote++;
+                if (aChar == '{') curlyQuote++;
+                if (aChar == '}') curlyQuote--;
+
+                // if curlyQuote ever goes negative
+                if (curlyQuote < 0)
+                {
+                    ErrorSender("Error: Ending curly quote \"}\" before a starting curly quote \"{.\"");
+                    tclIsNowGoing = false;
+                    return false;
+                }
+
+                // check for ending backslash
+                if (aChar == '\\' && i >= charArray.Length - 1)
+                {
+                    ErrorSender("Error: Line ends with backslash.");
+                    tclIsNowGoing = false;
+                    return false;
+                }
+            } // end for all chars
+
+            if (singleQuote % 2 != 0)
+            {
+                ErrorSender("Error: Mismatched single quotes.");
+                tclIsNowGoing = false;
+                return false;
+            }
+            if (doubleQuote % 2 != 0)
+            {
+                ErrorSender("Error: Mismatched double quotes.");
+                tclIsNowGoing = false;
+                return false;
+            }
+
+            if (curlyQuote != 0)
+            {
+                ErrorSender("Error: Mismatched curly quotes.");
+                tclIsNowGoing = false;
+                return false;
+            }
+
+            return true;
+        }
+        #endregion TCL methods
 
         #region internal sup Methods
         private void PingOperation(string name)
@@ -1130,7 +1701,7 @@ namespace Hitachi.Tester.Module
                     // write out 
                     bf.Serialize(fs, locSequenceList);
                     bf.Serialize(fs, locTesterStateStruct);
-                    // TODO : bf.Serialize(fs, TclPath);
+                    bf.Serialize(fs, TclPath);
                     bf.Serialize(fs, BladePath);
                     bf.Serialize(fs, FactPath);
                     bf.Serialize(fs, GradePath);
@@ -1142,7 +1713,7 @@ namespace Hitachi.Tester.Module
                     bf.Serialize(fs, CountsPath);
                     bf.Serialize(fs, OpenDelay);
                     bf.Serialize(fs, CloseDelay);
-                    // TODO : bf.Serialize(fs, TclStart);
+                    bf.Serialize(fs, TclStart);
 
                     fs.Flush();
                     fs.Close();
@@ -1220,7 +1791,7 @@ namespace Hitachi.Tester.Module
                 return;
             }
 
-            // TODO :  TCL need remove  waitForEveryTclThingNotBusy();
+            WaitForEveryTclThingNotBusy();
             if (_Escape) return;
 
             _TesterState.SeqGoing = true;
@@ -1332,7 +1903,6 @@ namespace Hitachi.Tester.Module
             //runThis.ParseString = sb.ToString() + parseStringBuilder.ToString().Replace("{", "").Replace("}", "");
             runThis.ParseString = sb.ToString() + parseStringBuilder.ToString();
 
-            //Go
             // TODO : RunTheSequence(runThis);
             return;
         }
@@ -1367,6 +1937,27 @@ namespace Hitachi.Tester.Module
             WriteLineContent("TCL Err:" + args.EventType + " " + args.Text);
             SendStatusEvent(this, args);
 
+        }
+
+        public void TclInputThreadFunc(string inputString, bool bToTv)
+        {
+            if (inputString.EndsWith(Environment.NewLine))
+            {
+                inputString = inputString.Substring(0, inputString.Length - 2);
+            }
+
+            WriteLine("TclIn " + inputString);
+            WriteLineContent(inputString);
+            if (bToTv)
+            {
+                StatusEventArgs args = new StatusEventArgs(inputString, (int)Enums.eventInts.toTv);
+                SendStatusEvent(this, args);
+            }
+
+            if (tclshGoing || _TesterState.SeqGoing || _TesterState.CmdBusy || tclIsNowGoing)
+            {
+                TclStreamWriter.WriteLine(inputString);
+            }
         }
 
         /// <summary>
@@ -1414,258 +2005,183 @@ namespace Hitachi.Tester.Module
             }
         }
 
-        #endregion internal sup Methods
-
-        #region TCL methods
         /// <summary>
-        /// Public function specified in ITesterObject.
-        /// This is used by Jade to execute TCL instructions.
+        /// Takes filename of file that we know exists and waits for it to show up.
         /// </summary>
-        /// <param name="Command"></param>
-        /// <param name="bToTv"></param>
-        public void TclCommand(string Command, bool bToTv)
+        /// <param name="fileName"></param>
+        /// <param name="milliSecs"></param>
+        private void WaitForUsbDriveToWakeUp(string fileName, int milliSecs)
         {
-            TclCommandDelegate tclCommandDelegate = new TclCommandDelegate(TclCommandThreadFunc);
-            // send string async
-            tclCommandDelegate.BeginInvoke(Command, bToTv, new AsyncCallback(delegate (IAsyncResult ar) { tclCommandDelegate.EndInvoke(ar); }), tclCommandDelegate);
+            int count = 0;
+            int delay = 100;
+            int maxCount = milliSecs / delay;
+            if (maxCount < 1) maxCount = 1;
+
+            while (!Directory.Exists(Path.GetPathRoot(fileName)))
+            {
+                if (_Exit) return;
+                // sleep while USB wakes up
+                Thread.Sleep(delay);
+                count++;
+                if (count > maxCount)
+                {
+                    break;
+                }
+            }
         }
 
         /// <summary>
-        /// Send string to tclsh and get return value.
+        /// Takes a stream, adds up the CRC, and returns a hex number in string format.
+        /// Does not close the stream when finished.
         /// </summary>
-        /// <param name="cmdStr"></param>
+        /// <param name="fs"></param>
         /// <returns></returns>
-        private string SendToTclAndGetResult(string cmdStr, bool bToTv)
+        private string WhatIsTheCRC(Stream fs)
+        {
+            StreamCrcClass streamCrcClass = new StreamCrcClass();
+            string whatCRC = streamCrcClass.GetCrcString(fs);
+            return whatCRC;
+        }
+
+        private void readTheStatusCallback(object state)
         {
             try
             {
-                // In case previous command still going, wait for it to finish.
-                WaitForCommandToFinish();
-                // If aborting 
-                if (_Escape) return "";
-
-                tclshGoing = true;
-                // Flag to tell us that tclsh is busy.
-                // This is cleared when STDOUT receives onstants.weBeDoneString.
-                tclIsNowGoing = true;
-
-                StdOutLog.Info("sendTcl start: {0} ", cmdStr);
-
-                lastStdErr = "";
-                lastStdOut = "";
-                lastLastStdOut = "";
-
-
-                // send to tcl (we get the result below).
-                SendTclCmdString(cmdStr, bToTv);
-
-                // Wait for this to return from tclsh sending function.
-                // The command is not finished until Constants.weBeDoneString
-                // Shows up in stdout handler wwhich clears tclIsNowGoing.
-                WaitForTclToFinish();
-
-                // If aborting 
-                if (_Escape) return "";
-
-                // Get the return value from TCL.
-                string retVal;
-                // Sometimes TCL gives the answer on previous stdout and
-                //   sometines on the last stdout.
-                if (lastStdOut.Trim().Length == 0)
+                readStatusTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                if (_BunnyCard != null && _TesterState.BunnyGood)
                 {
-                    retVal = lastLastStdOut;  // Previous stdout
+                    bool bunnyStat = false;
+                    bool isOK = true;
+                    ReadBunnyStatusAndUpdateFlags(out bunnyStat);
+                    _TesterState.BunnyGood = bunnyStat;
+                    if (!bunnyStat)
+                    {
+                        isOK = false;
+                        NotifyWorldBunnyStatus(false, "read status invalid");
+                    }
+
+                    if (FirmwareRev.Length == 0)
+                    {
+                        if (isOK)
+                        {
+                            _BunnyCard.LcdScrollText("Bunny On-Line   ");
+                            StaticServerTalker.SendLineToLCD("Bunny On-Line   ");
+
+                        }
+                        NotifyWorldBunnyStatus(bunnyStat, "read status callback ");
+                        if (isOK)
+                        {
+                            GetFwRev();
+                            GetDriverVer();
+                        }
+                    }
                 }
                 else
                 {
-                    retVal = lastStdOut;  // the last stdout
+                    bool status = UsbReset(0);
+                    if (status)
+                    {
+                        ReadBunnyStatusAndUpdateFlags();
+                    }
+                    else
+                    {
+                        if (FirmwareRev.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs("", (int)BunnyEvents.FirmwareVer));
+                            FirmwareRev = "";
+                        }
+                        if (_DriverRev.Length > 0)
+                        {
+                            SendBunnyEvent(this, new StatusEventArgs("", (int)BunnyEvents.DriverVer));
+                            _DriverRev = "";
+                        }
+                        if (_Exit) return;
+                        Application.DoEvents();
+                        Thread.Sleep(1000);
+                    }
                 }
-                StdOutLog.Info("sendTcl RetVal: {0} ", retVal);
-
-                return retVal;
             }
             finally
             {
-                // Now we are really done.
-                tclshGoing = false;
-            }
-        } // end sendToTclAndGetResult
-
-        /// <summary>
-        /// Wait for RunTest to finish.
-        /// This exits when tcl is finsihed and we have processed the result.
-        /// </summary>
-        private void WaitForCommandToFinish()
-        {
-            while (!_Exit && !_Escape)
-            {
-                if (!tclshGoing)
+                if (_TesterState.BunnyGood)
                 {
-                    break;
+                    if (_VoltageCheckBlade)
+                    {
+                        // if voltage check blade then do it as quickly as possible.
+                        readStatusTimer.Change(1, Timeout.Infinite);
+                    }
+                    else
+                    {
+                        // if not voltage check blade then do regular rate.
+                        readStatusTimer.Change(readStatusTime, Timeout.Infinite);
+                    }
                 }
-                Thread.Sleep(tclSleepTime);
-                Application.DoEvents();
+                else // broke
+                {
+                    readStatusTimer.Change(readStatusTime * 5, Timeout.Infinite);
+                }
             }
         }
 
-        /// <summary>
-        /// Wait for nothing going.
-        /// </summary>
-        private void WaitForEveryTclThingNotBusy()
+        private void sequenceTimeoutCallback(object state)
         {
-            while (!_Exit && !_Escape)
-            {
-                if (!tclshGoing && !_TesterState.SeqGoing && !_TesterState.CmdBusy)
-                {
-                    break;
-                }
-                Thread.Sleep(tclSleepTime);
-                Application.DoEvents();
-            }
+            if (!bTimeoutEnabled) return;
+
+            _Escape = true;
+            AbortTCL(Constants.SeqTimeout, false);
+        }
+
+        private void CardPower(bool State)
+        {
+            CardPowerDelegate cardPowerDelegate = new CardPowerDelegate(CardPowerTreadFunc);
+            cardPowerDelegate.BeginInvoke(State, new AsyncCallback(delegate (IAsyncResult ar) { cardPowerDelegate.EndInvoke(ar); }), cardPowerDelegate);
         }
 
         /// <summary>
-        /// Wait for TCL to finish.
-        /// This is just TCL.  We have not processed the TCL result yet.
+        /// Turns PCB power on or off via bunny card.
         /// </summary>
-        private void WaitForTclToFinish()
-        {
-            int count = 0;
-            while (!_Exit && !_Escape)
-            {
-                // Break when TCL instruction finishes.
-                if (!tclIsNowGoing)
-                {
-                    break;
-                }
-                // If TesterModule's constructor gets an exception, it stops TCL.
-                // This prevents a hang on this condition.
-                if (!constructorFinished)
-                {
-                    Thread.Sleep(100);
-                    if (count > 1) break;
-                }
-                Thread.Sleep(tclSleepTime);
-                Application.DoEvents();
-                count++;
-            }
-        }
-
-        /// <summary>
-        /// Sends a command string to TCL.  TCL will execute string.
-        ///   TCL returns result via stdout events.
-        ///    Actually sends:  puts "[command] Constants.weBeDoneString";
-        ///    Sends puts "Constants.weBeDoneString"  This tells Jade.Exe that it has the answer.
-        /// </summary>
-        /// <param name="Command"></param>
-        private void SendTclCmdString(string Command, bool bToTv)
+        /// <param name="State"></param>
+        private void CardPowerTreadFunc(bool State)
         {
             try
             {
-                lastStdOut2 = "";
-
-                if (TclProcess.HasExited)
-                {
-                    if (Command == "exit")
-                    {
-                        return;
-                    }
-                    StartTclsh();
-                }
-
-                //bTclError = false;   // if something goes wr_ong std err event previously set this.
-
-                if (bToTv)
-                {
-                    StatusEventArgs args = new StatusEventArgs("% " + Command, (int)Enums.eventInts.toTv);
-                    SendStatusEvent(this, args);
-                }
-
-                if (!IsCmdStringPossiblyOK(Command)) return;
-                lastLastStdOut = lastStdOut = lastStdErr = "";
-                TclStreamWriter.WriteLine("puts \"[" + Command.Trim() + "]" + Constants.weBeDoneString + "\";");
+                SetAux12VDC(State);
+                SetAux5VDC(State);
             }
             catch (Exception e)
             {
-                TclStreamWriter.WriteLine("puts stderr \"" + MakeUpExceptionString(e) + Constants.weBeDoneString + "\"");
+                WriteLine("Exception in CardPower: " + e.Message);
             }
-        }
-
-        private void StartTclsh()
-        {
-            // TODO : !!!!Tcl Start
         }
 
         /// <summary>
-        /// Checks for "\\" at end of string and for matching TCL quotes.
-        /// If OK returns True.
-        /// If something is wrong returns false and sends error message to tcl window. 
-        /// This is in case someone types something wrong on the command line.
+        /// Turn 12V on or off
         /// </summary>
-        /// <param name="cmd"></param>
-        /// <returns></returns>
-        private bool IsCmdStringPossiblyOK(string cmd)
+        /// <param name="state"></param>
+        private void SetAux12VDC(bool value)
         {
-            int singleQuote = 0;
-            int doubleQuote = 0;
-            int curlyQuote = 0;
-            char[] charArray = cmd.Trim().ToCharArray();
-            for (int i = 0; i < charArray.Length; i++)
+            SendBunnyEvent(this, new StatusEventArgs(value ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Pwr12V));
+            if (_BunnyCard != null)
             {
-                char aChar = charArray[i];
-                // check the char for the various quotes
-                if (aChar == '\'') singleQuote++;
-                if (aChar == '\"') doubleQuote++;
-                if (aChar == '{') curlyQuote++;
-                if (aChar == '}') curlyQuote--;
-
-                // if curlyQuote ever goes negative
-                if (curlyQuote < 0)
-                {
-                    ErrorSender("Error: Ending curly quote \"}\" before a starting curly quote \"{.\"");
-                    tclIsNowGoing = false;
-                    return false;
-                }
-
-                // check for ending backslash
-                if (aChar == '\\' && i >= charArray.Length - 1)
-                {
-                    ErrorSender("Error: Line ends with backslash.");
-                    tclIsNowGoing = false;
-                    return false;
-                }
-
-                //// check for escape
-                //if (aChar == '\\')
-                //{
-                //   // if next char not backslash then escape (skip) the next char
-                //   if (charArray[i + 1] != '\\') i++; 
-                //   continue;
-                //}
-            } // end for all chars
-
-            if (singleQuote % 2 != 0)
-            {
-                ErrorSender("Error: Mismatched single quotes.");
-                tclIsNowGoing = false;
-                return false;
+                _BunnyCard.Set12vdc(value);
+                ReadBunnyStatusAndUpdateFlags();
             }
-            if (doubleQuote % 2 != 0)
-            {
-                ErrorSender("Error: Mismatched double quotes.");
-                tclIsNowGoing = false;
-                return false;
-            }
-
-            if (curlyQuote != 0)
-            {
-                ErrorSender("Error: Mismatched curly quotes.");
-                tclIsNowGoing = false;
-                return false;
-            }
-
-            return true;
         }
-        #endregion TCL methods
+
+        /// <summary>
+        /// Turn 5V on or off
+        /// </summary>
+        /// <param name="state"></param>
+        private void SetAux5VDC(bool value)
+        {
+            SendBunnyEvent(this, new StatusEventArgs(value ? ((int)OnOffValues.On).ToString() : ((int)OnOffValues.Off).ToString(), (int)BunnyEvents.Pwr5V));
+            if (_BunnyCard != null)
+            {
+                _BunnyCard.Set5vdc(value);
+                ReadBunnyStatusAndUpdateFlags();
+            }
+        }
+        #endregion internal sup Methods
 
         #region Log System
         internal void WriteLine(string Text)
@@ -1680,7 +2196,24 @@ namespace Hitachi.Tester.Module
 
         private void WriteLineThreadFunc(object passingObject)
         {
-            // TODO : Achieve write line function
+            try
+            {
+                string text = (string)passingObject;
+                if (text.Trim().StartsWith(Constants.weBeDoneString)) return;
+                if (text.Contains("StatusEvent")) return;
+
+                // TODO :   To LCD
+                // SendLineToLCD(text);
+
+                // To blade runner service and client
+                StatusEventArgs e = new StatusEventArgs(text, (int)eventInts.Notify);
+                SendStatusEvent(this, e);
+
+                // To Host
+                StaticServerTalker.MessageString = text;
+            }
+            catch
+            { }
         }
 
         internal void WriteLineContent(string Text)
@@ -1695,7 +2228,20 @@ namespace Hitachi.Tester.Module
 
         private void WriteLineContentThreadFunc(object passingObject)
         {
-            // TODO : Achieve write line content function
+            try
+            {
+                string text = (string)passingObject;
+                if (text.Trim().StartsWith(Constants.weBeDoneString)) return;
+
+                // To balde runner service and client
+                StatusEventArgs e = new StatusEventArgs(text, (int)eventInts.NotifyWithContent);
+                SendStatusEvent(this, e);
+
+                // To host
+                StaticServerTalker.MessageStringContent = text;
+            }
+            catch
+            { }
         }
         #endregion Log System
 

@@ -37,8 +37,6 @@ namespace Hitachi.Tester.Client
         // private WCF stuff
         private ITesterObject _TesterObject;  // proxy for non-stream functions.
         private ITesterObjectStreaming _TesterObjectStreaming; // proxy for stream funcitons.
-        // TODO : private object ITesterObjectLock;
-        // TODO : private object ITesterObjectStreamLock = new object();
         private System.Threading.Timer _KeepAliveTimer;
         public bool _KeepAliveArrived;
         private ResuffleEvents processSequenceEventsInOrder;
@@ -180,21 +178,18 @@ namespace Hitachi.Tester.Client
         {
             get
             {
-                // TODO : the lock for what
-                //lock (ITesterObjectStreamLock)
+                //CommunicationState swhat = ((System.ServiceModel.ICommunicationObject)m_testerObjectStreaming).State;
+                // If WCF broke, then restart.
+                if (_TesterObjectStreaming == null || ((System.ServiceModel.ICommunicationObject)_TesterObjectStreaming).State != CommunicationState.Opened)
                 {
-                    //CommunicationState swhat = ((System.ServiceModel.ICommunicationObject)m_testerObjectStreaming).State;
-                    // If WCF broke, then restart.
-                    if (_TesterObjectStreaming == null || ((System.ServiceModel.ICommunicationObject)_TesterObjectStreaming).State != CommunicationState.Opened)
+                    if (_TesterObjectStreaming != null)
                     {
-                        if (_TesterObjectStreaming != null)
-                        {
-                            ((System.ServiceModel.ICommunicationObject)_TesterObjectStreaming).Abort();
-                        }
-                        Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, false, true);
+                        ((System.ServiceModel.ICommunicationObject)_TesterObjectStreaming).Abort();
                     }
-                    return _TesterObjectStreaming;
+                    Connect(_CurrentUrlAddress, _CurrentUserID, _CurrentPassword, _CurrentNetTcpConnectFlag, false, true);
                 }
+                return _TesterObjectStreaming;
+
             }
         }
 
@@ -260,10 +255,10 @@ namespace Hitachi.Tester.Client
             del.BeginInvoke(new AsyncCallback(delegate (IAsyncResult ar) { del.EndInvoke(ar); }), del);
         }
 
-        public string Ping(string message)
+        public string PingAllEvent(string message)
         {
             if (Obj == null) return "";
-            EventPingDelegate pingDelegate = new EventPingDelegate(Obj.Ping);
+            EventPingDelegate pingDelegate = new EventPingDelegate(Obj.PingAllEvent);
             IAsyncResult ar = pingDelegate.BeginInvoke(message, null, null);
 
             //ar.AsyncWaitHandle.WaitOne(20000, false);
@@ -562,7 +557,6 @@ namespace Hitachi.Tester.Client
             nlogger.Info("RemoteConnectLib::Connect [ConnectBusy:{0}]", _BusyConnecting);
 
             // TODO : Determine whether the connection has been made, or reconnect put to keep alive function.
-
             // _BusyConnecting keep only one connect operation in one class.
             if (!_BusyConnecting)
             {
@@ -613,12 +607,10 @@ namespace Hitachi.Tester.Client
                     }
                     catch (Exception ex)
                     {
-                        // TODO : Add log information.
                         nlogger.Error("RemoteConnectLib::Connect Create Channel exception [Exception :{0}]", ex.Message);
                         retVal = (UInt32)ReturnValues.connectionBad;
                     }
 
-                    // TODO : Add tester object streaming
                     if (_Factory == null || _FactoryStreaming == null || _TesterObject == null || _TesterObjectStreaming == null)
                     {
                         nlogger.Error("RemoteConnectLib::Connect failed to attach event to remote server [URL:{0}]", strUrl);
@@ -639,7 +631,6 @@ namespace Hitachi.Tester.Client
                         }
                         catch (Exception ex)
                         {
-                            // TODO : Add log information.
                             nlogger.Error("RemoteConnectLib::Connect Create Channel exception [Exception :{0}]", ex.Message);
                             retVal = (UInt32)ReturnValues.connectionBad;
                         }
@@ -680,7 +671,7 @@ namespace Hitachi.Tester.Client
             return retVal;
         }
 
-        // TODO : Think about put MakeupCompleteUrl and MakeupCompleteUrl2 together.
+        // TODO : Think about put MakeupCompleteUrl and MakeupCompleteStreamingUrl together.
         private string MakeupCompleteUrl(string urlAddress, bool netTcp)
         {
             // make up the url from the computer name/ip passed to this func
@@ -739,7 +730,6 @@ namespace Hitachi.Tester.Client
                     portNumber = Constants.WcfBladePort;
                 }
             }
-
             if (netTcp)
             {
                 retVal = strUrl.Substring(0, lastColon + 1) + (portNumber + 1).ToString() + strUrl.Substring(testerObjSpot) + "Streaming";
@@ -748,13 +738,17 @@ namespace Hitachi.Tester.Client
             {
                 retVal = strUrl + "Streaming";
             }
-
             return retVal;
         }
 
         private void InitChannelFactory(string url, string streamingUrl, bool netTcp, bool tobj, bool tobjStr)
         {
-            // TODO : Check string url, streamingUrl null
+            if (url == null || url == "" || streamingUrl == null || streamingUrl == "")
+            {
+                nlogger.Info("RemoteConnectLib::InitChannelFactory fail, url is null or empty");
+                return;
+            }
+
             InstanceContext context;
             EndpointAddress endpoint;
             EndpointAddress endpoint2;
@@ -795,23 +789,25 @@ namespace Hitachi.Tester.Client
             }
             else
             {
+                // Log information
+                nlogger.Info("RemoteConnectLib::InitChannelFactory fail, pattern error, we only support net tcp pattern.");
                 // Pipe model, may be no use
-                if (tobj)
-                {
-                    //NetNamedPipeBinding binding = new NetNamedPipeBinding();
-                    //binding.MaxReceivedMessageSize = 524288;
-                    //binding.MaxBufferSize = 524288;
-                    //binding.MaxBufferPoolSize = 524288;
-                    //binding.ReaderQuotas.MaxArrayLength = 524288;
-                    //binding.ReaderQuotas.MaxBytesPerRead = 524288;
-                    //binding.ReaderQuotas.MaxNameTableCharCount = 524288;
-                    //binding.ReaderQuotas.MaxStringContentLength = 524288;
-                    //_Factory = new DuplexChannelFactory<ITesterObject>(context, binding, endpoint);
-                }
-                if (tobjStr)
-                {
-                    // TODO : object Streaming
-                }
+                //if (tobj)
+                //{
+                //    //NetNamedPipeBinding binding = new NetNamedPipeBinding();
+                //    //binding.MaxReceivedMessageSize = 524288;
+                //    //binding.MaxBufferSize = 524288;
+                //    //binding.MaxBufferPoolSize = 524288;
+                //    //binding.ReaderQuotas.MaxArrayLength = 524288;
+                //    //binding.ReaderQuotas.MaxBytesPerRead = 524288;
+                //    //binding.ReaderQuotas.MaxNameTableCharCount = 524288;
+                //    //binding.ReaderQuotas.MaxStringContentLength = 524288;
+                //    //_Factory = new DuplexChannelFactory<ITesterObject>(context, binding, endpoint);
+                //}
+                //if (tobjStr)
+                //{
+                //    // TODO : object Streaming
+                //}
             }
         }
 
@@ -845,7 +841,7 @@ namespace Hitachi.Tester.Client
                 // PingInt in the Host sends a callback to set this (see TesterInstance OnStatusEvent).
                 // If callback fails, then this stays false and we know to reconnect.
                 // Call Ping int in host.
-                int value = _TesterObject.PingInt();
+                int value = _TesterObject.KeepAliveChannel();
                 // Is the return value correct?
                 nlogger.Info("RemoteConnectLib::KeepAliveTimer_Tick [value:{0}] [currentUrlAddress.Length:{1}] [currentUserID.Length:{2}]", value, _CurrentUrlAddress.Length, _CurrentUserID.Length);
                 if (value != Constants.KeepAliveTimeout && _CurrentUrlAddress.Length > 0 && _CurrentUserID.Length > 0)
@@ -885,10 +881,7 @@ namespace Hitachi.Tester.Client
         private void CleanObject()
         {
             nlogger.Info("RemoteConnectLib::CleanObject [busyConnecting:{0}] ", _BusyConnecting);
-
             if (_BusyConnecting) return;
-
-            // TODO : Disconnect first.
             Disconnect();
 
             // Close TesterObject service.
@@ -896,9 +889,7 @@ namespace Hitachi.Tester.Client
             {
                 try { ((ICommunicationObject)_TesterObject).Close(); }
                 catch
-                {
-                    // TODO :ignored
-                }
+                { }
             }
             // Close TesterObject service.
             else if (_TesterObject != null)
