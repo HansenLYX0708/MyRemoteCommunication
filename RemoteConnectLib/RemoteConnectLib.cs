@@ -48,10 +48,6 @@ namespace Hitachi.Tester.Client
         // TODO : Should add remove function.
         static private Dictionary<string, RemoteConnectLib> _Connections;
 
-        // Event hander
-        public event StatusEventHandler _ComStatusEvent;
-
-
         private static object oBladeInfoLockObject;
 
         private delegate void TclCommandDelegate(object CommandObj);
@@ -1047,7 +1043,7 @@ namespace Hitachi.Tester.Client
                     return;
                 }
             }
-            _ComStatusEvent?.Invoke(this, e);
+            comStatusEvent?.Invoke(this, e);
         }
 
         private string[] GetBladeStrings(string[] names)

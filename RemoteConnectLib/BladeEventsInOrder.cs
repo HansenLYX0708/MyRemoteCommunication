@@ -126,11 +126,7 @@ namespace Hitachi.Tester.Client
         /// <param name="e"></param>
         private void _SendOrderedOutputEvent(object sender, BladeEventArgs e)
         {
-            BladeEventHandler handler = OrderedBladeEvent;
-            if (handler != null)
-            {
-                handler(sender, e);
-            }
+            OrderedBladeEvent?.Invoke(sender, e);
         }
 
         /// <summary>
