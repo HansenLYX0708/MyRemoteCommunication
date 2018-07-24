@@ -6,6 +6,9 @@ using Hitachi.Tester.Module;
 
 namespace Hitachi.Tester.Client
 {
+    /// <summary>
+    /// Summary description for BladeEventClass.
+    /// </summary>
     public class BladeEventClass : AbstractEventClass
     {
         #region Fields
@@ -20,6 +23,10 @@ namespace Hitachi.Tester.Client
         {
         }
 
+        /// <summary>
+        /// Use RemoteConnectLib initialization constructor
+        /// </summary>
+        /// <param name="_remoteConnectLib"></param>
         public BladeEventClass(RemoteConnectLib _remoteConnectLib)
         {
             remoteConnectLib = _remoteConnectLib;
@@ -54,7 +61,6 @@ namespace Hitachi.Tester.Client
         /// <summary>
         /// Override lifetime manager for an infinite lease on life.
         /// </summary>
-        /// <param name="name"></param>
         /// <returns>Object</returns>
         public override Object InitializeLifetimeService()
         {

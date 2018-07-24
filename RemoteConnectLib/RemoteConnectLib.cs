@@ -15,11 +15,13 @@ using Hitachi.Tester.Module;
 
 namespace Hitachi.Tester.Client
 {
+    /// <summary>
+    /// Summary description of RemoteConnectLib
+    /// </summary>
     public class RemoteConnectLib : IDisposable
     {
         #region Fields
         private readonly NLog.Logger nlogger = NLog.LogManager.GetLogger("RemoteConnectLibLog");
-
         private string _OurName;
         private bool _Disposed;
 
@@ -32,24 +34,18 @@ namespace Hitachi.Tester.Client
         private object _ConnectLockObject;
         private bool _BusyConnecting;
 
-        public TesterObjectCallback _BladeEventCallbackClass = null;
-
         // private WCF stuff
         private ITesterObject _TesterObject;  // proxy for non-stream functions.
         private ITesterObjectStreaming _TesterObjectStreaming; // proxy for stream funcitons.
         private System.Threading.Timer _KeepAliveTimer;
-        public bool _KeepAliveArrived;
         private ResuffleEvents processSequenceEventsInOrder;
         private BladeEventClass _BladeEvent;
 
         private bool _Connected = false; // Flag to see if we have ever connected.
-
         // Justin
         // TODO : Should add remove function.
         static private Dictionary<string, RemoteConnectLib> _Connections;
-
         private static object oBladeInfoLockObject;
-
         private delegate void TclCommandDelegate(object CommandObj);
         private delegate string EventPingDelegate(string str);
         private delegate Stream BladeFileReadDelegate(string fileRequest);
@@ -62,25 +58,76 @@ namespace Hitachi.Tester.Client
         private delegate void SetBladeIntsDelegate(string key, string[] names, int[] numbers);
         private delegate bool DelConfigDelegate(string Key, string TestName);
 
+        /// <summary>
+        /// Used to mark communication success every 30 seconds.
+        /// </summary>
+        public bool _KeepAliveArrived;
 
+        /// <summary>
+        /// Service definition for Client callback.
+        /// </summary>
+        public TesterObjectCallback _BladeEventCallbackClass = null;
+
+        /// <summary>
+        /// The status handle represents the program closing event, this external interface used to listen for events
+        /// </summary>
         public event StatusEventHandler comProgramClosingEvent;
+
+        /// <summary>
+        /// The status handle represents the sequence update event, this external interface used to listen for events
+        /// </summary>
         public event StatusEventHandler comSequenceUpdateEvent;
+
+        /// <summary>
+        /// The status handle represents the sequence Aborting event, this external interface used to listen for events
+        /// </summary>
         public event StatusEventHandler comSequenceAbortingEvent;
+
+        /// <summary>
+        /// The status handle represents the sequence complete event, this external interface used to listen for events
+        /// </summary>
         public event StatusEventHandler comSequenceCompleteEvent;
+
+        /// <summary>
+        /// The started handle represents the sequence started event, this external interface used to listen for events
+        /// </summary>
         public event StartedEventHandler comSequenceStartedEvent;
+
+        /// <summary>
+        /// The status handle represents the Status event, this external interface used to listen for events
+        /// </summary>
         public event StatusEventHandler comStatusEvent;
+
+        /// <summary>
+        /// The status handle represents the bunny event, this external interface used to listen for events
+        /// </summary>
         public event StatusEventHandler comBunnyEvent;
+
+        /// <summary>
+        /// The status handle represents the test started event, this external interface used to listen for events
+        /// </summary>
         public event StatusEventHandler comTestStartedEvent;
+
+        /// <summary>
+        /// The complete handle represents the test complete event, this external interface used to listen for events
+        /// </summary>
         public event CompleteEventHandler comTestCompleteEvent;
-        public event EventHandler ConnectedToRemote;
+
+        // public event EventHandler ConnectedToRemote;
         #endregion Fields
 
         #region Constructors
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public RemoteConnectLib()
         {
             Init();
         }
 
+        /// <summary>
+        /// Initialization function
+        /// </summary>
         private void Init()
         {
             Microsoft.VisualBasic.Devices.Computer computer = new Microsoft.VisualBasic.Devices.Computer();
@@ -97,8 +144,6 @@ namespace Hitachi.Tester.Client
             _CurrentNetTcpConnectFlag = false;
             _ConnectLockObject = new object();
             _BusyConnecting = false;
-
-            //ITesterObjectLock = new object();
 
             oBladeInfoLockObject = new object();
 
@@ -127,11 +172,17 @@ namespace Hitachi.Tester.Client
         #endregion Constructors
 
         #region Properties
+        /// <summary>
+        /// The _BladeEvent attribute interface is provided externally
+        /// </summary>
         public BladeEventClass BladeEvent
         {
             get { return _BladeEvent; }
         }
 
+        /// <summary>
+        /// The Connections attribute interface is provided externally
+        /// </summary>
         public Dictionary<string, RemoteConnectLib> Connections
         {
             get
@@ -206,6 +257,13 @@ namespace Hitachi.Tester.Client
         #endregion Properties
 
         #region TesterObject Service methods
+        /// <summary>
+        /// Used to establish a communication connection with the server
+        /// </summary>
+        /// <param name="urlAddress"></param>
+        /// <param name="userID"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public UInt32 Connect(string urlAddress, string userID, string password)
         {
             _KeepAliveTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -214,6 +272,9 @@ namespace Hitachi.Tester.Client
             return value;
         }
 
+        /// <summary>
+        /// Used to disconnect from the server
+        /// </summary>
         public void Disconnect()
         {
             nlogger.Info("RemoteConnectLib::Disconnect start");
@@ -251,13 +312,16 @@ namespace Hitachi.Tester.Client
             del.BeginInvoke(new AsyncCallback(delegate (IAsyncResult ar) { del.EndInvoke(ar); }), del);
         }
 
+        /// <summary>
+        /// Test all event types
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public string PingAllEvent(string message)
         {
             if (Obj == null) return "";
             EventPingDelegate pingDelegate = new EventPingDelegate(Obj.PingAllEvent);
             IAsyncResult ar = pingDelegate.BeginInvoke(message, null, null);
-
-            //ar.AsyncWaitHandle.WaitOne(20000, false);
             // for loop used instead of AsyncWaitHandle so that Twidler moves during the wait.
             for (int i = 0; i < 200 && !ar.IsCompleted; i++)
             {
@@ -266,6 +330,12 @@ namespace Hitachi.Tester.Client
             return ar.IsCompleted ? pingDelegate.EndInvoke(ar) : "Fail";
         }
 
+        /// <summary>
+        /// Returns directory list to client.  
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="Filter"></param>
+        /// <returns></returns>
         public FileNameStruct[] BladeFileDir(string path, string Filter)
         {
             if (Obj == null) throw new Exception(String.Format("Cannot read directory \"{0}\" with filter \"{1}\" in BladeFileDir", path, Filter)); ;
@@ -276,35 +346,67 @@ namespace Hitachi.Tester.Client
             else throw new Exception(String.Format("Cannot read directory \"{0}\" with filter \"{1}\" in BladeFileDir", path, Filter));
         }
 
+        /// <summary>
+        /// Get the string data for the blade based on the name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public string GetBladeString(string name)
         {
             string strValue = (GetBladeStrings(new string[] { name }))[0];
             return strValue;
         }
 
+        /// <summary>
+        /// Set the string data for the blade based on the name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
         public void SetBladeString(string name, string value)
         {
             SetBladeStrings(new string[] { name }, new string[] { value });
         }
 
+        /// <summary>
+        /// Get the Integer data for the blade based on the name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public int GetBladeInteger(string name)
         {
             if (Obj == null) return -1;
             return GetBladeIntegers(new string[] { name })[0];
         }
 
+
+        /// <summary>
+        /// Set the Integer data for the blade based on the name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
         public void SetBladeInteger(string name, int value)
         {
             if (Obj == null) return;
             SetBladeIntegers(new string[] { name }, new int[] { value });
         }
 
+        /// <summary>
+        /// Copy fromFile to tofile on the blade
+        /// </summary>
+        /// <param name="fromFile"></param>
+        /// <param name="toFile"></param>
+        /// <returns></returns>
         public bool CopyFileOnBlade(string fromFile, string toFile)
         {
             if (Obj == null) return false;
             return Obj.CopyFileOnBlade(fromFile, toFile);
         }
 
+        /// <summary>
+        /// Delete FileName on the blade
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <returns></returns>
         public bool BladeDelFile(string FileName)
         {
             DelConfigDelegate factFileDeleteDelegate = new DelConfigDelegate(Obj.BladeDelFile);
@@ -314,41 +416,67 @@ namespace Hitachi.Tester.Client
             else throw new Exception("Cannot delete file in BladeDelFile " + FileName + ".");
         }
 
+        /// <summary>
+        /// Safe eject Blade
+        /// </summary>
         public void SafelyRemove()
         {
             Obj.SafeRemoveBlade();
         }
 
+        /// <summary>
+        /// Set the Mems state in the opposite direction
+        /// </summary>
         public void PinMotionToggle()
         {
             if (Obj == null) return;
             Obj.PinMotionToggle();
         }
 
+        /// <summary>
+        /// Gets the name of the server
+        /// </summary>
+        /// <returns></returns>
         public string Name()
         {
             if (Obj != null) return Obj.Name();
             else return "";
         }
-        // TODO : Consider remove follow GradeFilePath FirmwareFilePath FactFilePath
+
+        /// <summary>
+        /// Returns the path of grade file
+        /// </summary>
+        /// <returns></returns>
         public string GradeFilePath()
         {
             if (Obj == null) return "";
             return Obj.GetStrings("", new string[] { BladeDataName.GradePath })[0];
         }
 
+        /// <summary>
+        /// Returns the path of firmware file
+        /// </summary>
+        /// <returns></returns>
         public string FirmwareFilePath()
         {
             if (Obj == null) return "";
             return Obj.GetStrings("", new string[] { BladeDataName.FirmwarePath })[0];
         }
 
+        /// <summary>
+        /// Returns the path of fact file
+        /// </summary>
+        /// <returns></returns>
         public string FactFilePath()
         {
             if (Obj == null) return "";
             return Obj.GetStrings("", new string[] { BladeDataName.FactPath })[0];
         }
 
+        /// <summary>
+        /// Gets the state of mems
+        /// </summary>
+        /// <returns></returns>
         public MemsStateValues GetMemsState()
         {
             if (Obj == null) return MemsStateValues.Unknown;
@@ -359,6 +487,7 @@ namespace Hitachi.Tester.Client
         /// Sends a command to the BladeRunner via thread pool thread.
         /// </summary>
         /// <param name="Command"></param>
+        /// <param name="bToTv"></param>
         public void TclCommand(string Command, bool bToTv)
         {
             if (Obj == null) return;
@@ -380,6 +509,11 @@ namespace Hitachi.Tester.Client
         #endregion TesterObject Service methods
 
         #region TesterObjectStream service methods
+        /// <summary>
+        /// Read the blade file through ObjectStreaming
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public Stream BladeFileRead(string fileName)
         {
             BladeFileReadDelegate factFileReadingDelegate =
@@ -393,6 +527,12 @@ namespace Hitachi.Tester.Client
             else throw new Exception("Cannot open file in BladeFileRead " + fileName + ".");
         }
 
+        /// <summary>
+        /// Write the blade file through ObjectStreaming
+        /// </summary>
+        /// <param name="readStream"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public string BladeFileWrite(Stream readStream, string fileName)
         {
             FileStreamRequest fileRequest = new FileStreamRequest
@@ -413,116 +553,208 @@ namespace Hitachi.Tester.Client
         #endregion TesterObjectStream service methods
 
         #region Blade string and integer methods
+        /// <summary>
+        /// GetFwRev
+        /// </summary>
+        /// <returns></returns>
         public string GetFwRev()
         {
             return GetBladeString(BladeDataName.FwRev);
         }
 
+        /// <summary>
+        /// Get the type of blade
+        /// </summary>
+        /// <returns></returns>
         public string GetBladeType()
         {
             return GetBladeString(BladeDataName.BladeType);
         }
 
+        /// <summary>
+        /// Get the serial number of blade
+        /// </summary>
+        /// <returns></returns>
         public string GetSerialNumber()
         {
             return GetBladeString(BladeDataName.BladeSN);
         }
 
+        /// <summary>
+        /// Get TCL start status of blade
+        /// </summary>
+        /// <returns></returns>
         public string GetTclStart()
         {
             return GetBladeString(BladeDataName.TclStart);
         }
 
+        /// <summary>
+        /// Set state of card power
+        /// </summary>
+        /// <param name="State"></param>
         public void CardPower(bool State)
         {
             SetBladeInteger(BladeDataName.CardPower, State ? 1 : 0);
         }
 
+        /// <summary>
+        /// Set the serial number of blade
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetSerialNumber(string serialNumber)
         {
             SetBladeString(BladeDataName.BladeSN, serialNumber);
         }
 
+        /// <summary>
+        /// Set the type of blade
+        /// </summary>
+        /// <param name="bladeType"></param>
         public void SetBladeType(string bladeType)
         {
             SetBladeString(BladeDataName.BladeType, bladeType);
         }
 
+        /// <summary>
+        /// Set Motor Base plate SN of blade
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetMotorBaseplateSN(string serialNumber)
         {
             SetBladeString(BladeDataName.MotorBaseplateSN, serialNumber);
         }
 
+        /// <summary>
+        /// Set Motor SN of blade
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetMotorSN(string serialNumber)
         {
             SetBladeString(BladeDataName.MotorSN, serialNumber);
         }
 
+        /// <summary>
+        /// Set Actuator SN of blade
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetActuatorSN(string serialNumber)
         {
             SetBladeString(BladeDataName.ActuatorSN, serialNumber);
         }
 
+        /// <summary>
+        /// Set Disk SN of blade
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetDiskSN(string serialNumber)
         {
             SetBladeString(BladeDataName.DiskSN, serialNumber);
         }
 
+        /// <summary>
+        /// Set Pcba SN of blade
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetPcbaSN(string serialNumber)
         {
             SetBladeString(BladeDataName.PcbaSN, serialNumber);
         }
 
+        /// <summary>
+        /// Set jade SN of blade
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetJadeSN(string serialNumber)
         {
             SetBladeString(BladeDataName.JadeSN, serialNumber);
         }
 
+        /// <summary>
+        /// Set blade loc 
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetBladeLoc(string serialNumber)
         {
             SetBladeString(BladeDataName.BladeLoc, serialNumber);
         }
 
+        /// <summary>
+        /// Set Mems open delay of blade
+        /// </summary>
+        /// <param name="delayMs"></param>
         public void SetMemsOpenDelay(string delayMs)
         {
             SetBladeString(BladeDataName.MemsOpenDelay, delayMs);
         }
 
+        /// <summary>
+        /// Set Mems close delay of blade
+        /// </summary>
+        /// <param name="delayMs"></param>
         public void SetMemsCloseDelay(string delayMs)
         {
             SetBladeString(BladeDataName.MemsCloseDelay, delayMs);
         }
 
+        /// <summary>
+        /// Set Flex SN of blade
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetFlexSN(string serialNumber)
         {
             SetBladeString(BladeDataName.FlexSN, serialNumber);
         }
 
+        /// <summary>
+        /// Set Mems SN of blade
+        /// </summary>
+        /// <param name="serialNumber"></param>
         public void SetMemsSN(string serialNumber)
         {
             SetBladeString(BladeDataName.MemsSN, serialNumber);
         }
 
+        /// <summary>
+        /// Set TCL start status of blade
+        /// </summary>
+        /// <param name="command"></param>
         public void SetTclStart(string command)
         {
             SetBladeString(BladeDataName.TclStart, command);
         }
 
+        /// <summary>
+        /// Set mems state of blade
+        /// </summary>
+        /// <param name="State"></param>
         public void PinMotion(bool State)
         {
             SetBladeInteger(BladeDataName.PinMotion, State ? 1 : 0);
         }
 
+        /// <summary>
+        /// Set backLight state of blade
+        /// </summary>
+        /// <param name="State"></param>
         public void BackLight(bool State)
         {
             SetBladeInteger(BladeDataName.BackLight, State ? 1 : 0);
         }
 
+        /// <summary>
+        /// Set AuxOut0 state of blade
+        /// </summary>
+        /// <param name="output"></param>
         public void AuxOut0(int output)
         {
             SetBladeInteger(BladeDataName.AuxOut0, output);
         }
 
+        /// <summary>
+        /// Set AuxOut1 state of blade
+        /// </summary>
+        /// <param name="output"></param>
         public void AuxOut1(int output)
         {
             SetBladeInteger(BladeDataName.AuxOut1, output);
@@ -1267,6 +1499,10 @@ namespace Hitachi.Tester.Client
         #endregion internal support Methods
 
         #region dispose Methods
+        /// <summary>
+        /// Safe destruction
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (_Disposed)
@@ -1330,6 +1566,9 @@ namespace Hitachi.Tester.Client
             _Disposed = true;
         }
 
+        /// <summary>
+        /// Notify the GC
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

@@ -21,6 +21,10 @@ namespace Hitachi.Tester.Client
         #endregion Fields
 
         #region Constructors
+        /// <summary>
+        /// Initialize the constructor with RemoteConnectLib
+        /// </summary>
+        /// <param name="remoteConnectLib"></param>
         public TesterObjectCallback(RemoteConnectLib remoteConnectLib)
         {
             _RemoteConnectLib = remoteConnectLib;

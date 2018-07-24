@@ -6,6 +6,9 @@ using NLog;
 
 namespace Hitachi.Tester.Client
 {
+    /// <summary>
+    /// Summary description for BladeEventsInOrder. 
+    /// </summary>
     public class BladeEventsInOrder
     {
         #region Fields
@@ -16,13 +19,18 @@ namespace Hitachi.Tester.Client
         private volatile List<BladeEventWithTime> _EventQueue;
         private volatile ReaderWriterLock _ReaderWriterLock;
 
-        // Our event Sends out ordered items.
+        /// <summary>
+        /// Our event Sends out ordered items.
+        /// </summary>
         public event BladeEventHandler OrderedBladeEvent;
         #endregion Fields
 
 
 
         #region Constructors
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public BladeEventsInOrder()
         {
             _EventQueue = new List<BladeEventWithTime>();
@@ -34,11 +42,6 @@ namespace Hitachi.Tester.Client
         }
 
         #endregion Constructors
-
-        #region Properties
-
-        #endregion Properties
-
 
         #region Methods
         /// <summary>

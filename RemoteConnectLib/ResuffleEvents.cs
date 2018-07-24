@@ -188,6 +188,11 @@ namespace Hitachi.Tester.Client
             testCount = (e.testCount * 2) + 1;
         }
 
+        /// <summary>
+        /// Puts an async SequenceAbortingEvent into our class for processing.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void QueueUpSequenceAbortingEvent(object sender, StatusEventArgs e)
         {
             try
@@ -210,11 +215,29 @@ namespace Hitachi.Tester.Client
         #endregion Public Methods
 
         #region Public Events
-
+        /// <summary>
+        /// The status handle represents the start of the test event.
+        /// </summary>
         public event StatusEventHandler TestStartedEvent;
+
+        /// <summary>
+        /// The status handle represents the sequence completed event
+        /// </summary>
         public event StatusEventHandler SequenceCompletedEvent;
+
+        /// <summary>
+        /// The status handle represents the sequence started event
+        /// </summary>
         public event StartedEventHandler SequenceStartedEvent;
+
+        /// <summary>
+        /// The status handle represents the test completed event
+        /// </summary>
         public event CompleteEventHandler TestCompletedEvent;
+
+        /// <summary>
+        /// The status handle represents the sequence abort event
+        /// </summary>
         public event StatusEventHandler SequenceAbortEvent;
 
         private void sendSequenceStartedEvent(object sender, StartedEventArgs e)
@@ -572,6 +595,12 @@ namespace Hitachi.Tester.Client
         {
         }
 
+        /// <summary>
+        /// Construct TestStartedEventStruct with specific parameters
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="sequenceCount"></param>
         public TestStartedEventStruct(object sender, StatusEventArgs e, int sequenceCount)
         {
             TestStartedArg = e;
@@ -580,9 +609,21 @@ namespace Hitachi.Tester.Client
             SequenceCount = sequenceCount;
         }
 
+        /// <summary>
+        /// The args for callback in Test Started event.
+        /// </summary>
         public StatusEventArgs TestStartedArg;
+        /// <summary>
+        /// The Sender of test start events
+        /// </summary>
         public object Sender;
+        /// <summary>
+        /// The index of test start events
+        /// </summary>
         public int Index;
+        /// <summary>
+        /// The Sequence Count of test start events
+        /// </summary>
         public int SequenceCount;
     } // end TestStartedEventStruct class
 
@@ -595,6 +636,12 @@ namespace Hitachi.Tester.Client
         {
         }
 
+        /// <summary>
+        /// Construct TestCompletedEventStruct with specific parameters
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="sequenceCount"></param>
         public TestCompletedEventStruct(object sender, CompletedEventArgs e, int sequenceCount)
         {
             TestCompleteArg = e;
@@ -602,10 +649,21 @@ namespace Hitachi.Tester.Client
             Index = -1;
             SequenceCount = sequenceCount;
         }
-
+        /// <summary>
+        /// The Test Complete Args of test complete events
+        /// </summary>
         public CompletedEventArgs TestCompleteArg;
+        /// <summary>
+        /// The Sender of test complete events
+        /// </summary>
         public object Sender;
+        /// <summary>
+        /// The Index of test complete events
+        /// </summary>
         public int Index;
+        /// <summary>
+        /// The SequenceCount of test complete events
+        /// </summary>
         public int SequenceCount;
     } // end TestCompletedEventStruct class
 
@@ -619,15 +677,29 @@ namespace Hitachi.Tester.Client
         {
         }
 
+        /// <summary>
+        /// Construct SequenceStartedEventStruct with specific parameters
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="sequenceCount"></param>
         public SequenceStartedEventStruct(object sender, StartedEventArgs e, int sequenceCount)
         {
             SequenceStartedArg = e;
             Sender = sender;
             SequenceCount = sequenceCount;
         }
-
+        /// <summary>
+        /// The Sequence Started Arg of Sequence Started events
+        /// </summary>
         public StartedEventArgs SequenceStartedArg;
+        /// <summary>
+        /// The Sender of Sequence Started events
+        /// </summary>
         public object Sender;
+        /// <summary>
+        /// The Sequence Count of Sequence Started events
+        /// </summary>
         public int SequenceCount;
     } // end SequenceStartedEventStruct class
 
@@ -641,6 +713,12 @@ namespace Hitachi.Tester.Client
         {
         }
 
+        /// <summary>
+        /// Construct SequenceCompleteStruct with specific parameters
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <param name="sequenceCount"></param>
         public SequenceCompleteStruct(object sender, StatusEventArgs e, int sequenceCount)
         {
             SequenceCompleteArg = e;
@@ -648,12 +726,21 @@ namespace Hitachi.Tester.Client
             Index = -1;
             SequenceCount = sequenceCount;
         }
-
+        /// <summary>
+        /// The Args of Sequence Complete events
+        /// </summary>
         public StatusEventArgs SequenceCompleteArg;
+        /// <summary>
+        /// The Sender of Sequence Complete events
+        /// </summary>
         public object Sender;
+        /// <summary>
+        /// The Index of Sequence Complete events
+        /// </summary>
         public int Index;
+        /// <summary>
+        /// The Sequence Count of Sequence Complete events
+        /// </summary>
         public int SequenceCount;
     } // end SequenceCompleteStruct class
-
-
 } // end namespace
