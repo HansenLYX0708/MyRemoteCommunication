@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 
-using Hitachi.Tester.Enums;
+using WD.Tester.Enums;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     //[Serializable]
     public class StatsClass

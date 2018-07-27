@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Threading;
 
-using Hitachi.Tester.Enums;
+using WD.Tester.Enums;
 using System.Windows.Forms;
 using HGST.Defines;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     public partial class TesterObject : ITesterObject
     {

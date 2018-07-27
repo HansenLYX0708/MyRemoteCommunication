@@ -8,7 +8,7 @@
 // ****************************************************************
 using System;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
 
     public class StaticServerTalker
@@ -72,7 +72,7 @@ namespace Hitachi.Tester.Module
            }
        }
 
-       public static Hitachi.Tester.Enums.ReturnValues LogInValueProp
+       public static WD.Tester.Enums.ReturnValues LogInValueProp
        {
           set
           {

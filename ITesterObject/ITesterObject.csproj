@@ -143,7 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Defines\Defines.csproj">
-      <Project>{1158CE60-E954-4FC2-9442-1BF5AC00431B}</Project>
+      <Project>{1158ce60-e954-4fc2-9442-1bf5ac00431b}</Project>
       <Name>Defines</Name>
     </ProjectReference>
     <ProjectReference Include="..\IJadeCommonTables\IJadeCommonTables.csproj">

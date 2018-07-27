@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     [Serializable]
     public class FileNameStruct

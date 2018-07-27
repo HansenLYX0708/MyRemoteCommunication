@@ -159,6 +159,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\DataSources\Hitachi.Tester.Module.TesterStateStruct1.datasource" />
+    <None Include="Properties\DataSources\WD.Tester.Module.FileNameStruct.datasource" />
+    <None Include="Properties\DataSources\WD.Tester.Module.TesterState.datasource" />
     <None Include="Service References\ServiceReference1\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>

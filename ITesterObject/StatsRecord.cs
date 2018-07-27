@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
    public class StatsRecord
    {

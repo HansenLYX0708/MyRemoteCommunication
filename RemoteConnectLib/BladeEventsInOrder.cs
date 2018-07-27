@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Hitachi.Tester.Module;
+using WD.Tester.Module;
 using NLog;
 
-namespace Hitachi.Tester.Client
+namespace WD.Tester.Client
 {
     /// <summary>
     /// Summary description for BladeEventsInOrder. 

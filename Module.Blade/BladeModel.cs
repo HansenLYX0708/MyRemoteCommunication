@@ -3,11 +3,11 @@ using System.Threading;
 using System.IO;
 using System.Windows.Forms;
 
-using Hitachi.Tester;
-using Hitachi.Tester.Client;
-using Hitachi.Tester.Enums;
+using WD.Tester;
+using WD.Tester.Client;
+using WD.Tester.Enums;
 using NLog;
-using Hitachi.Tester.Module;
+using WD.Tester.Module;
 
 namespace Module.Blade
 {
@@ -651,6 +651,7 @@ namespace Module.Blade
                             break;
                         case BunnyEvents.BladeType:
                             break;
+
                     }
                 };
                 del.BeginInvoke(new AsyncCallback(delegate (IAsyncResult ar) { del.EndInvoke(ar); }), del);

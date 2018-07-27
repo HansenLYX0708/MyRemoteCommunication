@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.ServiceModel;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     /// <summary>
     /// Required to make WCF happy.

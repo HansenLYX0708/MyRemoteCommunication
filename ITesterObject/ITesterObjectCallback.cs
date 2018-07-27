@@ -8,7 +8,7 @@
 // ==========================================================================================
 using System.ServiceModel;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     [ServiceContract(
         SessionMode = SessionMode.Required,

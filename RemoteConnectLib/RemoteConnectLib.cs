@@ -9,11 +9,11 @@ using System.Net;
 using System.Windows.Forms;
 using System.IO;
 
-using Hitachi.Tester;
-using Hitachi.Tester.Enums;
-using Hitachi.Tester.Module;
+using WD.Tester;
+using WD.Tester.Enums;
+using WD.Tester.Module;
 
-namespace Hitachi.Tester.Client
+namespace WD.Tester.Client
 {
     /// <summary>
     /// Summary description of RemoteConnectLib

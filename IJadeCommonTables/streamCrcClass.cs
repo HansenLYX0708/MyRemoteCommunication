@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace Hitachi.Tester.IJadeCommonTables
+namespace WD.Tester.IJadeCommonTables
 {
     /// <summary>
     /// This class takes a byte stream and returns a CRC32 of the input stream.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Text;
 
-namespace Hitachi.Tester
+namespace WD.Tester
 {
     public class Constants
     {

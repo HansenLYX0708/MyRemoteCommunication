@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.IO;
 using System.Threading;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     [Serializable]
     public class CountsClass : ISerializable

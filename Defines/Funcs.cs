@@ -10,7 +10,7 @@ using System.Reflection;
 using NLog;
 using Defines;
 
-namespace Hitachi.Tester
+namespace WD.Tester
 {
     public class Funcs
     {

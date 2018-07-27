@@ -1,9 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="Hitachi.Tester.Module" elementFormDefault="qualified" targetNamespace="Hitachi.Tester.Module" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:8000/?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
-  <xs:import schemaLocation="http://localhost:8000/?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" />
-  <xs:import schemaLocation="http://localhost:8000/?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Enums" />
+  <xs:import schemaLocation="http://localhost:8000/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/WD.Tester.Module" />
+  <xs:import schemaLocation="http://localhost:8000/?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/WD.Tester.Enums" />
+  <xs:import schemaLocation="http://localhost:8000/?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
   <xs:import schemaLocation="http://localhost:8000/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:element name="Connect">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="userID" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="password" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="computerName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ConnectResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ConnectResult" type="xs:unsignedInt" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Disconnect">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="userID" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="computerName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DisconnectResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="KeepAliveChannel">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="KeepAliveChannelResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="KeepAliveChannelResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PingAllEvent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="message" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PingAllEventResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="PingAllEventResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BladeFileDir">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="Filter" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BladeFileDirResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/WD.Tester.Module" minOccurs="0" name="BladeFileDirResult" nillable="true" type="q1:ArrayOfFileNameStruct" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CopyFileOnBlade">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="fromFile" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="toFile" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CopyFileOnBladeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="CopyFileOnBladeResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="BladeDelFile">
     <xs:complexType>
       <xs:sequence>
@@ -19,22 +104,16 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:complexType name="ReceiverFaultDetail">
-    <xs:sequence>
-      <xs:element name="Message" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
-      <xs:element name="ContactAdministrator" type="xs:boolean" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ReceiverFaultDetail" nillable="true" type="tns:ReceiverFaultDetail" />
-  <xs:complexType name="SenderFaultDetail">
-    <xs:sequence>
-      <xs:element name="Message" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string" />
-      <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" name="FailedBodyElements" nillable="true" type="q1:ArrayOfstring" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="SenderFaultDetail" nillable="true" type="tns:SenderFaultDetail" />
+  <xs:element name="SafeRemoveBlade">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SafeRemoveBladeResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="BunnyReInit">
     <xs:complexType>
       <xs:sequence />
@@ -50,7 +129,7 @@
   <xs:element name="SetMemsType">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" minOccurs="0" name="whichKind" type="q2:BunnyPinMotionType" />
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/WD.Tester.Module" minOccurs="0" name="whichKind" type="q2:BunnyPinMotionType" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -62,7 +141,7 @@
   <xs:element name="SetMemsOpenSensorType">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" minOccurs="0" name="whichKind" type="q3:BunnyPinMotionSensor" />
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/WD.Tester.Module" minOccurs="0" name="whichKind" type="q3:BunnyPinMotionSensor" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -74,13 +153,117 @@
   <xs:element name="SetMemsCloseSensorType">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" minOccurs="0" name="whichKind" type="q4:BunnyPinMotionSensor" />
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/WD.Tester.Module" minOccurs="0" name="whichKind" type="q4:BunnyPinMotionSensor" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SetMemsCloseSensorTypeResponse">
     <xs:complexType>
       <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetModuleState">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetModuleStateResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/WD.Tester.Module" minOccurs="0" name="GetModuleStateResult" nillable="true" type="q5:TesterState" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetModuleState">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/WD.Tester.Module" minOccurs="0" name="testerState" nillable="true" type="q6:TesterState" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetModuleStateResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetBunnyStatus">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetBunnyStatusResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMemsStatus">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetMemsStatusResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/WD.Tester.Enums" minOccurs="0" name="GetMemsStatusResult" type="q7:MemsStateValues" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetStrings">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
+        <xs:element xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q8:ArrayOfstring" />
+        <xs:element xmlns:q9="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="strings" nillable="true" type="q9:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetStringsResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetStrings">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
+        <xs:element xmlns:q10="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q10:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetStringsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q11="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetStringsResult" nillable="true" type="q11:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetIntegers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
+        <xs:element xmlns:q12="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q12:ArrayOfstring" />
+        <xs:element xmlns:q13="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="numbers" nillable="true" type="q13:ArrayOfint" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetIntegersResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetIntegers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
+        <xs:element xmlns:q14="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q14:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetIntegersResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q15="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetIntegersResult" nillable="true" type="q15:ArrayOfint" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="PinMotionToggle">
@@ -93,15 +276,138 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="SetRampValue">
+  <xs:element name="GetFileCRC">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="Key" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="value" type="xs:unsignedInt" />
+        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SetRampValueResponse">
+  <xs:element name="GetFileCRCResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetFileCRCResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Name">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NameResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="NameResult" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetConfig">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="NewConfig" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetConfigResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetConfig">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetConfigResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DelConfig">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Key" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DelConfigResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="DelConfigResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DirConfig">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="FileName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DirConfigResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q16="http://schemas.datacontract.org/2004/07/WD.Tester.Module" minOccurs="0" name="DirConfigResult" nillable="true" type="q16:ArrayOfFileNameStruct" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StartTest">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ParseString" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="GradeName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="tableStr" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StartTestResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PauseTests">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="bwait" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PauseTestsResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="hgst_get_servo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="index" type="xs:int" />
+        <xs:element minOccurs="0" name="dev" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="hgst_get_servoResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="hgst_move_servo">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="index" type="xs:int" />
+        <xs:element minOccurs="0" name="dev" type="xs:int" />
+        <xs:element minOccurs="0" name="type" type="xs:int" />
+        <xs:element minOccurs="0" name="end_pos" type="xs:int" />
+        <xs:element minOccurs="0" name="max_vel" type="xs:int" />
+        <xs:element minOccurs="0" name="accel" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="hgst_move_servoResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
@@ -156,36 +462,6 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="hgst_get_servo">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="index" type="xs:int" />
-        <xs:element minOccurs="0" name="dev" type="xs:int" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="hgst_get_servoResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="hgst_move_servo">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="index" type="xs:int" />
-        <xs:element minOccurs="0" name="dev" type="xs:int" />
-        <xs:element minOccurs="0" name="type" type="xs:int" />
-        <xs:element minOccurs="0" name="end_pos" type="xs:int" />
-        <xs:element minOccurs="0" name="max_vel" type="xs:int" />
-        <xs:element minOccurs="0" name="accel" type="xs:int" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="hgst_move_servoResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
   <xs:element name="hgst_usb_reset">
     <xs:complexType>
       <xs:sequence>
@@ -196,465 +472,6 @@
   <xs:element name="hgst_usb_resetResponse">
     <xs:complexType>
       <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetStrings">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
-        <xs:element xmlns:q5="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q5:ArrayOfstring" />
-        <xs:element xmlns:q6="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="strings" nillable="true" type="q6:ArrayOfstring" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetStringsResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetStrings">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
-        <xs:element xmlns:q7="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q7:ArrayOfstring" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetStringsResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetStringsResult" nillable="true" type="q8:ArrayOfstring" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetDataViaEvent">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q9="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q9:ArrayOfstring" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetDataViaEventResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetIntegers">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
-        <xs:element xmlns:q10="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q10:ArrayOfstring" />
-        <xs:element xmlns:q11="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="numbers" nillable="true" type="q11:ArrayOfint" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetIntegersResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetIntegers">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
-        <xs:element xmlns:q12="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q12:ArrayOfstring" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetIntegersResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q13="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="GetIntegersResult" nillable="true" type="q13:ArrayOfint" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetTclStart">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="command" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetTclStartResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetTclStart">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetTclStartResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="GetTclStartResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="PauseEvents">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="bwait" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="PauseEventsResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="PauseTests">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="bwait" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="PauseTestsResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="BladeFilePath">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="BladeFilePathResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="BladeFilePathResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="FactFilePath">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="FactFilePathResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="FactFilePathResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GradeFilePath">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GradeFilePathResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="GradeFilePathResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="FirmwareFilePath">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="FirmwareFilePathResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="FirmwareFilePathResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CountsFilePath">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CountsFilePathResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="CountsFilePathResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="LogInValue">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="setValue" type="xs:int" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="LogInValueResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Connect">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="UserID" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="Password" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="ComputerName" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ConnectResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="ConnectResult" type="xs:unsignedInt" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Initialize">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="Key" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="InitializeResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Ping">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="message" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="PingResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="PingResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Disconnect">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="Key" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="DisconnectResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Abort">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="Reason" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="Force" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="AbortResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="AbortResult" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="StartTest">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="ParseString" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="GradeName" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="tableStr" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="StartTestResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetConfig">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="NewConfig" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetConfigResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetConfig">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetConfigResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="DelConfig">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="Key" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="DelConfigResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="DelConfigResult" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="DirConfig">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="FileName" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="DirConfigResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" minOccurs="0" name="DirConfigResult" nillable="true" type="q14:ArrayOfFileNameStruct" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CopyFileOnBlade">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="fromFile" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="toFile" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CopyFileOnBladeResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="CopyFileOnBladeResult" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetConfigCRC">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetConfigCRCResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="GetConfigCRCResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetGradeCRCs">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetGradeCRCsResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" minOccurs="0" name="GetGradeCRCsResult" nillable="true" type="q15:FileNameStruct" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetFileCRC">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="TestName" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetFileCRCResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="GetFileCRCResult" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TclInput">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="inputString" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="bToTv" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TclInputResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TclCommand">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="Command" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="bToTv" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TclCommandResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetModuleState">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetModuleStateResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q16="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" minOccurs="0" name="GetModuleStateResult" nillable="true" type="q16:TesterStateStruct" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetModuleState">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" minOccurs="0" name="testerState" nillable="true" type="q17:TesterStateStruct" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetModuleStateResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetBunnyStatus">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetBunnyStatusResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetMemsState">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetMemsStateResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Enums" minOccurs="0" name="GetMemsStateResult" type="q18:MemsStateValues" />
-      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SetCounts">
@@ -728,41 +545,27 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="ClearStats">
+  <xs:element name="ClearCountsStats">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="ClearStatsResponse">
+  <xs:element name="ClearCountsStatsResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="UpdateStatValuesViaEvent">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q19="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="what" nillable="true" type="q19:ArrayOfstring" />
-        <xs:element minOccurs="0" name="from" type="xs:long" />
-        <xs:element minOccurs="0" name="to" type="xs:long" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="UpdateStatValuesViaEventResponse">
+  <xs:element name="CountsGetFirstLastIndexViaEvent">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetFirstLastIndexViaEvent">
+  <xs:element name="CountsGetFirstLastIndexViaEventResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetFirstLastIndexViaEventResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetFromToViaEvent">
+  <xs:element name="CountsGetFromToViaEvent">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="from" type="xs:long" />
@@ -770,42 +573,128 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetFromToViaEventResponse">
+  <xs:element name="CountsGetFromToViaEventResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="UpdateDgrValuesViaEvent">
+  <xs:element name="CountsUpdateDgrValuesViaEvent">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q20="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="timeSpan" type="q20:duration" />
+        <xs:element xmlns:q17="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="timeSpan" type="q17:duration" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="UpdateDgrValuesViaEventResponse">
+  <xs:element name="CountsUpdateDgrValuesViaEventResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="BladeFileDir">
+  <xs:element name="InitializeTCL">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="Filter" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="Key" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="BladeFileDirResponse">
+  <xs:element name="InitializeTCLResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AbortTCL">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" minOccurs="0" name="BladeFileDirResult" nillable="true" type="q21:ArrayOfFileNameStruct" />
+        <xs:element minOccurs="0" name="Reason" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="Force" type="xs:boolean" />
       </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AbortTCLResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="AbortTCLResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TclInput">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="inputString" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="bToTv" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TclInputResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TclCommand">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Command" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="bToTv" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TclCommandResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetDataViaEvent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q18="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="names" nillable="true" type="q18:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetDataViaEventResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PauseEvents">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="bwait" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PauseEventsResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StaticTalkLogInValue">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="setValue" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StaticTalkLogInValueResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetLcdText">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="text" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetLcdTextResponse">
+    <xs:complexType>
+      <xs:sequence />
     </xs:complexType>
   </xs:element>
   <xs:element name="BladeEventCallback">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" minOccurs="0" name="e" nillable="true" type="q22:BladeEventArgs" />
+        <xs:element xmlns:q19="http://schemas.datacontract.org/2004/07/WD.Tester.Module" minOccurs="0" name="e" nillable="true" type="q19:BladeEventArgs" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

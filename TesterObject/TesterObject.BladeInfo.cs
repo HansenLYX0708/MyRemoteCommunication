@@ -5,10 +5,10 @@ using System.Threading;
 using System.IO;
 using System.Windows.Forms;
 
-using Hitachi.Tester.Enums;
+using WD.Tester.Enums;
 using HGST.Blades;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     public partial class TesterObject : ITesterObject
     {

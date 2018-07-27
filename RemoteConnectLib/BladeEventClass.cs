@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Hitachi.Tester.Module;
+using WD.Tester.Module;
 
-namespace Hitachi.Tester.Client
+namespace WD.Tester.Client
 {
     /// <summary>
     /// Summary description for BladeEventClass.

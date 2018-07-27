@@ -1,4 +1,4 @@
-namespace Hitachi.Tester.Sequence
+namespace WD.Tester.Sequence
 {
    class SequenceExecutionObject
    {

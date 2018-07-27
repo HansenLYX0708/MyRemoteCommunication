@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.ServiceModel;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     [ServiceContract(Name = "TesterObjectStreamingContract", Namespace = "Hitachi.Tester.Module")]
     public interface ITesterObjectStreaming

@@ -17,7 +17,7 @@ using System.Linq;
 using System.Text;
 using System.ServiceModel;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     [MessageContract]
     public class FileStreamRequest 

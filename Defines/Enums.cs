@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Hitachi.Tester.Enums
+namespace WD.Tester.Enums
 {
     public enum BladeExceptionCode
     {

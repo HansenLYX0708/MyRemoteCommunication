@@ -26,9 +26,9 @@ using System.Timers;
 using System.Threading;
 using System.Diagnostics;
 
-using Hitachi.Tester.Module;
+using WD.Tester.Module;
 
-namespace Hitachi.Tester.Client
+namespace WD.Tester.Client
 {
     /// <summary>
     /// Sequence status events are sent asynchronously from the BladeRunner in unknown order.  This reorders the events and

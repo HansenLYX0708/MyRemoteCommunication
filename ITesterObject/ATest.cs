@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Hitachi.Tester.Sequence
+namespace WD.Tester.Sequence
 {
     /// <summary>
     /// This class is a struct that holds one test.

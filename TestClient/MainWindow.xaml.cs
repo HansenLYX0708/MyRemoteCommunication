@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using Hitachi.Tester.Client;
+using WD.Tester.Client;
 using Module.Blade;
 using NLog;
 
@@ -32,16 +32,16 @@ namespace TestClient
 
             bladeModel = new BladeModel();
 
-            bladeModel.RemoteInstance.comStatusEvent += new Hitachi.Tester.Module.StatusEventHandler(TestOnStatusEvent);
+            bladeModel.RemoteInstance.comStatusEvent += new WD.Tester.Module.StatusEventHandler(TestOnStatusEvent);
         }
 
-        private void TestOnStatusEvent(object sender, Hitachi.Tester.Module.StatusEventArgs e)
+        private void TestOnStatusEvent(object sender, WD.Tester.Module.StatusEventArgs e)
         {
-            switch ( (Hitachi.Tester.Enums.eventInts)e.EventType )
+            switch ( (WD.Tester.Enums.eventInts)e.EventType )
             {
-                case Hitachi.Tester.Enums.eventInts.Notify:
+                case WD.Tester.Enums.eventInts.Notify:
                     break;
-                case Hitachi.Tester.Enums.eventInts.NotifyWithContent:
+                case WD.Tester.Enums.eventInts.NotifyWithContent:
                     break;
             }
         }
@@ -54,7 +54,7 @@ namespace TestClient
             {
                 #region Blade status control
                 case "Connect":
-                    bladeModel.Connect("10.113.201.113", string.Empty, string.Empty);
+                    bladeModel.Connect("127.0.0.1", string.Empty, string.Empty);// 10.113.201.113
                     btn.Content = "Disconnect";
                     break;
                 case "Disconnect":
@@ -131,7 +131,6 @@ namespace TestClient
         {
             //textBox1.Text = "test MemsSN";
             textBox1.Text = bladeModel.MEMSSN;
-            textBox2.Text = bladeModel.DRIVESN;
             textBox3.Text = bladeModel.DISKSN;
             textBox4.Text = bladeModel.MBPSN;
             textBox5.Text = bladeModel.ActuatorSN;

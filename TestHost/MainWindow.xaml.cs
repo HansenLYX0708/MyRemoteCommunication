@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using System.ServiceModel;
-using Hitachi.Tester.Module;
+using WD.Tester.Module;
 
 namespace TestHost
 {

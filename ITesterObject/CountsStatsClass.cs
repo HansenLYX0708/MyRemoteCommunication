@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     public class CountsStatsClass : CountsClass
     {

@@ -19,11 +19,11 @@ using System.Xml;
 using System.Xml.Schema;
 using System.IO;
 using System.Drawing;
-using Hitachi.Tester.Sequence;
+using WD.Tester.Sequence;
 using System.Windows.Forms;
-using Hitachi.Tester.IJadeCommonTables;
+using WD.Tester.IJadeCommonTables;
 
-namespace Hitachi.Tester.Sequence
+namespace WD.Tester.Sequence
 {
     /// <summary>
     /// This class is a struct that holds one test sequence.

@@ -8,7 +8,7 @@
 // ****************************************************************
 using System;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
 	/// <summary>
 	/// Summary description for CompletedEventArgs.

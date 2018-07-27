@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     /// <summary>
     /// The args for callback in status event.

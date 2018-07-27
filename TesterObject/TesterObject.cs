@@ -10,14 +10,14 @@ using System.Collections;
 using System.Xml;
 using System.Diagnostics;
 
-using Hitachi.Tester.Enums;
-using Hitachi.Tester.Sequence;
-using Hitachi.Tester.IJadeCommonTables;
+using WD.Tester.Enums;
+using WD.Tester.Sequence;
+using WD.Tester.IJadeCommonTables;
 using HGST.Blades;
 using RemoveDriveByLetter;
 using NLog;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     /// <summary>
     /// Summary description for TesterObject.
@@ -796,7 +796,7 @@ namespace Hitachi.Tester.Module
             {
                 Thread.Sleep(100);
                 // Is it closed yet?
-                if (GetMemsStatus() == Hitachi.Tester.Enums.MemsStateValues.Closed) break;
+                if (GetMemsStatus() == WD.Tester.Enums.MemsStateValues.Closed) break;
                 //_memsState
             }
 

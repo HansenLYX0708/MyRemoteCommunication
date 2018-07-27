@@ -15,9 +15,9 @@ using System.ServiceModel;
 using System.Threading;
 using System.ComponentModel.Composition;
 
-using Hitachi.Tester.Enums;
+using WD.Tester.Enums;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     [Export(typeof(ITesterObjectStreaming)), 
         PartCreationPolicy(CreationPolicy.Any), 

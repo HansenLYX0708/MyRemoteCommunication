@@ -1,15 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:tns="Hitachi.Tester.Module" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" targetNamespace="Hitachi.Tester.Module" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="Hitachi.Tester.Module" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="Hitachi.Tester.Module" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:types>
     <xsd:schema targetNamespace="Hitachi.Tester.Module/Imports">
       <xsd:import schemaLocation="http://localhost:8000/?xsd=xsd0" namespace="Hitachi.Tester.Module" />
+      <xsd:import schemaLocation="http://localhost:8000/?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/WD.Tester.Module" />
       <xsd:import schemaLocation="http://localhost:8000/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
-      <xsd:import schemaLocation="http://localhost:8000/?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
-      <xsd:import schemaLocation="http://localhost:8000/?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" />
-      <xsd:import schemaLocation="http://localhost:8000/?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Enums" />
+      <xsd:import schemaLocation="http://localhost:8000/?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/WD.Tester.Enums" />
+      <xsd:import schemaLocation="http://localhost:8000/?xsd=xsd4" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
       <xsd:import schemaLocation="http://localhost:8000/?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/System" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="TesterObjectContract_Connect_InputMessage">
+    <wsdl:part name="parameters" element="tns:Connect" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_Connect_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ConnectResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_Connect_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q1:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_Connect_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q2:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_Disconnect_InputMessage">
+    <wsdl:part name="parameters" element="tns:Disconnect" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_Disconnect_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DisconnectResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_Disconnect_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q3:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_Disconnect_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q4:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_KeepAliveChannel_InputMessage">
+    <wsdl:part name="parameters" element="tns:KeepAliveChannel" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_KeepAliveChannel_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KeepAliveChannelResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_KeepAliveChannel_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q5:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_KeepAliveChannel_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q6:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_PingAllEvent_InputMessage">
+    <wsdl:part name="parameters" element="tns:PingAllEvent" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_PingAllEvent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PingAllEventResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_PingAllEvent_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q7:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_PingAllEvent_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q8="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q8:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_BladeFileDir_InputMessage">
+    <wsdl:part name="parameters" element="tns:BladeFileDir" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_BladeFileDir_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BladeFileDirResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_BladeFileDir_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q9="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q9:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_BladeFileDir_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q10="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q10:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_CopyFileOnBlade_InputMessage">
+    <wsdl:part name="parameters" element="tns:CopyFileOnBlade" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_CopyFileOnBlade_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CopyFileOnBladeResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_CopyFileOnBlade_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q11="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q11:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_CopyFileOnBlade_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q12="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q12:SenderFaultDetail" />
+  </wsdl:message>
   <wsdl:message name="TesterObjectContract_BladeDelFile_InputMessage">
     <wsdl:part name="parameters" element="tns:BladeDelFile" />
   </wsdl:message>
@@ -17,10 +89,22 @@
     <wsdl:part name="parameters" element="tns:BladeDelFileResponse" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_BladeDelFile_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q13="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q13:ReceiverFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_BladeDelFile_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+    <wsdl:part xmlns:q14="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q14:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SafeRemoveBlade_InputMessage">
+    <wsdl:part name="parameters" element="tns:SafeRemoveBlade" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SafeRemoveBlade_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SafeRemoveBladeResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SafeRemoveBlade_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q15="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q15:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SafeRemoveBlade_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q16="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q16:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_BunnyReInit_InputMessage">
     <wsdl:part name="parameters" element="tns:BunnyReInit" />
@@ -28,11 +112,11 @@
   <wsdl:message name="TesterObjectContract_BunnyReInit_OutputMessage">
     <wsdl:part name="parameters" element="tns:BunnyReInitResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_BunnyReInit_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_BunnyReInit_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q17="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q17:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_BunnyReInit_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q18="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q18:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetMemsType_InputMessage">
     <wsdl:part name="parameters" element="tns:SetMemsType" />
@@ -40,11 +124,11 @@
   <wsdl:message name="TesterObjectContract_SetMemsType_OutputMessage">
     <wsdl:part name="parameters" element="tns:SetMemsTypeResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetMemsType_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetMemsType_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q19="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q19:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetMemsType_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q20="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q20:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetMemsOpenSensorType_InputMessage">
     <wsdl:part name="parameters" element="tns:SetMemsOpenSensorType" />
@@ -52,11 +136,11 @@
   <wsdl:message name="TesterObjectContract_SetMemsOpenSensorType_OutputMessage">
     <wsdl:part name="parameters" element="tns:SetMemsOpenSensorTypeResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetMemsOpenSensorType_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetMemsOpenSensorType_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q21="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q21:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetMemsOpenSensorType_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q22="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q22:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetMemsCloseSensorType_InputMessage">
     <wsdl:part name="parameters" element="tns:SetMemsCloseSensorType" />
@@ -64,107 +148,59 @@
   <wsdl:message name="TesterObjectContract_SetMemsCloseSensorType_OutputMessage">
     <wsdl:part name="parameters" element="tns:SetMemsCloseSensorTypeResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetMemsCloseSensorType_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetMemsCloseSensorType_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q23="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q23:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PinMotionToggle_InputMessage">
-    <wsdl:part name="parameters" element="tns:PinMotionToggle" />
+  <wsdl:message name="TesterObjectContract_SetMemsCloseSensorType_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q24="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q24:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PinMotionToggle_OutputMessage">
-    <wsdl:part name="parameters" element="tns:PinMotionToggleResponse" />
+  <wsdl:message name="TesterObjectContract_GetModuleState_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetModuleState" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PinMotionToggle_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_GetModuleState_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetModuleStateResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PinMotionToggle_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_GetModuleState_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q25="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q25:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetRampValue_InputMessage">
-    <wsdl:part name="parameters" element="tns:SetRampValue" />
+  <wsdl:message name="TesterObjectContract_GetModuleState_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q26="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q26:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetRampValue_OutputMessage">
-    <wsdl:part name="parameters" element="tns:SetRampValueResponse" />
+  <wsdl:message name="TesterObjectContract_SetModuleState_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetModuleState" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetRampValue_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_SetModuleState_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetModuleStateResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetRampValue_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_SetModuleState_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q27="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q27:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_set_save_servo_InputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_set_save_servo" />
+  <wsdl:message name="TesterObjectContract_SetModuleState_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q28="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q28:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_set_save_servo_OutputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_set_save_servoResponse" />
+  <wsdl:message name="TesterObjectContract_GetBunnyStatus_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetBunnyStatus" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_set_save_servo_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_GetBunnyStatus_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetBunnyStatusResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_set_save_servo_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_GetBunnyStatus_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q29="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q29:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_get_neutral_InputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_get_neutral" />
+  <wsdl:message name="TesterObjectContract_GetBunnyStatus_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q30="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q30:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_get_neutral_OutputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_get_neutralResponse" />
+  <wsdl:message name="TesterObjectContract_GetMemsStatus_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetMemsStatus" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_get_neutral_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_GetMemsStatus_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetMemsStatusResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_get_neutral_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_GetMemsStatus_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q31="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q31:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_set_neutral_InputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_set_neutral" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_set_neutral_OutputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_set_neutralResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_set_neutral_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_set_neutral_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_get_servo_InputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_get_servo" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_get_servo_OutputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_get_servoResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_get_servo_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_get_servo_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_move_servo_InputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_move_servo" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_move_servo_OutputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_move_servoResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_move_servo_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_move_servo_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_usb_reset_InputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_usb_reset" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_usb_reset_OutputMessage">
-    <wsdl:part name="parameters" element="tns:hgst_usb_resetResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_usb_reset_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_hgst_usb_reset_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_GetMemsStatus_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q32="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q32:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetStrings_InputMessage">
     <wsdl:part name="parameters" element="tns:SetStrings" />
@@ -172,11 +208,11 @@
   <wsdl:message name="TesterObjectContract_SetStrings_OutputMessage">
     <wsdl:part name="parameters" element="tns:SetStringsResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetStrings_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetStrings_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q33="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q33:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetStrings_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q34="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q34:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetStrings_InputMessage">
     <wsdl:part name="parameters" element="tns:GetStrings" />
@@ -185,22 +221,10 @@
     <wsdl:part name="parameters" element="tns:GetStringsResponse" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetStrings_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q35="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q35:ReceiverFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetStrings_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetDataViaEvent_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetDataViaEvent" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetDataViaEvent_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetDataViaEventResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetDataViaEvent_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetDataViaEvent_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+    <wsdl:part xmlns:q36="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q36:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetIntegers_InputMessage">
     <wsdl:part name="parameters" element="tns:SetIntegers" />
@@ -208,11 +232,11 @@
   <wsdl:message name="TesterObjectContract_SetIntegers_OutputMessage">
     <wsdl:part name="parameters" element="tns:SetIntegersResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetIntegers_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetIntegers_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q37="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q37:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetIntegers_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q38="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q38:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetIntegers_InputMessage">
     <wsdl:part name="parameters" element="tns:GetIntegers" />
@@ -221,202 +245,46 @@
     <wsdl:part name="parameters" element="tns:GetIntegersResponse" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetIntegers_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q39="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q39:ReceiverFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetIntegers_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+    <wsdl:part xmlns:q40="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q40:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetTclStart_InputMessage">
-    <wsdl:part name="parameters" element="tns:SetTclStart" />
+  <wsdl:message name="TesterObjectContract_PinMotionToggle_InputMessage">
+    <wsdl:part name="parameters" element="tns:PinMotionToggle" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetTclStart_OutputMessage">
-    <wsdl:part name="parameters" element="tns:SetTclStartResponse" />
+  <wsdl:message name="TesterObjectContract_PinMotionToggle_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PinMotionToggleResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetTclStart_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_PinMotionToggle_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q41="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q41:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetTclStart_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_PinMotionToggle_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q42="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q42:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetTclStart_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetTclStart" />
+  <wsdl:message name="TesterObjectContract_GetFileCRC_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetFileCRC" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetTclStart_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetTclStartResponse" />
+  <wsdl:message name="TesterObjectContract_GetFileCRC_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetFileCRCResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetTclStart_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_GetFileCRC_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q43="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q43:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetTclStart_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_GetFileCRC_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q44="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q44:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PauseEvents_InputMessage">
-    <wsdl:part name="parameters" element="tns:PauseEvents" />
+  <wsdl:message name="TesterObjectContract_Name_InputMessage">
+    <wsdl:part name="parameters" element="tns:Name" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PauseEvents_OutputMessage">
-    <wsdl:part name="parameters" element="tns:PauseEventsResponse" />
+  <wsdl:message name="TesterObjectContract_Name_OutputMessage">
+    <wsdl:part name="parameters" element="tns:NameResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PauseEvents_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_Name_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q45="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q45:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PauseEvents_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PauseTests_InputMessage">
-    <wsdl:part name="parameters" element="tns:PauseTests" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PauseTests_OutputMessage">
-    <wsdl:part name="parameters" element="tns:PauseTestsResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PauseTests_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_PauseTests_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_BladeFilePath_InputMessage">
-    <wsdl:part name="parameters" element="tns:BladeFilePath" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_BladeFilePath_OutputMessage">
-    <wsdl:part name="parameters" element="tns:BladeFilePathResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_BladeFilePath_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_BladeFilePath_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_FactFilePath_InputMessage">
-    <wsdl:part name="parameters" element="tns:FactFilePath" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_FactFilePath_OutputMessage">
-    <wsdl:part name="parameters" element="tns:FactFilePathResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_FactFilePath_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_FactFilePath_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GradeFilePath_InputMessage">
-    <wsdl:part name="parameters" element="tns:GradeFilePath" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GradeFilePath_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GradeFilePathResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GradeFilePath_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GradeFilePath_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_FirmwareFilePath_InputMessage">
-    <wsdl:part name="parameters" element="tns:FirmwareFilePath" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_FirmwareFilePath_OutputMessage">
-    <wsdl:part name="parameters" element="tns:FirmwareFilePathResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_FirmwareFilePath_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_FirmwareFilePath_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_CountsFilePath_InputMessage">
-    <wsdl:part name="parameters" element="tns:CountsFilePath" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_CountsFilePath_OutputMessage">
-    <wsdl:part name="parameters" element="tns:CountsFilePathResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_CountsFilePath_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_CountsFilePath_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_LogInValue_InputMessage">
-    <wsdl:part name="parameters" element="tns:LogInValue" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_LogInValue_OutputMessage">
-    <wsdl:part name="parameters" element="tns:LogInValueResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_LogInValue_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_LogInValue_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Connect_InputMessage">
-    <wsdl:part name="parameters" element="tns:Connect" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Connect_OutputMessage">
-    <wsdl:part name="parameters" element="tns:ConnectResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Connect_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Connect_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Initialize_InputMessage">
-    <wsdl:part name="parameters" element="tns:Initialize" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Initialize_OutputMessage">
-    <wsdl:part name="parameters" element="tns:InitializeResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Initialize_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Initialize_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Ping_InputMessage">
-    <wsdl:part name="parameters" element="tns:Ping" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Ping_OutputMessage">
-    <wsdl:part name="parameters" element="tns:PingResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Ping_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Ping_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Disconnect_InputMessage">
-    <wsdl:part name="parameters" element="tns:Disconnect" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Disconnect_OutputMessage">
-    <wsdl:part name="parameters" element="tns:DisconnectResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Disconnect_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Disconnect_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Abort_InputMessage">
-    <wsdl:part name="parameters" element="tns:Abort" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Abort_OutputMessage">
-    <wsdl:part name="parameters" element="tns:AbortResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Abort_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_Abort_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_StartTest_InputMessage">
-    <wsdl:part name="parameters" element="tns:StartTest" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_StartTest_OutputMessage">
-    <wsdl:part name="parameters" element="tns:StartTestResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_StartTest_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_StartTest_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_Name_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q46="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q46:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetConfig_InputMessage">
     <wsdl:part name="parameters" element="tns:SetConfig" />
@@ -424,11 +292,11 @@
   <wsdl:message name="TesterObjectContract_SetConfig_OutputMessage">
     <wsdl:part name="parameters" element="tns:SetConfigResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetConfig_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetConfig_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q47="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q47:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetConfig_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q48="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q48:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetConfig_InputMessage">
     <wsdl:part name="parameters" element="tns:GetConfig" />
@@ -436,11 +304,11 @@
   <wsdl:message name="TesterObjectContract_GetConfig_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetConfigResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetConfig_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetConfig_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q49="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q49:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_GetConfig_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q50="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q50:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_DelConfig_InputMessage">
     <wsdl:part name="parameters" element="tns:DelConfig" />
@@ -448,11 +316,11 @@
   <wsdl:message name="TesterObjectContract_DelConfig_OutputMessage">
     <wsdl:part name="parameters" element="tns:DelConfigResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_DelConfig_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_DelConfig_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q51="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q51:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_DelConfig_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q52="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q52:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_DirConfig_InputMessage">
     <wsdl:part name="parameters" element="tns:DirConfig" />
@@ -461,130 +329,106 @@
     <wsdl:part name="parameters" element="tns:DirConfigResponse" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_DirConfig_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q53="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q53:ReceiverFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_DirConfig_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+    <wsdl:part xmlns:q54="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q54:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_CopyFileOnBlade_InputMessage">
-    <wsdl:part name="parameters" element="tns:CopyFileOnBlade" />
+  <wsdl:message name="TesterObjectContract_StartTest_InputMessage">
+    <wsdl:part name="parameters" element="tns:StartTest" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_CopyFileOnBlade_OutputMessage">
-    <wsdl:part name="parameters" element="tns:CopyFileOnBladeResponse" />
+  <wsdl:message name="TesterObjectContract_StartTest_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StartTestResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_CopyFileOnBlade_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_StartTest_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q55="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q55:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_CopyFileOnBlade_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_StartTest_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q56="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q56:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetConfigCRC_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetConfigCRC" />
+  <wsdl:message name="TesterObjectContract_PauseTests_InputMessage">
+    <wsdl:part name="parameters" element="tns:PauseTests" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetConfigCRC_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetConfigCRCResponse" />
+  <wsdl:message name="TesterObjectContract_PauseTests_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PauseTestsResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetConfigCRC_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_PauseTests_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q57="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q57:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetConfigCRC_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_PauseTests_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q58="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q58:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetGradeCRCs_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetGradeCRCs" />
+  <wsdl:message name="TesterObjectContract_hgst_get_servo_InputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_get_servo" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetGradeCRCs_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetGradeCRCsResponse" />
+  <wsdl:message name="TesterObjectContract_hgst_get_servo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_get_servoResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetGradeCRCs_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_get_servo_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q59="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q59:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetGradeCRCs_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_get_servo_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q60="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q60:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFileCRC_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetFileCRC" />
+  <wsdl:message name="TesterObjectContract_hgst_move_servo_InputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_move_servo" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFileCRC_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetFileCRCResponse" />
+  <wsdl:message name="TesterObjectContract_hgst_move_servo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_move_servoResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFileCRC_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_move_servo_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q61="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q61:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFileCRC_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_move_servo_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q62="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q62:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_TclInput_InputMessage">
-    <wsdl:part name="parameters" element="tns:TclInput" />
+  <wsdl:message name="TesterObjectContract_hgst_set_save_servo_InputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_set_save_servo" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_TclInput_OutputMessage">
-    <wsdl:part name="parameters" element="tns:TclInputResponse" />
+  <wsdl:message name="TesterObjectContract_hgst_set_save_servo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_set_save_servoResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_TclInput_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_set_save_servo_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q63="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q63:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_TclInput_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_set_save_servo_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q64="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q64:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_TclCommand_InputMessage">
-    <wsdl:part name="parameters" element="tns:TclCommand" />
+  <wsdl:message name="TesterObjectContract_hgst_get_neutral_InputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_get_neutral" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_TclCommand_OutputMessage">
-    <wsdl:part name="parameters" element="tns:TclCommandResponse" />
+  <wsdl:message name="TesterObjectContract_hgst_get_neutral_OutputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_get_neutralResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_TclCommand_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_get_neutral_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q65="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q65:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_TclCommand_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_get_neutral_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q66="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q66:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetModuleState_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetModuleState" />
+  <wsdl:message name="TesterObjectContract_hgst_set_neutral_InputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_set_neutral" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetModuleState_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetModuleStateResponse" />
+  <wsdl:message name="TesterObjectContract_hgst_set_neutral_OutputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_set_neutralResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetModuleState_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_set_neutral_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q67="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q67:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetModuleState_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_set_neutral_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q68="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q68:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetModuleState_InputMessage">
-    <wsdl:part name="parameters" element="tns:SetModuleState" />
+  <wsdl:message name="TesterObjectContract_hgst_usb_reset_InputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_usb_reset" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetModuleState_OutputMessage">
-    <wsdl:part name="parameters" element="tns:SetModuleStateResponse" />
+  <wsdl:message name="TesterObjectContract_hgst_usb_reset_OutputMessage">
+    <wsdl:part name="parameters" element="tns:hgst_usb_resetResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetModuleState_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_usb_reset_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q69="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q69:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetModuleState_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetBunnyStatus_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetBunnyStatus" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetBunnyStatus_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetBunnyStatusResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetBunnyStatus_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetBunnyStatus_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetMemsState_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetMemsState" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetMemsState_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetMemsStateResponse" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetMemsState_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
-  </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetMemsState_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_hgst_usb_reset_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q70="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q70:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetCounts_InputMessage">
     <wsdl:part name="parameters" element="tns:SetCounts" />
@@ -592,11 +436,11 @@
   <wsdl:message name="TesterObjectContract_SetCounts_OutputMessage">
     <wsdl:part name="parameters" element="tns:SetCountsResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetCounts_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetCounts_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q71="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q71:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetCounts_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q72="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q72:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetCountValue_InputMessage">
     <wsdl:part name="parameters" element="tns:GetCountValue" />
@@ -604,11 +448,11 @@
   <wsdl:message name="TesterObjectContract_GetCountValue_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetCountValueResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetCountValue_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_GetCountValue_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q73="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q73:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_GetCountValue_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q74="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q74:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetCountValue_InputMessage">
     <wsdl:part name="parameters" element="tns:SetCountValue" />
@@ -616,11 +460,11 @@
   <wsdl:message name="TesterObjectContract_SetCountValue_OutputMessage">
     <wsdl:part name="parameters" element="tns:SetCountValueResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SetCountValue_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_SetCountValue_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q75="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q75:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetCountValue_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q76="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q76:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_IncCountValue_InputMessage">
     <wsdl:part name="parameters" element="tns:IncCountValue" />
@@ -628,11 +472,11 @@
   <wsdl:message name="TesterObjectContract_IncCountValue_OutputMessage">
     <wsdl:part name="parameters" element="tns:IncCountValueResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_IncCountValue_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_IncCountValue_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q77="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q77:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_IncCountValue_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q78="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q78:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_SaveCounts_InputMessage">
     <wsdl:part name="parameters" element="tns:SaveCounts" />
@@ -640,11 +484,11 @@
   <wsdl:message name="TesterObjectContract_SaveCounts_OutputMessage">
     <wsdl:part name="parameters" element="tns:SaveCountsResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_SaveCounts_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_SaveCounts_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q79="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q79:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SaveCounts_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q80="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q80:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_ZeroCounts_InputMessage">
     <wsdl:part name="parameters" element="tns:ZeroCounts" />
@@ -652,171 +496,261 @@
   <wsdl:message name="TesterObjectContract_ZeroCounts_OutputMessage">
     <wsdl:part name="parameters" element="tns:ZeroCountsResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_ZeroCounts_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
-  </wsdl:message>
   <wsdl:message name="TesterObjectContract_ZeroCounts_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+    <wsdl:part xmlns:q81="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q81:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_ClearStats_InputMessage">
-    <wsdl:part name="parameters" element="tns:ClearStats" />
+  <wsdl:message name="TesterObjectContract_ZeroCounts_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q82="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q82:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_ClearStats_OutputMessage">
-    <wsdl:part name="parameters" element="tns:ClearStatsResponse" />
+  <wsdl:message name="TesterObjectContract_ClearCountsStats_InputMessage">
+    <wsdl:part name="parameters" element="tns:ClearCountsStats" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_ClearStats_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_ClearCountsStats_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ClearCountsStatsResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_ClearStats_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_ClearCountsStats_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q83="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q83:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_UpdateStatValuesViaEvent_InputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateStatValuesViaEvent" />
+  <wsdl:message name="TesterObjectContract_ClearCountsStats_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q84="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q84:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_UpdateStatValuesViaEvent_OutputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateStatValuesViaEventResponse" />
+  <wsdl:message name="TesterObjectContract_CountsGetFirstLastIndexViaEvent_InputMessage">
+    <wsdl:part name="parameters" element="tns:CountsGetFirstLastIndexViaEvent" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_UpdateStatValuesViaEvent_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_CountsGetFirstLastIndexViaEvent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CountsGetFirstLastIndexViaEventResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_UpdateStatValuesViaEvent_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_CountsGetFirstLastIndexViaEvent_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q85="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q85:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFirstLastIndexViaEvent_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetFirstLastIndexViaEvent" />
+  <wsdl:message name="TesterObjectContract_CountsGetFirstLastIndexViaEvent_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q86="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q86:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFirstLastIndexViaEvent_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetFirstLastIndexViaEventResponse" />
+  <wsdl:message name="TesterObjectContract_CountsGetFromToViaEvent_InputMessage">
+    <wsdl:part name="parameters" element="tns:CountsGetFromToViaEvent" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFirstLastIndexViaEvent_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_CountsGetFromToViaEvent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CountsGetFromToViaEventResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFirstLastIndexViaEvent_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_CountsGetFromToViaEvent_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q87="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q87:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFromToViaEvent_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetFromToViaEvent" />
+  <wsdl:message name="TesterObjectContract_CountsGetFromToViaEvent_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q88="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q88:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFromToViaEvent_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetFromToViaEventResponse" />
+  <wsdl:message name="TesterObjectContract_CountsUpdateDgrValuesViaEvent_InputMessage">
+    <wsdl:part name="parameters" element="tns:CountsUpdateDgrValuesViaEvent" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFromToViaEvent_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_CountsUpdateDgrValuesViaEvent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CountsUpdateDgrValuesViaEventResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_GetFromToViaEvent_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_CountsUpdateDgrValuesViaEvent_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q89="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q89:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_UpdateDgrValuesViaEvent_InputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateDgrValuesViaEvent" />
+  <wsdl:message name="TesterObjectContract_CountsUpdateDgrValuesViaEvent_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q90="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q90:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_UpdateDgrValuesViaEvent_OutputMessage">
-    <wsdl:part name="parameters" element="tns:UpdateDgrValuesViaEventResponse" />
+  <wsdl:message name="TesterObjectContract_InitializeTCL_InputMessage">
+    <wsdl:part name="parameters" element="tns:InitializeTCL" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_UpdateDgrValuesViaEvent_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_InitializeTCL_OutputMessage">
+    <wsdl:part name="parameters" element="tns:InitializeTCLResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_UpdateDgrValuesViaEvent_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_InitializeTCL_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q91="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q91:ReceiverFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_BladeFileDir_InputMessage">
-    <wsdl:part name="parameters" element="tns:BladeFileDir" />
+  <wsdl:message name="TesterObjectContract_InitializeTCL_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q92="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q92:SenderFaultDetail" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_BladeFileDir_OutputMessage">
-    <wsdl:part name="parameters" element="tns:BladeFileDirResponse" />
+  <wsdl:message name="TesterObjectContract_AbortTCL_InputMessage">
+    <wsdl:part name="parameters" element="tns:AbortTCL" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_BladeFileDir_SenderFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:SenderFaultDetail" />
+  <wsdl:message name="TesterObjectContract_AbortTCL_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AbortTCLResponse" />
   </wsdl:message>
-  <wsdl:message name="TesterObjectContract_BladeFileDir_ReceiverFaultDetailFault_FaultMessage">
-    <wsdl:part name="detail" element="tns:ReceiverFaultDetail" />
+  <wsdl:message name="TesterObjectContract_AbortTCL_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q93="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q93:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_AbortTCL_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q94="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q94:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_TclInput_InputMessage">
+    <wsdl:part name="parameters" element="tns:TclInput" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_TclInput_OutputMessage">
+    <wsdl:part name="parameters" element="tns:TclInputResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_TclInput_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q95="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q95:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_TclInput_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q96="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q96:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_TclCommand_InputMessage">
+    <wsdl:part name="parameters" element="tns:TclCommand" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_TclCommand_OutputMessage">
+    <wsdl:part name="parameters" element="tns:TclCommandResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_TclCommand_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q97="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q97:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_TclCommand_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q98="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q98:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_GetDataViaEvent_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDataViaEvent" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_GetDataViaEvent_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDataViaEventResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_GetDataViaEvent_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q99="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q99:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_GetDataViaEvent_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q100="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q100:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_PauseEvents_InputMessage">
+    <wsdl:part name="parameters" element="tns:PauseEvents" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_PauseEvents_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PauseEventsResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_PauseEvents_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q101="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q101:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_PauseEvents_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q102="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q102:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_StaticTalkLogInValue_InputMessage">
+    <wsdl:part name="parameters" element="tns:StaticTalkLogInValue" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_StaticTalkLogInValue_OutputMessage">
+    <wsdl:part name="parameters" element="tns:StaticTalkLogInValueResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_StaticTalkLogInValue_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q103="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q103:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_StaticTalkLogInValue_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q104="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q104:SenderFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetLcdText_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetLcdText" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetLcdText_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetLcdTextResponse" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetLcdText_ReceiverFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q105="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q105:ReceiverFaultDetail" />
+  </wsdl:message>
+  <wsdl:message name="TesterObjectContract_SetLcdText_SenderFaultDetailFault_FaultMessage">
+    <wsdl:part xmlns:q106="http://schemas.datacontract.org/2004/07/WD.Tester.Module" name="detail" element="q106:SenderFaultDetail" />
   </wsdl:message>
   <wsdl:message name="TesterObjectContract_BladeEventCallback_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:BladeEventCallback" />
   </wsdl:message>
   <wsdl:portType name="TesterObjectContract">
+    <wsdl:operation name="Connect">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/Connect" message="tns:TesterObjectContract_Connect_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ConnectResponse" message="tns:TesterObjectContract_Connect_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ConnectReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_Connect_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ConnectSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_Connect_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Disconnect">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/Disconnect" message="tns:TesterObjectContract_Disconnect_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DisconnectResponse" message="tns:TesterObjectContract_Disconnect_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DisconnectReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_Disconnect_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DisconnectSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_Disconnect_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="KeepAliveChannel">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/KeepAliveChannel" message="tns:TesterObjectContract_KeepAliveChannel_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/KeepAliveChannelResponse" message="tns:TesterObjectContract_KeepAliveChannel_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/KeepAliveChannelReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_KeepAliveChannel_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/KeepAliveChannelSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_KeepAliveChannel_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="PingAllEvent">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PingAllEvent" message="tns:TesterObjectContract_PingAllEvent_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PingAllEventResponse" message="tns:TesterObjectContract_PingAllEvent_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PingAllEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_PingAllEvent_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PingAllEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_PingAllEvent_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BladeFileDir">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFileDir" message="tns:TesterObjectContract_BladeFileDir_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFileDirResponse" message="tns:TesterObjectContract_BladeFileDir_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFileDirReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_BladeFileDir_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFileDirSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_BladeFileDir_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CopyFileOnBlade">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CopyFileOnBlade" message="tns:TesterObjectContract_CopyFileOnBlade_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CopyFileOnBladeResponse" message="tns:TesterObjectContract_CopyFileOnBlade_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CopyFileOnBladeReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_CopyFileOnBlade_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CopyFileOnBladeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_CopyFileOnBlade_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
     <wsdl:operation name="BladeDelFile">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeDelFile" message="tns:TesterObjectContract_BladeDelFile_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeDelFileResponse" message="tns:TesterObjectContract_BladeDelFile_OutputMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeDelFileReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_BladeDelFile_ReceiverFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeDelFileSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_BladeDelFile_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
+    <wsdl:operation name="SafeRemoveBlade">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SafeRemoveBlade" message="tns:TesterObjectContract_SafeRemoveBlade_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SafeRemoveBladeResponse" message="tns:TesterObjectContract_SafeRemoveBlade_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SafeRemoveBladeReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SafeRemoveBlade_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SafeRemoveBladeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SafeRemoveBlade_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
     <wsdl:operation name="BunnyReInit">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BunnyReInit" message="tns:TesterObjectContract_BunnyReInit_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BunnyReInitResponse" message="tns:TesterObjectContract_BunnyReInit_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BunnyReInitSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_BunnyReInit_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BunnyReInitReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_BunnyReInit_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BunnyReInitSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_BunnyReInit_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="SetMemsType">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsType" message="tns:TesterObjectContract_SetMemsType_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsTypeResponse" message="tns:TesterObjectContract_SetMemsType_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsTypeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetMemsType_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsTypeReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetMemsType_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsTypeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetMemsType_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="SetMemsOpenSensorType">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsOpenSensorType" message="tns:TesterObjectContract_SetMemsOpenSensorType_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsOpenSensorTypeResponse" message="tns:TesterObjectContract_SetMemsOpenSensorType_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsOpenSensorTypeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetMemsOpenSensorType_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsOpenSensorTypeReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetMemsOpenSensorType_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsOpenSensorTypeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetMemsOpenSensorType_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="SetMemsCloseSensorType">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsCloseSensorType" message="tns:TesterObjectContract_SetMemsCloseSensorType_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsCloseSensorTypeResponse" message="tns:TesterObjectContract_SetMemsCloseSensorType_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsCloseSensorTypeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetMemsCloseSensorType_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsCloseSensorTypeReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetMemsCloseSensorType_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetMemsCloseSensorTypeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetMemsCloseSensorType_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="PinMotionToggle">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggle" message="tns:TesterObjectContract_PinMotionToggle_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggleResponse" message="tns:TesterObjectContract_PinMotionToggle_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggleSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_PinMotionToggle_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggleReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_PinMotionToggle_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="GetModuleState">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetModuleState" message="tns:TesterObjectContract_GetModuleState_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetModuleStateResponse" message="tns:TesterObjectContract_GetModuleState_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetModuleStateReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetModuleState_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetModuleStateSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetModuleState_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="SetRampValue">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetRampValue" message="tns:TesterObjectContract_SetRampValue_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetRampValueResponse" message="tns:TesterObjectContract_SetRampValue_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetRampValueSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetRampValue_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetRampValueReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetRampValue_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="SetModuleState">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetModuleState" message="tns:TesterObjectContract_SetModuleState_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetModuleStateResponse" message="tns:TesterObjectContract_SetModuleState_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetModuleStateReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetModuleState_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetModuleStateSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetModuleState_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="hgst_set_save_servo">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servo" message="tns:TesterObjectContract_hgst_set_save_servo_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servoResponse" message="tns:TesterObjectContract_hgst_set_save_servo_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servoSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_set_save_servo_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servoReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_set_save_servo_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="GetBunnyStatus">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatus" message="tns:TesterObjectContract_GetBunnyStatus_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatusResponse" message="tns:TesterObjectContract_GetBunnyStatus_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatusReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetBunnyStatus_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatusSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetBunnyStatus_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="hgst_get_neutral">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutral" message="tns:TesterObjectContract_hgst_get_neutral_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutralResponse" message="tns:TesterObjectContract_hgst_get_neutral_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutralSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_get_neutral_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutralReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_get_neutral_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="hgst_set_neutral">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutral" message="tns:TesterObjectContract_hgst_set_neutral_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutralResponse" message="tns:TesterObjectContract_hgst_set_neutral_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutralSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_set_neutral_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutralReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_set_neutral_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="hgst_get_servo">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servo" message="tns:TesterObjectContract_hgst_get_servo_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servoResponse" message="tns:TesterObjectContract_hgst_get_servo_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servoSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_get_servo_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servoReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_get_servo_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="hgst_move_servo">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servo" message="tns:TesterObjectContract_hgst_move_servo_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servoResponse" message="tns:TesterObjectContract_hgst_move_servo_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servoSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_move_servo_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servoReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_move_servo_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="hgst_usb_reset">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_reset" message="tns:TesterObjectContract_hgst_usb_reset_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_resetResponse" message="tns:TesterObjectContract_hgst_usb_reset_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_resetSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_usb_reset_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_resetReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_usb_reset_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="GetMemsStatus">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetMemsStatus" message="tns:TesterObjectContract_GetMemsStatus_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetMemsStatusResponse" message="tns:TesterObjectContract_GetMemsStatus_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetMemsStatusReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetMemsStatus_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetMemsStatusSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetMemsStatus_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="SetStrings">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetStrings" message="tns:TesterObjectContract_SetStrings_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetStringsResponse" message="tns:TesterObjectContract_SetStrings_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetStringsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetStrings_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetStringsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetStrings_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetStringsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetStrings_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetStrings">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetStrings" message="tns:TesterObjectContract_GetStrings_InputMessage" />
@@ -824,17 +758,11 @@
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetStringsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetStrings_ReceiverFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetStringsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetStrings_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetDataViaEvent">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEvent" message="tns:TesterObjectContract_GetDataViaEvent_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEventResponse" message="tns:TesterObjectContract_GetDataViaEvent_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetDataViaEvent_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetDataViaEvent_SenderFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
     <wsdl:operation name="SetIntegers">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetIntegers" message="tns:TesterObjectContract_SetIntegers_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetIntegersResponse" message="tns:TesterObjectContract_SetIntegers_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetIntegersSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetIntegers_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetIntegersReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetIntegers_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetIntegersSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetIntegers_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetIntegers">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetIntegers" message="tns:TesterObjectContract_GetIntegers_InputMessage" />
@@ -842,119 +770,41 @@
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetIntegersReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetIntegers_ReceiverFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetIntegersSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetIntegers_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="SetTclStart">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetTclStart" message="tns:TesterObjectContract_SetTclStart_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetTclStartResponse" message="tns:TesterObjectContract_SetTclStart_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetTclStartReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetTclStart_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetTclStartSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetTclStart_SenderFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="PinMotionToggle">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggle" message="tns:TesterObjectContract_PinMotionToggle_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggleResponse" message="tns:TesterObjectContract_PinMotionToggle_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggleReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_PinMotionToggle_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PinMotionToggleSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_PinMotionToggle_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetTclStart">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetTclStart" message="tns:TesterObjectContract_GetTclStart_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetTclStartResponse" message="tns:TesterObjectContract_GetTclStart_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetTclStartSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetTclStart_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetTclStartReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetTclStart_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="GetFileCRC">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFileCRC" message="tns:TesterObjectContract_GetFileCRC_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFileCRCResponse" message="tns:TesterObjectContract_GetFileCRC_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFileCRCReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetFileCRC_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFileCRCSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetFileCRC_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="PauseEvents">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseEvents" message="tns:TesterObjectContract_PauseEvents_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseEventsResponse" message="tns:TesterObjectContract_PauseEvents_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseEventsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_PauseEvents_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseEventsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_PauseEvents_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="PauseTests">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseTests" message="tns:TesterObjectContract_PauseTests_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseTestsResponse" message="tns:TesterObjectContract_PauseTests_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseTestsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_PauseTests_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseTestsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_PauseTests_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="BladeFilePath">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFilePath" message="tns:TesterObjectContract_BladeFilePath_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFilePathResponse" message="tns:TesterObjectContract_BladeFilePath_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFilePathSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_BladeFilePath_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFilePathReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_BladeFilePath_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="FactFilePath">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/FactFilePath" message="tns:TesterObjectContract_FactFilePath_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/FactFilePathResponse" message="tns:TesterObjectContract_FactFilePath_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/FactFilePathSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_FactFilePath_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/FactFilePathReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_FactFilePath_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="GradeFilePath">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GradeFilePath" message="tns:TesterObjectContract_GradeFilePath_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GradeFilePathResponse" message="tns:TesterObjectContract_GradeFilePath_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GradeFilePathSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GradeFilePath_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GradeFilePathReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GradeFilePath_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="FirmwareFilePath">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/FirmwareFilePath" message="tns:TesterObjectContract_FirmwareFilePath_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/FirmwareFilePathResponse" message="tns:TesterObjectContract_FirmwareFilePath_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/FirmwareFilePathReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_FirmwareFilePath_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/FirmwareFilePathSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_FirmwareFilePath_SenderFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="CountsFilePath">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsFilePath" message="tns:TesterObjectContract_CountsFilePath_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsFilePathResponse" message="tns:TesterObjectContract_CountsFilePath_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsFilePathReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_CountsFilePath_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsFilePathSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_CountsFilePath_SenderFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="LogInValue">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/LogInValue" message="tns:TesterObjectContract_LogInValue_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/LogInValueResponse" message="tns:TesterObjectContract_LogInValue_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/LogInValueReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_LogInValue_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/LogInValueSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_LogInValue_SenderFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="Connect">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/Connect" message="tns:TesterObjectContract_Connect_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ConnectResponse" message="tns:TesterObjectContract_Connect_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ConnectSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_Connect_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ConnectReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_Connect_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="Initialize">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/Initialize" message="tns:TesterObjectContract_Initialize_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/InitializeResponse" message="tns:TesterObjectContract_Initialize_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/InitializeReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_Initialize_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/InitializeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_Initialize_SenderFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="Ping">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/Ping" message="tns:TesterObjectContract_Ping_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PingResponse" message="tns:TesterObjectContract_Ping_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PingReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_Ping_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PingSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_Ping_SenderFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="Disconnect">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/Disconnect" message="tns:TesterObjectContract_Disconnect_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DisconnectResponse" message="tns:TesterObjectContract_Disconnect_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DisconnectSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_Disconnect_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DisconnectReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_Disconnect_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="Abort">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/Abort" message="tns:TesterObjectContract_Abort_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/AbortResponse" message="tns:TesterObjectContract_Abort_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/AbortSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_Abort_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/AbortReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_Abort_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="StartTest">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StartTest" message="tns:TesterObjectContract_StartTest_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StartTestResponse" message="tns:TesterObjectContract_StartTest_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StartTestSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_StartTest_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StartTestReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_StartTest_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="Name">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/Name" message="tns:TesterObjectContract_Name_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/NameResponse" message="tns:TesterObjectContract_Name_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/NameReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_Name_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/NameSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_Name_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="SetConfig">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetConfig" message="tns:TesterObjectContract_SetConfig_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetConfigResponse" message="tns:TesterObjectContract_SetConfig_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetConfigSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetConfig_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetConfigReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetConfig_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetConfigSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetConfig_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetConfig">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetConfig" message="tns:TesterObjectContract_GetConfig_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetConfigResponse" message="tns:TesterObjectContract_GetConfig_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetConfigSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetConfig_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetConfigReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetConfig_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetConfigSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetConfig_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="DelConfig">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DelConfig" message="tns:TesterObjectContract_DelConfig_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DelConfigResponse" message="tns:TesterObjectContract_DelConfig_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DelConfigSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_DelConfig_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DelConfigReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_DelConfig_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DelConfigSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_DelConfig_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="DirConfig">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DirConfig" message="tns:TesterObjectContract_DirConfig_InputMessage" />
@@ -962,137 +812,161 @@
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DirConfigReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_DirConfig_ReceiverFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/DirConfigSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_DirConfig_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="CopyFileOnBlade">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CopyFileOnBlade" message="tns:TesterObjectContract_CopyFileOnBlade_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CopyFileOnBladeResponse" message="tns:TesterObjectContract_CopyFileOnBlade_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CopyFileOnBladeSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_CopyFileOnBlade_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CopyFileOnBladeReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_CopyFileOnBlade_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="StartTest">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StartTest" message="tns:TesterObjectContract_StartTest_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StartTestResponse" message="tns:TesterObjectContract_StartTest_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StartTestReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_StartTest_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StartTestSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_StartTest_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetConfigCRC">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetConfigCRC" message="tns:TesterObjectContract_GetConfigCRC_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetConfigCRCResponse" message="tns:TesterObjectContract_GetConfigCRC_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetConfigCRCSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetConfigCRC_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetConfigCRCReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetConfigCRC_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="PauseTests">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseTests" message="tns:TesterObjectContract_PauseTests_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseTestsResponse" message="tns:TesterObjectContract_PauseTests_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseTestsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_PauseTests_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseTestsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_PauseTests_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetGradeCRCs">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetGradeCRCs" message="tns:TesterObjectContract_GetGradeCRCs_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetGradeCRCsResponse" message="tns:TesterObjectContract_GetGradeCRCs_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetGradeCRCsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetGradeCRCs_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetGradeCRCsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetGradeCRCs_SenderFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="hgst_get_servo">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servo" message="tns:TesterObjectContract_hgst_get_servo_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servoResponse" message="tns:TesterObjectContract_hgst_get_servo_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servoReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_get_servo_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_servoSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_get_servo_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetFileCRC">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFileCRC" message="tns:TesterObjectContract_GetFileCRC_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFileCRCResponse" message="tns:TesterObjectContract_GetFileCRC_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFileCRCSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetFileCRC_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFileCRCReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetFileCRC_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="hgst_move_servo">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servo" message="tns:TesterObjectContract_hgst_move_servo_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servoResponse" message="tns:TesterObjectContract_hgst_move_servo_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servoReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_move_servo_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_move_servoSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_move_servo_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="TclInput">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclInput" message="tns:TesterObjectContract_TclInput_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclInputResponse" message="tns:TesterObjectContract_TclInput_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclInputSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_TclInput_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclInputReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_TclInput_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="hgst_set_save_servo">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servo" message="tns:TesterObjectContract_hgst_set_save_servo_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servoResponse" message="tns:TesterObjectContract_hgst_set_save_servo_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servoReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_set_save_servo_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_save_servoSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_set_save_servo_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="TclCommand">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclCommand" message="tns:TesterObjectContract_TclCommand_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclCommandResponse" message="tns:TesterObjectContract_TclCommand_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclCommandSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_TclCommand_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclCommandReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_TclCommand_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="hgst_get_neutral">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutral" message="tns:TesterObjectContract_hgst_get_neutral_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutralResponse" message="tns:TesterObjectContract_hgst_get_neutral_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutralReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_get_neutral_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_get_neutralSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_get_neutral_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetModuleState">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetModuleState" message="tns:TesterObjectContract_GetModuleState_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetModuleStateResponse" message="tns:TesterObjectContract_GetModuleState_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetModuleStateSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetModuleState_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetModuleStateReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetModuleState_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="hgst_set_neutral">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutral" message="tns:TesterObjectContract_hgst_set_neutral_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutralResponse" message="tns:TesterObjectContract_hgst_set_neutral_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutralReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_set_neutral_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_set_neutralSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_set_neutral_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="SetModuleState">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetModuleState" message="tns:TesterObjectContract_SetModuleState_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetModuleStateResponse" message="tns:TesterObjectContract_SetModuleState_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetModuleStateSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetModuleState_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetModuleStateReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetModuleState_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="GetBunnyStatus">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatus" message="tns:TesterObjectContract_GetBunnyStatus_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatusResponse" message="tns:TesterObjectContract_GetBunnyStatus_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatusSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetBunnyStatus_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetBunnyStatusReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetBunnyStatus_ReceiverFaultDetailFault_FaultMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="GetMemsState">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetMemsState" message="tns:TesterObjectContract_GetMemsState_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetMemsStateResponse" message="tns:TesterObjectContract_GetMemsState_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetMemsStateReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetMemsState_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetMemsStateSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetMemsState_SenderFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="hgst_usb_reset">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_reset" message="tns:TesterObjectContract_hgst_usb_reset_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_resetResponse" message="tns:TesterObjectContract_hgst_usb_reset_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_resetReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_hgst_usb_reset_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/hgst_usb_resetSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_hgst_usb_reset_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="SetCounts">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCounts" message="tns:TesterObjectContract_SetCounts_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCountsResponse" message="tns:TesterObjectContract_SetCounts_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCountsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetCounts_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCountsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetCounts_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCountsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetCounts_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetCountValue">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetCountValue" message="tns:TesterObjectContract_GetCountValue_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetCountValueResponse" message="tns:TesterObjectContract_GetCountValue_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetCountValueSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetCountValue_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetCountValueReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetCountValue_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetCountValueSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetCountValue_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="SetCountValue">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCountValue" message="tns:TesterObjectContract_SetCountValue_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCountValueResponse" message="tns:TesterObjectContract_SetCountValue_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCountValueSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetCountValue_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCountValueReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetCountValue_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetCountValueSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetCountValue_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="IncCountValue">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/IncCountValue" message="tns:TesterObjectContract_IncCountValue_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/IncCountValueResponse" message="tns:TesterObjectContract_IncCountValue_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/IncCountValueSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_IncCountValue_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/IncCountValueReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_IncCountValue_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/IncCountValueSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_IncCountValue_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="SaveCounts">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SaveCounts" message="tns:TesterObjectContract_SaveCounts_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SaveCountsResponse" message="tns:TesterObjectContract_SaveCounts_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SaveCountsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SaveCounts_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SaveCountsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SaveCounts_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SaveCountsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SaveCounts_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="ZeroCounts">
       <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ZeroCounts" message="tns:TesterObjectContract_ZeroCounts_InputMessage" />
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ZeroCountsResponse" message="tns:TesterObjectContract_ZeroCounts_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ZeroCountsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_ZeroCounts_SenderFaultDetailFault_FaultMessage" />
       <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ZeroCountsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_ZeroCounts_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ZeroCountsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_ZeroCounts_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="ClearStats">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ClearStats" message="tns:TesterObjectContract_ClearStats_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ClearStatsResponse" message="tns:TesterObjectContract_ClearStats_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ClearStatsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_ClearStats_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ClearStatsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_ClearStats_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="ClearCountsStats">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ClearCountsStats" message="tns:TesterObjectContract_ClearCountsStats_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ClearCountsStatsResponse" message="tns:TesterObjectContract_ClearCountsStats_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ClearCountsStatsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_ClearCountsStats_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/ClearCountsStatsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_ClearCountsStats_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="UpdateStatValuesViaEvent">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/UpdateStatValuesViaEvent" message="tns:TesterObjectContract_UpdateStatValuesViaEvent_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/UpdateStatValuesViaEventResponse" message="tns:TesterObjectContract_UpdateStatValuesViaEvent_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/UpdateStatValuesViaEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_UpdateStatValuesViaEvent_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/UpdateStatValuesViaEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_UpdateStatValuesViaEvent_SenderFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="CountsGetFirstLastIndexViaEvent">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsGetFirstLastIndexViaEvent" message="tns:TesterObjectContract_CountsGetFirstLastIndexViaEvent_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsGetFirstLastIndexViaEventResponse" message="tns:TesterObjectContract_CountsGetFirstLastIndexViaEvent_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsGetFirstLastIndexViaEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_CountsGetFirstLastIndexViaEvent_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsGetFirstLastIndexViaEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_CountsGetFirstLastIndexViaEvent_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetFirstLastIndexViaEvent">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFirstLastIndexViaEvent" message="tns:TesterObjectContract_GetFirstLastIndexViaEvent_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFirstLastIndexViaEventResponse" message="tns:TesterObjectContract_GetFirstLastIndexViaEvent_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFirstLastIndexViaEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetFirstLastIndexViaEvent_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFirstLastIndexViaEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetFirstLastIndexViaEvent_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="CountsGetFromToViaEvent">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsGetFromToViaEvent" message="tns:TesterObjectContract_CountsGetFromToViaEvent_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsGetFromToViaEventResponse" message="tns:TesterObjectContract_CountsGetFromToViaEvent_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsGetFromToViaEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_CountsGetFromToViaEvent_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsGetFromToViaEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_CountsGetFromToViaEvent_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="GetFromToViaEvent">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFromToViaEvent" message="tns:TesterObjectContract_GetFromToViaEvent_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFromToViaEventResponse" message="tns:TesterObjectContract_GetFromToViaEvent_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFromToViaEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetFromToViaEvent_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetFromToViaEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetFromToViaEvent_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="CountsUpdateDgrValuesViaEvent">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsUpdateDgrValuesViaEvent" message="tns:TesterObjectContract_CountsUpdateDgrValuesViaEvent_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsUpdateDgrValuesViaEventResponse" message="tns:TesterObjectContract_CountsUpdateDgrValuesViaEvent_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsUpdateDgrValuesViaEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_CountsUpdateDgrValuesViaEvent_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/CountsUpdateDgrValuesViaEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_CountsUpdateDgrValuesViaEvent_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="UpdateDgrValuesViaEvent">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/UpdateDgrValuesViaEvent" message="tns:TesterObjectContract_UpdateDgrValuesViaEvent_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/UpdateDgrValuesViaEventResponse" message="tns:TesterObjectContract_UpdateDgrValuesViaEvent_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/UpdateDgrValuesViaEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_UpdateDgrValuesViaEvent_ReceiverFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/UpdateDgrValuesViaEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_UpdateDgrValuesViaEvent_SenderFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="InitializeTCL">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/InitializeTCL" message="tns:TesterObjectContract_InitializeTCL_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/InitializeTCLResponse" message="tns:TesterObjectContract_InitializeTCL_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/InitializeTCLReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_InitializeTCL_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/InitializeTCLSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_InitializeTCL_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation name="BladeFileDir">
-      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFileDir" message="tns:TesterObjectContract_BladeFileDir_InputMessage" />
-      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFileDirResponse" message="tns:TesterObjectContract_BladeFileDir_OutputMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFileDirSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_BladeFileDir_SenderFaultDetailFault_FaultMessage" />
-      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeFileDirReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_BladeFileDir_ReceiverFaultDetailFault_FaultMessage" />
+    <wsdl:operation name="AbortTCL">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/AbortTCL" message="tns:TesterObjectContract_AbortTCL_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/AbortTCLResponse" message="tns:TesterObjectContract_AbortTCL_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/AbortTCLReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_AbortTCL_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/AbortTCLSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_AbortTCL_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="TclInput">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclInput" message="tns:TesterObjectContract_TclInput_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclInputResponse" message="tns:TesterObjectContract_TclInput_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclInputReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_TclInput_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclInputSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_TclInput_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="TclCommand">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclCommand" message="tns:TesterObjectContract_TclCommand_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclCommandResponse" message="tns:TesterObjectContract_TclCommand_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclCommandReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_TclCommand_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/TclCommandSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_TclCommand_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDataViaEvent">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEvent" message="tns:TesterObjectContract_GetDataViaEvent_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEventResponse" message="tns:TesterObjectContract_GetDataViaEvent_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEventReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_GetDataViaEvent_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/GetDataViaEventSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_GetDataViaEvent_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="PauseEvents">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseEvents" message="tns:TesterObjectContract_PauseEvents_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseEventsResponse" message="tns:TesterObjectContract_PauseEvents_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseEventsReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_PauseEvents_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/PauseEventsSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_PauseEvents_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="StaticTalkLogInValue">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StaticTalkLogInValue" message="tns:TesterObjectContract_StaticTalkLogInValue_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StaticTalkLogInValueResponse" message="tns:TesterObjectContract_StaticTalkLogInValue_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StaticTalkLogInValueReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_StaticTalkLogInValue_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/StaticTalkLogInValueSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_StaticTalkLogInValue_SenderFaultDetailFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetLcdText">
+      <wsdl:input wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetLcdText" message="tns:TesterObjectContract_SetLcdText_InputMessage" />
+      <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetLcdTextResponse" message="tns:TesterObjectContract_SetLcdText_OutputMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetLcdTextReceiverFaultDetailFault" name="ReceiverFaultDetailFault" message="tns:TesterObjectContract_SetLcdText_ReceiverFaultDetailFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/SetLcdTextSenderFaultDetailFault" name="SenderFaultDetailFault" message="tns:TesterObjectContract_SetLcdText_SenderFaultDetailFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="BladeEventCallback">
       <wsdl:output wsaw:Action="Hitachi.Tester.Module/TesterObjectContract/BladeEventCallback" message="tns:TesterObjectContract_BladeEventCallback_OutputCallbackMessage" />

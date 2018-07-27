@@ -1,96 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Hitachi.Tester.Module" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:8000/?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/System" />
-  <xs:simpleType name="BunnyPinMotionType">
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/WD.Tester.Enums" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/WD.Tester.Enums" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="MemsStateValues">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="NONE" />
-      <xs:enumeration value="SERVO" />
-      <xs:enumeration value="SOLENOID" />
+      <xs:enumeration value="Closed" />
+      <xs:enumeration value="Opened" />
+      <xs:enumeration value="Closing" />
+      <xs:enumeration value="Opening" />
+      <xs:enumeration value="Unknown" />
     </xs:restriction>
   </xs:simpleType>
-  <xs:element name="BunnyPinMotionType" nillable="true" type="tns:BunnyPinMotionType" />
-  <xs:simpleType name="BunnyPinMotionSensor">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="NONE" />
-      <xs:enumeration value="HIGH" />
-      <xs:enumeration value="LOW" />
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:element name="BunnyPinMotionSensor" nillable="true" type="tns:BunnyPinMotionSensor" />
-  <xs:complexType name="ArrayOfFileNameStruct">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="FileNameStruct" nillable="true" type="tns:FileNameStruct" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfFileNameStruct" nillable="true" type="tns:ArrayOfFileNameStruct" />
-  <xs:complexType name="FileNameStruct">
-    <xs:sequence>
-      <xs:element name="BinVerStr" nillable="true" type="xs:string" />
-      <xs:element name="DateStr" nillable="true" type="xs:string" />
-      <xs:element name="DispVerStr" nillable="true" type="xs:string" />
-      <xs:element name="FileNameStr" nillable="true" type="xs:string" />
-      <xs:element name="GradeVerStr" nillable="true" type="xs:string" />
-      <xs:element name="OcrVerStr" nillable="true" type="xs:string" />
-      <xs:element name="RetryDispoVerStr" nillable="true" type="xs:string" />
-      <xs:element name="SkipVerStr" nillable="true" type="xs:string" />
-      <xs:element name="TestCountVerStr" nillable="true" type="xs:string" />
-      <xs:element name="TrayDispoVerStr" nillable="true" type="xs:string" />
-      <xs:element name="VersionStr" nillable="true" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="FileNameStruct" nillable="true" type="tns:FileNameStruct" />
-  <xs:complexType name="TesterStateStruct">
-    <xs:complexContent mixed="false">
-      <xs:extension base="tns:StopGoPauseState">
-        <xs:sequence>
-          <xs:element name="b12VDC" type="xs:boolean" />
-          <xs:element name="b5VDC" type="xs:boolean" />
-          <xs:element name="bAuxIn0" type="xs:boolean" />
-          <xs:element name="bAuxIn1" type="xs:boolean" />
-          <xs:element name="bAuxOut0" type="xs:boolean" />
-          <xs:element name="bAuxOut1" type="xs:boolean" />
-          <xs:element name="bBackLight" type="xs:boolean" />
-          <xs:element name="bBunnyGood" type="xs:boolean" />
-          <xs:element name="bMemsOpen" type="xs:boolean" />
-          <xs:element name="bRampInited" type="xs:boolean" />
-          <xs:element name="bServoEnabled" type="xs:boolean" />
-          <xs:element name="gradeName" nillable="true" type="xs:string" />
-          <xs:element name="iTestNumber" type="xs:int" />
-          <xs:element name="pinMotionCloseSensor" type="tns:BunnyPinMotionSensor" />
-          <xs:element name="pinMotionOpenSensor" type="tns:BunnyPinMotionSensor" />
-          <xs:element name="pinMotionType" type="tns:BunnyPinMotionType" />
-          <xs:element name="sequenceName" nillable="true" type="xs:string" />
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element name="TesterStateStruct" nillable="true" type="tns:TesterStateStruct" />
-  <xs:complexType name="StopGoPauseState">
-    <xs:sequence>
-      <xs:element name="bCmdBusy" type="xs:boolean" />
-      <xs:element name="bNowTestsArePaused" type="xs:boolean" />
-      <xs:element name="bOnLine" type="xs:boolean" />
-      <xs:element name="bPauseTests" type="xs:boolean" />
-      <xs:element name="bPleaseStop" type="xs:boolean" />
-      <xs:element name="bSeqGoing" type="xs:boolean" />
-      <xs:element name="m_PauseEvents" type="xs:boolean" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="StopGoPauseState" nillable="true" type="tns:StopGoPauseState" />
-  <xs:complexType name="BladeEventArgs">
-    <xs:complexContent mixed="false">
-      <xs:extension xmlns:q1="http://schemas.datacontract.org/2004/07/System" base="q1:EventArgs">
-        <xs:sequence>
-          <xs:element name="Bool1" type="xs:boolean" />
-          <xs:element name="EventType" type="xs:int" />
-          <xs:element name="Int1" type="xs:int" />
-          <xs:element name="Int2" type="xs:int" />
-          <xs:element name="Revision" type="xs:int" />
-          <xs:element name="Str1" nillable="true" type="xs:string" />
-          <xs:element name="Str2" nillable="true" type="xs:string" />
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:element name="BladeEventArgs" nillable="true" type="tns:BladeEventArgs" />
+  <xs:element name="MemsStateValues" nillable="true" type="tns:MemsStateValues" />
 </xs:schema>

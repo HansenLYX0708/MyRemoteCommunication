@@ -5,9 +5,9 @@ using System.Threading;
 
 using System.ServiceModel;
 
-using Hitachi.Tester.Module;
+using WD.Tester.Module;
 
-namespace Hitachi.Tester.Client
+namespace WD.Tester.Client
 {
     /// <summary>
     /// Service definition for Client callback.

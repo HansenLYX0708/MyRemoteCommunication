@@ -10,9 +10,9 @@ using System;
 
 using System.ServiceModel;
 
-using Hitachi.Tester.Enums;
+using WD.Tester.Enums;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
     [ServiceContract(Name = "TesterObjectContract",
         Namespace = "Hitachi.Tester.Module",

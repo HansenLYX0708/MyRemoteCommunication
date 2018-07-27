@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Hitachi.Tester.Module
+namespace WD.Tester.Module
 {
    public class ObjectStatusEventArgsClass
    {
