@@ -69,6 +69,16 @@ namespace Hitachi.Tester.Client
         public TesterObjectCallback _BladeEventCallbackClass = null;
 
         /// <summary>
+        /// The status handle represents the Status event, this external interface used to listen for events
+        /// </summary>
+        public event StatusEventHandler comStatusEvent;
+
+        /// <summary>
+        /// The status handle represents the bunny event, this external interface used to listen for events
+        /// </summary>
+        public event StatusEventHandler comBunnyEvent;
+
+        /// <summary>
         /// The status handle represents the program closing event, this external interface used to listen for events
         /// </summary>
         public event StatusEventHandler comProgramClosingEvent;
@@ -92,16 +102,6 @@ namespace Hitachi.Tester.Client
         /// The started handle represents the sequence started event, this external interface used to listen for events
         /// </summary>
         public event StartedEventHandler comSequenceStartedEvent;
-
-        /// <summary>
-        /// The status handle represents the Status event, this external interface used to listen for events
-        /// </summary>
-        public event StatusEventHandler comStatusEvent;
-
-        /// <summary>
-        /// The status handle represents the bunny event, this external interface used to listen for events
-        /// </summary>
-        public event StatusEventHandler comBunnyEvent;
 
         /// <summary>
         /// The status handle represents the test started event, this external interface used to listen for events

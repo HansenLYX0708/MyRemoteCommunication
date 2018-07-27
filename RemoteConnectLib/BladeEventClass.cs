@@ -81,6 +81,10 @@ namespace Hitachi.Tester.Client
                     remoteConnectLib.OnBunnyEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
 
+                case BladeEventType.Status:
+                    remoteConnectLib.OnStatusEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
+                    break;
+
                 case BladeEventType.ProgramClosing:
                     remoteConnectLib.OnProgramClosingEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
@@ -107,10 +111,6 @@ namespace Hitachi.Tester.Client
 
                 case BladeEventType.TestStarted:
                     remoteConnectLib.OnTestStartedEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
-                    break;
-
-                case BladeEventType.Status:
-                    remoteConnectLib.OnStatusEvent(sender, e.ToStatusEventBladeArgs().ToStatusEventArgs());
                     break;
                 default:
                     break;

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.IO;
+using System.Windows.Forms;
 
+using Hitachi.Tester;
 using Hitachi.Tester.Client;
 using Hitachi.Tester.Enums;
 using NLog;
@@ -16,16 +18,15 @@ namespace Module.Blade
     {
         #region  Fields
         private Logger logger = LogManager.GetLogger("SlotLog");
-        private RemoteConnectLib _RemoteInstance;
-        private bool _TestingControl;
         private string _MEMSSN;
-        private string _DRIVESN;
         private string _DISKSN;
         private string _MBPSN;
         private string _ActuatorSN;
         private string _PCBASN;
         private string _BladeSN;
-
+        private string _MotorSN;
+        private string _FlexSN;
+        private object onBunnyEventLockObj;
         /// <summary>
         /// Represents the initial value of the data on the Blade.
         /// </summary>
@@ -33,14 +34,16 @@ namespace Module.Blade
         #endregion Fields
 
         #region Constructor and destructor
+        /// <summary>
+        /// Default constructor, initialize the attributes, not including RemoteConnectLib
+        /// </summary>
         public BladeModel()
         {
             logger.Info("BladeModel construct start");
-            _TestingControl = false;
+            TestingControl = false;
             _BladeDataInit = "__";
 
             _MEMSSN = string.Empty;
-            _DRIVESN = string.Empty;
             _DISKSN = string.Empty;
             _MBPSN = string.Empty;
             _ActuatorSN = string.Empty;
@@ -48,6 +51,8 @@ namespace Module.Blade
             _BladeSN = string.Empty;
             logger.Info("BladeModel construct complete");
             Initialize();
+            onBunnyEventLockObj = new object();
+            RemoteInstance.comBunnyEvent += new StatusEventHandler(OnBunnyEvent);
         }
 
         ~BladeModel()
@@ -55,34 +60,46 @@ namespace Module.Blade
             Disconnect();
             Deinitialize();
         }
+
+        /// <summary>
+        /// Initialize the RemoteConnectLib
+        /// </summary>
+        public void Initialize()
+        {
+            Deinitialize();
+            logger.Info("BladeModel::Initialize start.");
+            RemoteInstance = new RemoteConnectLib();
+            if (RemoteInstance != null)
+            {
+                logger.Info("BladeModel::Initialize complete. [RemoteInstance:{0}]", RemoteInstance.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Deinitialize the RemoteConnectLib
+        /// </summary>
+        public void Deinitialize()
+        {
+            logger.Info("Slot::BladeModel::Deinitialize start.");
+            // Cleanup RemoteconnectLib
+            if (RemoteInstance != null)
+            {
+                RemoteInstance.Dispose();
+                RemoteInstance = null;
+            }
+        }
         #endregion Constructor and destructor
 
         #region Properties
         /// <summary>
         /// Provide external communication interface.
         /// </summary>
-        public RemoteConnectLib RemoteInstance
-        {
-            get
-            {
-                return _RemoteInstance;
-            }
-        }
+        public RemoteConnectLib RemoteInstance { get; private set; }
 
         /// <summary>
         /// Gets and sets the state of test.
         /// </summary>
-        public bool TestingControl
-        {
-            get
-            {
-                return _TestingControl;
-            }
-            set
-            {
-                _TestingControl = value;
-            }
-        }
+        public bool TestingControl { get; set; }
         #endregion
 
         #region Status Control Override from BladeModeBase Properties
@@ -98,14 +115,14 @@ namespace Module.Blade
                 switch (value)
                 {
                     case OnOffState.On:
-                    case OnOffState.TuringOn:
-                        _RemoteInstance.PinMotion(true);
+                    case OnOffState.TurningOn:
+                        RemoteInstance.PinMotion(true);
                         base.MemsControl = OnOffState.On;
                         break;
 
                     case OnOffState.Off:
                     case OnOffState.TurningOff:
-                        _RemoteInstance.PinMotion(false);
+                        RemoteInstance.PinMotion(false);
                         base.MemsControl = OnOffState.Off;
                         break;
                 }
@@ -124,14 +141,14 @@ namespace Module.Blade
                 switch (value)
                 {
                     case OnOffState.On:
-                    case OnOffState.TuringOn:
-                        _RemoteInstance.CardPower(true);
+                    case OnOffState.TurningOn:
+                        RemoteInstance.CardPower(true);
                         base.CardPowerControl = OnOffState.On;
                         break;
 
                     case OnOffState.Off:
                     case OnOffState.TurningOff:
-                        _RemoteInstance.CardPower(false);
+                        RemoteInstance.CardPower(false);
                         base.CardPowerControl = OnOffState.Off;
                         break;
                 }
@@ -150,14 +167,14 @@ namespace Module.Blade
                 switch (value)
                 {
                     case OnOffState.On:
-                    case OnOffState.TuringOn:
-                        _RemoteInstance.BackLight(true);
+                    case OnOffState.TurningOn:
+                        RemoteInstance.BackLight(true);
                         base.LCDControl = OnOffState.On;
                         break;
 
                     case OnOffState.Off:
                     case OnOffState.TurningOff:
-                        _RemoteInstance.BackLight(false);
+                        RemoteInstance.BackLight(false);
                         base.LCDControl = OnOffState.Off;
                         break;
                 }
@@ -176,14 +193,14 @@ namespace Module.Blade
                 switch (value)
                 {
                     case OnOffState.On:
-                    case OnOffState.TuringOn:
-                        _RemoteInstance.AuxOut0(1);
+                    case OnOffState.TurningOn:
+                        RemoteInstance.AuxOut0(1);
                         base.AuxOut0Control = OnOffState.On;
                         break;
 
                     case OnOffState.Off:
                     case OnOffState.TurningOff:
-                        _RemoteInstance.AuxOut0(0);
+                        RemoteInstance.AuxOut0(0);
                         base.AuxOut0Control = OnOffState.Off;
                         break;
                 }
@@ -202,14 +219,14 @@ namespace Module.Blade
                 switch (value)
                 {
                     case OnOffState.On:
-                    case OnOffState.TuringOn:
-                        _RemoteInstance.AuxOut1(1);
+                    case OnOffState.TurningOn:
+                        RemoteInstance.AuxOut1(1);
                         base.AuxOut1Control = OnOffState.On;
                         break;
 
                     case OnOffState.Off:
                     case OnOffState.TurningOff:
-                        _RemoteInstance.AuxOut1(0);
+                        RemoteInstance.AuxOut1(0);
                         base.AuxOut1Control = OnOffState.Off;
                         break;
                 }
@@ -257,25 +274,7 @@ namespace Module.Blade
         }
 
         /// <summary>
-        /// The serial number information of drive.
-        /// </summary>
-        public string DRIVESN
-        {
-            get
-            {
-                if (_DRIVESN == string.Empty || _DRIVESN == null || _DRIVESN == _BladeDataInit)
-                {
-                    _DRIVESN = _GetDataFromBladee("DiskSN");
-                    if (_DRIVESN == string.Empty)
-                    {
-                        _DRIVESN = _BladeDataInit;
-                    }
-                }
-                return _DRIVESN;
-            }
-        }
-        /// <summary>
-        /// 
+        /// The serial number information of disk.
         /// </summary>
         public string DISKSN
         {
@@ -349,41 +348,51 @@ namespace Module.Blade
                 return _PCBASN;
             }
         }
+
+        /// <summary>
+        /// The serial number information of PCB.
+        /// </summary>
+        public string FlexSN
+        {
+            get
+            {
+                if (_FlexSN == string.Empty || _FlexSN == null || _FlexSN == _BladeDataInit)
+                {
+                    _FlexSN = _GetDataFromBladee("FlexSN");
+                    if (_FlexSN == string.Empty)
+                    {
+                        _FlexSN = _BladeDataInit;
+                    }
+                }
+                return _FlexSN;
+            }
+        }
+
+        /// <summary>
+        /// The serial number information of PCB.
+        /// </summary>
+        public string MotorSN
+        {
+            get
+            {
+                if (_MotorSN == string.Empty || _MotorSN == null || _MotorSN == _BladeDataInit)
+                {
+                    _MotorSN = _GetDataFromBladee("MotorSN");
+                    if (_MotorSN == string.Empty)
+                    {
+                        _MotorSN = _BladeDataInit;
+                    }
+                }
+                return _MotorSN;
+            }
+        }
         #endregion SN Properties
 
         #region Overrides on BladeModelBase Methods
         /// <summary>
-        /// For data initialization.
+        /// The automation system connects the blade from here. 
         /// </summary>
-        public void Initialize()
-        {
-            Deinitialize();
-            logger.Info("BladeModel::Initialize start.");
-            _RemoteInstance = new RemoteConnectLib();
-            if (_RemoteInstance != null)
-            {
-                logger.Info("BladeModel::Initialize complete. [RemoteInstance:{0}]", _RemoteInstance.ToString());
-            }
-        }
-
-        /// <summary>
-        /// Used to clean up data.
-        /// </summary>
-        public void Deinitialize()
-        {
-            logger.Info("Slot::BladeModel::Deinitialize start.");
-            // Cleanup RemoteconnectLib
-            if (_RemoteInstance != null)
-            {
-                _RemoteInstance.Dispose();
-                _RemoteInstance = null;
-            }
-        }
-
-        /// <summary>
-        /// The automation system connects from the blade here.
-        /// </summary>
-        /// <param name="Address"></param>
+        /// <param name="Address">The server's IP address, shaped like "10.10.131.131".</param>
         /// <param name="UserID">When authentication is required, the user ID is set aside.</param>
         /// <param name="Password">Same as user ID.</param>
         public override void Connect(string address, string userID, string password)
@@ -397,12 +406,12 @@ namespace Module.Blade
             }
 
             BladeControl = BladeState.OnConnecting;
-            uint result = _RemoteInstance.Connect(IPAddress, string.Empty, string.Empty);
-            if (_RemoteInstance.Connected)
+            uint result = RemoteInstance.Connect(IPAddress, string.Empty, string.Empty);
+            if (RemoteInstance.Connected)
             {
                // _RemoteInstance.comStatusEvent += new StatusEventHandler(remoteInstance_comStatusEvent);
-                string pingResult = _RemoteInstance.PingAllEvent("hello");
-                _BladeSN = _RemoteInstance.GetSerialNumber();
+                string pingResult = RemoteInstance.PingAllEvent("hello");
+                _BladeSN = RemoteInstance.GetSerialNumber();
                 UpdateMemsStatus();
                 BladeControl = BladeState.Idle;
                 IsConnected = true;
@@ -419,10 +428,10 @@ namespace Module.Blade
         /// </summary>
         public override void Disconnect()
         {
-            if (_RemoteInstance != null && _RemoteInstance.Connected)
+            if (RemoteInstance != null && RemoteInstance.Connected)
             {
-                logger.Info("BladeModel::Disconnect [IsConnect:{0}] [Remote.Connected:{1}]", IsConnected, _RemoteInstance.Connected.ToString());
-                _RemoteInstance.Disconnect();
+                logger.Info("BladeModel::Disconnect [IsConnect:{0}] [Remote.Connected:{1}]", IsConnected, RemoteInstance.Connected.ToString());
+                RemoteInstance.Disconnect();
             }
             BladeControl = BladeState.Disconnected;
             IsConnected = false;
@@ -434,16 +443,16 @@ namespace Module.Blade
         /// <param name="Command">Command of TCL.</param>
         public override void TclCommand(string Command)
         {
-            if (_RemoteInstance != null && _RemoteInstance.Connected)
+            if (RemoteInstance != null && RemoteInstance.Connected)
             {
-                _RemoteInstance.TclCommand(Command, true);
+                RemoteInstance.TclCommand(Command, true);
             }
             else
             {
                 try
                 {
-                    _RemoteInstance.Connect(IPAddress, string.Empty, string.Empty);
-                    _RemoteInstance.TclCommand(Command, true);
+                    RemoteInstance.Connect(IPAddress, string.Empty, string.Empty);
+                    RemoteInstance.TclCommand(Command, true);
                 }
                 catch
                 { }
@@ -498,7 +507,7 @@ namespace Module.Blade
             // TODO : (old)This is because takes a long time to connect we need to wait 
             // TODO : but 5 seconds is too long, need verify in test
             //Thread.Sleep(5000);
-            return _RemoteInstance.BladeFileRead(fileName);
+            return RemoteInstance.BladeFileRead(fileName);
         }
 
         /// <summary>
@@ -510,7 +519,7 @@ namespace Module.Blade
         {
             logger.Info("BladeModel::WriteFileToBlade start [filename:{0}]", filename);
             string strRet = "";
-            strRet = _RemoteInstance.BladeFileWrite(fileBody, filename);
+            strRet = RemoteInstance.BladeFileWrite(fileBody, filename);
             logger.Info("BladeModel::WriteFileToBlade complete [strRet:{0}]", strRet);
         }
 
@@ -519,14 +528,139 @@ namespace Module.Blade
         /// </summary>
         private void UpdateMemsStatus()
         {
-            switch (_RemoteInstance.GetMemsState())
+            switch (RemoteInstance.GetMemsState())
             {
                 case MemsStateValues.Opened: MemsControl = OnOffState.On; break;
-                case MemsStateValues.Opening: MemsControl = OnOffState.TuringOn; break;
+                case MemsStateValues.Opening: MemsControl = OnOffState.TurningOn; break;
                 case MemsStateValues.Closed: MemsControl = OnOffState.Off; break;
                 case MemsStateValues.Closing: MemsControl = OnOffState.TurningOff; break;
                 case MemsStateValues.Unknown: MemsControl = OnOffState.Unknown; break;
             }
+        }
+
+        /// <summary>
+        /// Called from remote blade each time a Bunny function is called.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnBunnyEvent(object sender, StatusEventArgs e)
+        {
+            // Mostly don't know why this if is here.
+            // "meowner" comes from the counts class and does not need to be displayed - this is OK.
+            // "none" -- Do not know.
+            // I added in != for each blade info type so that they could be set to "NONE" as a value.
+            if (((BunnyEvents)e.EventType) != BunnyEvents.BladeSN &&
+               ((BunnyEvents)e.EventType) != BunnyEvents.BladeType &&
+               ((BunnyEvents)e.EventType) != BunnyEvents.ActuatorSN &&
+               ((BunnyEvents)e.EventType) != BunnyEvents.MemsSN &&
+               ((BunnyEvents)e.EventType) != BunnyEvents.MotorBaseSN &&
+               ((BunnyEvents)e.EventType) != BunnyEvents.DiskSN &&
+               ((BunnyEvents)e.EventType) != BunnyEvents.PcbaSN &&
+               ((BunnyEvents)e.EventType) != BunnyEvents.FlexSN &&
+               ((BunnyEvents)e.EventType) != BunnyEvents.MotorSN &&
+               e.Text.ToLower().Contains("none")
+               && !e.Text.ToLower().Contains("meowner")) return;
+
+            lock(onBunnyEventLockObj)
+            {
+                MethodInvoker del = delegate
+                {
+                    // Ping all event command
+                    if (e.Text.Contains("BunnyEvent " + Constants.CommTestString))
+                    {
+                        // TODO : Notify UI here ?
+                        return;
+                    }
+                    switch ((BunnyEvents)e.EventType)
+                    {
+                        case BunnyEvents.BladeSN:
+                            _BladeSN = e.Text;
+                            break;
+                        case BunnyEvents.ActuatorSN:
+                            _ActuatorSN = e.Text;
+                            break;
+                        case BunnyEvents.MemsSN:
+                            _MEMSSN = e.Text;
+                            break;
+                        case BunnyEvents.MotorBaseSN:
+                            _MBPSN = e.Text;
+                            break;
+                        case BunnyEvents.DiskSN:
+                            _DISKSN = e.Text;
+                            break;
+                        case BunnyEvents.PcbaSN:
+                            _PCBASN = e.Text;
+                            break;
+                        case BunnyEvents.FlexSN:
+                            _FlexSN = e.Text;
+                            break;
+                        case BunnyEvents.MotorSN:
+                            _MotorSN = e.Text;
+                            break;
+                        // TODO : Remove Jade serial number? 
+                        case BunnyEvents.JadeSN:
+                            break;
+
+
+
+
+
+                        case BunnyEvents.MemsType:
+                            break;
+
+                        case BunnyEvents.MemsOpenClose:
+                            OpenCloseMems(e.Text);
+                            
+
+                            if (e.Text == MemsStateValues.Opening.ToString() ||
+                              e.Text == MemsStateValues.Closing.ToString() ||
+                              e.Text == MemsStateValues.Unknown.ToString())
+                            {
+                            }
+                            else
+                            {
+
+                                base.MemsControl = (OnOffState)Enum.Parse(typeof(OnOffState), "Opened");
+                            }
+                            break;
+
+
+
+
+
+
+
+
+
+
+
+
+                        case BunnyEvents.BackLight:
+                            break;
+                        case BunnyEvents.Solenoid:
+                            break;
+                        case BunnyEvents.SolenoidRamp:
+                            break;
+                        case BunnyEvents.FirmwareVer:
+                            break;
+                        case BunnyEvents.DriverVer:
+                            break;
+                        case BunnyEvents.SetSaveServo:
+                            break;
+                        case BunnyEvents.BunnyStatus:
+                            break;
+                        case BunnyEvents.BladeType:
+                            break;
+                    }
+                };
+                del.BeginInvoke(new AsyncCallback(delegate (IAsyncResult ar) { del.EndInvoke(ar); }), del);
+            }
+        }
+
+        private void OpenCloseMems(string text)
+        {
+            // Switch MemsStateValues to OnOffState
+
         }
 
         //void remoteInstance_comStatusEvent(object sender, StatusEventArgs e)

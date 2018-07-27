@@ -83,7 +83,7 @@ namespace Module.Blade
 
         #region Methods
         /// <summary>
-        /// The automation system connects from the blade here.
+        /// Interface to connect to the server
         /// </summary>
         /// <param name="Address"></param>
         /// <param name="UserID">When authentication is required, the user ID is set aside.</param>
@@ -91,7 +91,7 @@ namespace Module.Blade
         void Connect(string Address, string UserID, string Password);
 
         /// <summary>
-        /// The automation system disconnects from the blade here.
+        /// Interface to disconnect to the server
         /// </summary>
         void Disconnect();
 

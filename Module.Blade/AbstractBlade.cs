@@ -227,41 +227,6 @@ namespace Module.Blade
         }
 
         /// <summary>
-        /// Gets and sets the state of lock status.
-        /// </summary>
-        //public virtual OnOffState LockControl
-        //{
-        //    get
-        //    {
-        //        if (_UnlockLine == null) return OnOffState.Unknown;
-        //        return _UnlockLine.State ? OnOffState.Off : OnOffState.On;
-        //    }
-        //    set
-        //    {
-        //        if (_UnlockLine == null) return;
-        //        bool newState;
-        //        switch (value)
-        //        {
-        //            case OnOffState.On:
-        //            case OnOffState.TuringOn:
-        //                newState = false;
-        //                break;
-        //            case OnOffState.Off:
-        //            case OnOffState.TurningOff:
-        //                newState = true;
-        //                break;
-        //            default:
-        //                throw new ArgumentException(string.Format("New value {0} is not valid.", value));
-        //        }
-        //        if (newState != _UnlockLine.State)
-        //        {
-        //            _UnlockLine.State = newState;
-        //            OnPropertyChanged("Lock");
-        //        }
-        //    }
-        //}
-
-        /// <summary>
         /// Record the amount to be recorded on the Blade.
         /// </summary>
         public virtual IEnumerable<BladeCount> Counts
@@ -279,8 +244,21 @@ namespace Module.Blade
         #endregion Properties
 
         #region Methods
+        /// <summary>
+        /// Abstract interface to connect to a server.
+        /// </summary>
+        /// <param name="Address">The server's IP address, shaped like "10.10.131.131".</param>
+        /// <param name="UserID">When authentication is required, the user ID is set aside.</param>
+        /// <param name="Password">Same as user ID.</param>
         public abstract void Connect(string Address, string UserID, string Password);
+        /// <summary>
+        /// Abstract interface to disconnect to a server.
+        /// </summary>
         public abstract void Disconnect();
+        /// <summary>
+        /// Abstract interface to TCL command.
+        /// </summary>
+        /// <param name="Command"></param>
         public abstract void TclCommand(string Command);
         #endregion Methods
 

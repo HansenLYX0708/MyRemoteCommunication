@@ -11,11 +11,11 @@ namespace Module.Blade
     /// </summary>
     public enum OnOffState
     {
-        Unknown = 0,
-        On,
         Off,
-        TuringOn,
+        On,
         TurningOff,
+        TurningOn,
+        Unknown,
         Error,
     }
 
