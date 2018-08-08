@@ -184,24 +184,22 @@ namespace Module.Blade
         /// <summary>
         /// Gets and sets the state of AuxOut0.
         /// </summary>
-        public override OnOffState AuxOut0Control
+        public override OnOffValues AuxOut0
         {
-            get { return base.AuxOut0Control; }
+            get { return base.AuxOut0; }
             set
             {
                 logger.Info("BladeModel AuxOut0Control set [status:{0}]", value);
                 switch (value)
                 {
-                    case OnOffState.On:
-                    case OnOffState.TurningOn:
+                    case OnOffValues.On:
                         RemoteInstance.AuxOut0(1);
-                        base.AuxOut0Control = OnOffState.On;
+                        base.AuxOut0 = OnOffValues.On;
                         break;
 
-                    case OnOffState.Off:
-                    case OnOffState.TurningOff:
+                    case OnOffValues.Off:
                         RemoteInstance.AuxOut0(0);
-                        base.AuxOut0Control = OnOffState.Off;
+                        base.AuxOut0 = OnOffValues.Off;
                         break;
                 }
             }
@@ -210,24 +208,22 @@ namespace Module.Blade
         /// <summary>
         /// Gets and sets the state of AuxOut1.
         /// </summary>
-        public override OnOffState AuxOut1Control
+        public override OnOffValues AuxOut1
         {
-            get { return base.AuxOut1Control; }
+            get { return base.AuxOut1; }
             set
             {
 
                 switch (value)
                 {
-                    case OnOffState.On:
-                    case OnOffState.TurningOn:
+                    case OnOffValues.On:
                         RemoteInstance.AuxOut1(1);
-                        base.AuxOut1Control = OnOffState.On;
+                        base.AuxOut1 = OnOffValues.On;
                         break;
 
-                    case OnOffState.Off:
-                    case OnOffState.TurningOff:
+                    case OnOffValues.Off:
                         RemoteInstance.AuxOut1(0);
-                        base.AuxOut1Control = OnOffState.Off;
+                        base.AuxOut1 = OnOffValues.Off;
                         break;
                 }
             }
@@ -549,6 +545,7 @@ namespace Module.Blade
             // "meowner" comes from the counts class and does not need to be displayed - this is OK.
             // "none" -- Do not know.
             // I added in != for each blade info type so that they could be set to "NONE" as a value.
+            // TODO : don't konw why here
             if (((BunnyEvents)e.EventType) != BunnyEvents.BladeSN &&
                ((BunnyEvents)e.EventType) != BunnyEvents.BladeType &&
                ((BunnyEvents)e.EventType) != BunnyEvents.ActuatorSN &&
@@ -573,6 +570,26 @@ namespace Module.Blade
                     }
                     switch ((BunnyEvents)e.EventType)
                     {
+                        case BunnyEvents.UsbReset:
+                        case BunnyEvents.Init:
+                        case BunnyEvents.Uninit:
+                            break;
+                        case BunnyEvents.Pwr12V:
+                            
+                            break;
+                        case BunnyEvents.Pwr5V:
+
+                            break;
+                        case BunnyEvents.Aux0Out:
+                            base.AuxOut0 = StringConvertToEnum(e.Text);
+                            break;
+                        case BunnyEvents.Aux1Out:
+                            base.AuxOut1 = StringConvertToEnum(e.Text);
+                            break;
+
+
+
+
                         case BunnyEvents.BladeSN:
                             _BladeSN = e.Text;
                             break;
@@ -663,6 +680,28 @@ namespace Module.Blade
             // Switch MemsStateValues to OnOffState
 
         }
+
+        /// <summary>
+        /// String convert to Enum OnOffState
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private OnOffValues StringConvertToEnum(string str)
+        {
+            OnOffValues state = OnOffValues.Off;
+            try
+            {
+                state = (OnOffValues)Enum.Parse(typeof(OnOffValues), str);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return state;
+            }
+
+            return state;
+        }
+
 
         //void remoteInstance_comStatusEvent(object sender, StatusEventArgs e)
         //{

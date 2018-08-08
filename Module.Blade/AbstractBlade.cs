@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using WD.Tester.Enums;
 
 namespace Module.Blade
 {
@@ -10,22 +11,28 @@ namespace Module.Blade
         private string _IPAddress = string.Empty;
         private bool _IsConnected = false;
         private bool _Operational = false;
+
+        private OnOffValues _Pwr12V;
+        private OnOffValues _Pwr5V;
+        private OnOffValues _AuxOut0;
+        private OnOffValues _AuxOut1;
+        private OnOffValues _AuxIn0;
+        private OnOffValues _AuxIn1;
+        private OnOffValues _BackLight;
+        private OnOffValues _Solenoid;
+        private String _SolenoidRamp;
+        private String _FirmwareVer;
+        private String _DriverVer;
+
+
         private BladeState _BladeControl = BladeState.Unknown;
         private OnOffState _MemsStatus = OnOffState.Unknown;
         private OnOffState _LoadStatus = OnOffState.Unknown;
         private OnOffState _CardPower = OnOffState.Unknown;
         private OnOffState _LCD = OnOffState.Unknown;
-        private OnOffState _AuxOut0 = OnOffState.Unknown;
-        private OnOffState _AuxOut1 = OnOffState.Unknown;
-        private OnOffState _AuxIn0 = OnOffState.Unknown;
-        private OnOffState _AuxIn1 = OnOffState.Unknown;
+        
+        
         private IEnumerable<BladeCount> _Counts;
-
-        // private HGST.IO.ILine<bool> _UnlockLine;
-        //public event TextReceivedEventHandler TextReceived;
-        //public event ResultReceivedEventHandler ResultReceived;
-        //public event ParametricResultReceivedEventHandler ParametricResultReceived;
-        //public event BladeEventReceivedEventHandler BladeEventReceived;
         #endregion Fields
 
         #region Properties
@@ -148,7 +155,7 @@ namespace Module.Blade
         /// Gets and sets the state of AuxOut0.
         /// It's override in BladeModel
         /// </summary>
-        public virtual OnOffState AuxOut0Control
+        public virtual OnOffValues AuxOut0
         {
             get { return _AuxOut0; }
             set
@@ -165,7 +172,7 @@ namespace Module.Blade
         /// Gets and sets the state of AuxOut1.
         /// It's override in BladeModel
         /// </summary>
-        public virtual OnOffState AuxOut1Control
+        public virtual OnOffValues AuxOut1
         {
             get { return _AuxOut1; }
             set
@@ -197,7 +204,7 @@ namespace Module.Blade
         /// <summary>
         /// Gets the state of AuxIn0.
         /// </summary>
-        public virtual OnOffState AuxIn0Control
+        public virtual OnOffValues AuxIn0
         {
             get { return _AuxIn0; }
             protected set
@@ -213,7 +220,7 @@ namespace Module.Blade
         /// <summary>
         /// Gets the state of AuxIn1.
         /// </summary>
-        public virtual OnOffState AuxIn1Control
+        public virtual OnOffValues AuxIn1
         {
             get { return _AuxIn1; }
             protected set

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using WD.Tester.Enums;
 
 namespace Module.Blade
 {
@@ -53,22 +54,22 @@ namespace Module.Blade
         /// <summary>
         /// Gets and sets the state of AuxOut0.
         /// </summary>
-        OnOffState AuxOut0Control { get; set; }
+        OnOffValues AuxOut0 { get; set; }
 
         /// <summary>
         /// Gets and sets the state of AuxOut1.
         /// </summary>
-        OnOffState AuxOut1Control { get; set; }
+        OnOffValues AuxOut1 { get; set; }
 
         /// <summary>
         /// Gets the state of AuxIn0.
         /// </summary>
-        OnOffState AuxIn0Control { get; }
+        OnOffValues AuxIn0 { get; }
 
         /// <summary>
         /// Gets the state of AuxIn1.
         /// </summary>
-        OnOffState AuxIn1Control { get; }
+        OnOffValues AuxIn1 { get; }
 
         /// <summary>
         /// Gets and sets the state of lock status.
